@@ -101,14 +101,14 @@ iframe,.map-frame{width:100%;height:100%;border:none}
 .donate-btn{padding:10px 20px;border:1px solid #00ffee66;background:#081821;color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:2px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s,background 0.15s,text-shadow 0.15s;border-radius:6px;margin-top:12px}
 .donate-btn:hover{background:#0c2430;transform:translateY(-2px);box-shadow:0 0 18px #00ffee88,0 0 36px #00ffee44;text-shadow:0 0 8px #00ffee;border-color:#00ffeebb}
 a{color:#00ffee;text-decoration:none}
-#splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease}
+#splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;background-image:url('AFROSINT LOGO.png');background-size:40%;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease}#splashScreen::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(2,7,13,0.85);z-index:0}#splashScreen>*{position:relative;z-index:1}
 #splashScreen.fade-out{opacity:0}
 #splashScreen video{width:140px;height:140px;border-radius:50%;border:1px solid #00ffee88;box-shadow:0 0 30px #00ffee,0 0 60px #00ffee55;animation:radarPulse 2s infinite;object-fit:cover}
 #splashScreen .splash-title{margin-top:20px;font-size:28px;font-weight:700;letter-spacing:3px;color:#06161c;text-shadow:0 0 30px #00ffee,0 0 60px #00ffee,0 0 100px #00ffee88}
 #splashScreen .splash-sub{font-size:13px;letter-spacing:6px;color:#00ffee;margin-top:6px;font-family:'Share Tech Mono'}
 .ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;padding:0 28px 28px}.ai-tile{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#081821;border:1px solid #00ffee33;border-radius:8px;color:#d7ffff;text-decoration:none;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s,transform 0.15s}.ai-tile:hover{border-color:#00ffee;box-shadow:0 0 18px #00ffee44,0 0 36px #00ffee22;background:#0c2430;transform:translateY(-2px);color:#00ffee;text-shadow:0 0 6px #00ffee88}.ai-tile-icon{font-size:22px;flex-shrink:0;width:30px;text-align:center}.ai-section-hdr{color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;padding:20px 28px 6px;margin:0;border-bottom:1px solid #00ffee22;text-shadow:0 0 8px #00ffee66}
 .loader-wrap{margin-top:32px;width:260px;height:3px;background:#0a1a22;border-radius:2px;overflow:hidden}
-.loader-bar{width:0;height:100%;background:linear-gradient(90deg,#00ffee,#00ffeedd);border-radius:2px;animation:loadBar 3s ease-in-out forwards}
+.loader-bar{width:0;height:100%;background:linear-gradient(90deg,#00ffee,#00ffeedd);border-radius:2px;animation:loadBar 5s ease-in-out forwards}
 @keyframes loadBar{0%{width:0}100%{width:100%}}
 </style>
 </head>
@@ -206,7 +206,7 @@ a{color:#00ffee;text-decoration:none}
 </footer>
 <script src='bugout-data.js'></script>
 <script>
-setTimeout(()=>{let s=document.getElementById('splashScreen');s.classList.add('fade-out');setTimeout(()=>s.remove(),500)},3000);
+setTimeout(()=>{let s=document.getElementById('splashScreen');s.classList.add('fade-out');setTimeout(()=>s.remove(),500)},5000);
 let headerTz=null,headerTzLabel='',headerTzIso='';
 function updateClock(){const now=new Date();const flagEl=document.getElementById('gmtClockFlag');if(headerTz){const time=new Intl.DateTimeFormat('en-GB',{timeZone:headerTz,weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);gmtClock.textContent=time+' | '+headerTzLabel;if(flagEl){flagEl.innerHTML=`<img src='https://flagcdn.com/w80/${headerTzIso}.png' alt='${headerTzLabel.replace(/'/g,"&#39;")}' style='width:36px;height:auto;border-radius:3px'>`;flagEl.style.display='block'}}else{const utc=new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);gmtClock.textContent=utc+' GMT / ZULU';if(flagEl){flagEl.innerHTML='';flagEl.style.display='none'}}}setInterval(updateClock,1000);updateClock();
 function setHeaderTime(tz,label,iso){headerTz=tz;headerTzLabel=label;headerTzIso=iso||'';const setBtn=document.getElementById('setCountryBtn');if(setBtn){setBtn.style.display=tz?'none':'block'}updateClock();atwRender();atwUpdateTimes()}
