@@ -967,11 +967,15 @@ if(afrHighlightLayer){afrMapInstance.removeLayer(afrHighlightLayer);afrHighlight
 }).catch(function(){});
 }
 function showCountryPopup(name,iso,latlng){
-var cached=afrCountryDataCache[iso];
+var cacheKey=name+'_'+iso;
+var cached=afrCountryDataCache[cacheKey];
 if(cached){renderCountryPopup(cached,latlng);return}
-var url=iso.length===3?'https://restcountries.com/v3.1/alpha/'+iso:'https://restcountries.com/v3.1/name/'+encodeURIComponent(name)+'?fullText=true';
+var url=(iso.length===3&&iso!=='-99')?'https://restcountries.com/v3.1/alpha/'+iso:'https://restcountries.com/v3.1/name/'+encodeURIComponent(name)+'?fullText=true';
 fetch(url).then(r=>r.json()).then(data=>{
 var c=Array.isArray(data)?data[0]:data;
+var callingCode='N/A';
+if(c.idd&&c.idd.root){callingCode=c.idd.root+(c.idd.suffixes&&c.idd.suffixes.length===1?c.idd.suffixes[0]:'')}
+var currCodes=c.currencies?Object.keys(c.currencies):[];
 var info={
 name:c.name&&c.name.common||name,
 official:c.name&&c.name.official||'',
@@ -982,20 +986,29 @@ subregion:c.subregion||'',
 area:c.area?c.area.toLocaleString()+' km²':'N/A',
 languages:c.languages?Object.values(c.languages).join(', '):'N/A',
 currencies:c.currencies?Object.values(c.currencies).map(cu=>cu.name+' ('+cu.symbol+')').join(', '):'N/A',
+currCodes:currCodes,
+callingCode:callingCode,
 flag:c.flags&&c.flags.svg||'',
 timezone:c.timezones?c.timezones[0]:'N/A',
-continent:c.continents?c.continents.join(', '):'N/A'
+continent:c.continents?c.continents.join(', '):'N/A',
+exchangeRate:null
 };
-afrCountryDataCache[iso]=info;
+afrCountryDataCache[cacheKey]=info;
+if(currCodes.length>0&&currCodes[0]!=='USD'){
+fetch('https://api.exchangerate-api.com/v4/latest/USD').then(r2=>r2.json()).then(exData=>{
+var rate=exData.rates[currCodes[0]];
+if(rate){info.exchangeRate='1 USD = '+rate.toFixed(2)+' '+currCodes[0]}
 renderCountryPopup(info,latlng);
+}).catch(function(){renderCountryPopup(info,latlng)});
+}else{renderCountryPopup(info,latlng)}
 }).catch(function(){
-renderCountryPopup({name:name,official:'',capital:'N/A',population:'N/A',region:'N/A',subregion:'',area:'N/A',languages:'N/A',currencies:'N/A',flag:'',timezone:'N/A',continent:'N/A'},latlng);
+renderCountryPopup({name:name,official:'',capital:'N/A',population:'N/A',region:'N/A',subregion:'',area:'N/A',languages:'N/A',currencies:'N/A',currCodes:[],callingCode:'N/A',flag:'',timezone:'N/A',continent:'N/A',exchangeRate:null},latlng);
 });
 }
 function renderCountryPopup(info,latlng){
 if(!afrMapInstance)return;
 var flagHtml=info.flag?'<img src="'+info.flag+'" style="width:36px;height:auto;border-radius:3px;border:1px solid #00ffee44;vertical-align:middle;margin-right:8px">':'';
-var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-width:220px;max-width:300px">'+
+var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-width:220px;max-width:320px">'+
 '<div style="display:flex;align-items:center;margin-bottom:8px;border-bottom:1px solid #00ffee33;padding-bottom:6px">'+flagHtml+'<strong style="color:#00ffee;font-size:14px;letter-spacing:1px">'+info.name+'</strong></div>'+
 (info.official?'<div style="color:#8899aa;font-size:10px;margin-bottom:6px">'+info.official+'</div>':'')+
 '<table style="font-size:11px;border-collapse:collapse;width:100%">'+
@@ -1004,10 +1017,12 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Region</td><td style="color:#d7ffff">'+info.region+(info.subregion?' / '+info.subregion:'')+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Area</td><td style="color:#d7ffff">'+info.area+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Languages</td><td style="color:#d7ffff">'+info.languages+'</td></tr>'+
+'<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Calling Code</td><td style="color:#d7ffff">'+info.callingCode+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Currency</td><td style="color:#d7ffff">'+info.currencies+'</td></tr>'+
+(info.exchangeRate?'<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Exchange Rate</td><td style="color:#ffcc00">'+info.exchangeRate+'</td></tr>':'')+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Timezone</td><td style="color:#d7ffff">'+info.timezone+'</td></tr>'+
 '</table></div>';
-L.popup({className:'afr-country-popup',maxWidth:320}).setLatLng(latlng).setContent(html).openOn(afrMapInstance);
+L.popup({className:'afr-country-popup',maxWidth:340}).setLatLng(latlng).setContent(html).openOn(afrMapInstance);
 }
 function cycleAfrRegion(){if(!afrMapInstance)return;var r=afrRegions[afrRegionIdx];afrMapInstance.setView([r.lat,r.lng],r.z);afrRegionIdx=(afrRegionIdx+1)%afrRegions.length;var next=afrRegions[afrRegionIdx];var btn=document.getElementById('afrRegionBtn');if(btn)btn.textContent='REGION: '+next.name}
 function toggleAfrTiles(){if(!afrMapInstance||!afrTileLayer)return;afrMapInstance.removeLayer(afrTileLayer);if(afrUseGoogle){afrTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19});afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='GOOGLE MAP'}else{afrTileLayer=L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20});afrUseGoogle=true;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='AfrOSINT MAP'}afrTileLayer.addTo(afrMapInstance)}
