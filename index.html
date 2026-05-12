@@ -16,7 +16,7 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .brand-wrap{display:flex;align-items:center;gap:15px}
 .radar-logo,.footer-radar{width:72px;height:72px;border-radius:50%;border:1px solid #00ffee88;box-shadow:0 0 16px #00ffee55;animation:radarPulse 4s infinite;transition:box-shadow 0.3s ease;object-fit:cover;overflow:hidden}
 @keyframes radarPulse{50%{box-shadow:0 0 26px #00ffeeaa}}
-.callsign{font-size:30px;font-weight:700;letter-spacing:2px;color:#06161c;text-shadow:0 0 27px #00ffee,0 0 50px #00ffee88;transition:text-shadow 0.3s ease;cursor:default}
+.callsign{font-size:30px;font-weight:700;letter-spacing:2px;color:#00ffee;text-shadow:0 0 12px #00ffee,0 0 30px #00ffee88,0 0 60px #00ffee44;transition:text-shadow 0.3s ease;cursor:default}
 .subline{font-size:16px;letter-spacing:4px;color:#fff;text-shadow:0 0 10px #00ffee,0 0 20px #00ffee88;transition:font-size 0.3s ease,text-shadow 0.3s ease}
 .OSINT.PLATFORM-sub{font-size:16px;letter-spacing:4px;color:#00ffee;transition:font-size 0.3s ease,text-shadow 0.3s ease}
 .header-center{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -154,7 +154,7 @@ a{color:#00ffee;text-decoration:none}
 </div>
 <header id='commandHeader'>
 <div class='brand-wrap'>
-<a href='#' target='_blank'><video class='radar-logo' autoplay muted loop playsinline style='cursor:pointer'><source src='radar.mp4'></video></a>
+<a href='#' target='_blank'><img class='radar-logo' src='AFROSINT LOGO.png' alt='AfrOSINT' style='cursor:pointer'></a>
 <div><div class='callsign'>AfrOSINT</div><div class='subline'>Members</div><div class='OSINT PLATFORM-sub'>OSINT PLATFORM</div></div>
 </div>
 <div class='header-center' style='position:relative'>
@@ -168,7 +168,7 @@ a{color:#00ffee;text-decoration:none}
 <button id='commsBtn' class='command-btn'>COMMS</button>
 </div>
 <div id='gmtClock' onclick='toggleAfricaTime()'></div>
-<div id='gmtClockFlag' style='text-align:center;font-size:28px;line-height:1;display:none'></div>
+<div id='gmtClockFlag' onclick='toggleAfricaTime()' style='text-align:center;font-size:28px;line-height:1;display:none;cursor:pointer'></div>
 <div id='setCountryBtn' style='text-align:center;margin-top:4px'><button onclick='toggleAfricaTime()' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-family:Share Tech Mono,monospace;font-size:11px;letter-spacing:2px;padding:4px 16px;cursor:pointer;transition:all 0.2s;text-shadow:0 0 6px #00ffee88' onmouseover="this.style.background='#0c2430';this.style.boxShadow='0 0 12px #00ffee66'" onmouseout="this.style.background='transparent';this.style.boxShadow='none'">SET</button></div>
 <div id='africaTimePanel' onmouseenter='clearAfricaTimeHide()' onmouseleave='scheduleAfricaTimeHide()'>
 <div id='africaTimeWidget'>
@@ -1214,13 +1214,15 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 
 
 loadTicker();loadHeadlines();
+var prevPrices={gold:null,silver:null,brent:null,btc:null};
+function setPriceWithArrow(elId,value,key,fmt){var el=document.getElementById(elId);if(!el)return;var prev=prevPrices[key];var arrow='';if(prev!==null){if(value>prev)arrow=' <span style="color:#00ff66">▲</span>';else if(value<prev)arrow=' <span style="color:#ff4444">▼</span>'}prevPrices[key]=value;el.innerHTML=fmt+arrow}
 async function fetchPrices(){
 let gotGold=false,gotSilver=false,gotBrent=false;
-try{const r=await fetch('https://scanner.tradingview.com/global/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbols:{tickers:['TVC:GOLD','TVC:SILVER','NYMEX:BB1!']},columns:['close']})});const d=await r.json();d.data.forEach(item=>{if(item.s==='TVC:GOLD'){document.getElementById('priceGold').textContent=Math.round(item.d[0]).toLocaleString();gotGold=true}if(item.s==='TVC:SILVER'){document.getElementById('priceSilver').textContent=item.d[0].toFixed(2);gotSilver=true}if(item.s.includes('BB1')){document.getElementById('priceBrent').textContent=item.d[0].toFixed(1);gotBrent=true}})}catch(e){}
-if(!gotGold){try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');const d=await r.json();document.getElementById('priceGold').textContent=Math.round(d['pax-gold'].usd).toLocaleString()}catch(e){}}
-if(!gotSilver){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);document.getElementById('priceSilver').textContent=d.chart.result[0].meta.regularMarketPrice.toFixed(2)}catch(e){}}
-if(!gotBrent){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);document.getElementById('priceBrent').textContent=d.chart.result[0].meta.regularMarketPrice.toFixed(1)}catch(e){}}
-try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');const d=await r.json();document.getElementById('priceBtc').textContent=Math.round(d.bitcoin.usd).toLocaleString()}catch(e){}
+try{const r=await fetch('https://scanner.tradingview.com/global/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbols:{tickers:['TVC:GOLD','TVC:SILVER','NYMEX:BB1!']},columns:['close']})});const d=await r.json();d.data.forEach(item=>{if(item.s==='TVC:GOLD'){setPriceWithArrow('priceGold',item.d[0],'gold',Math.round(item.d[0]).toLocaleString());gotGold=true}if(item.s==='TVC:SILVER'){setPriceWithArrow('priceSilver',item.d[0],'silver',item.d[0].toFixed(2));gotSilver=true}if(item.s.includes('BB1')){setPriceWithArrow('priceBrent',item.d[0],'brent',item.d[0].toFixed(1));gotBrent=true}})}catch(e){}
+if(!gotGold){try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');const d=await r.json();setPriceWithArrow('priceGold',d['pax-gold'].usd,'gold',Math.round(d['pax-gold'].usd).toLocaleString())}catch(e){}}
+if(!gotSilver){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);var sv=d.chart.result[0].meta.regularMarketPrice;setPriceWithArrow('priceSilver',sv,'silver',sv.toFixed(2))}catch(e){}}
+if(!gotBrent){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);var bv=d.chart.result[0].meta.regularMarketPrice;setPriceWithArrow('priceBrent',bv,'brent',bv.toFixed(1))}catch(e){}}
+try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');const d=await r.json();setPriceWithArrow('priceBtc',d.bitcoin.usd,'btc',Math.round(d.bitcoin.usd).toLocaleString())}catch(e){}
 }
 fetchPrices();setInterval(fetchPrices,60000);
 
