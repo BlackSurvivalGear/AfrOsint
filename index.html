@@ -101,9 +101,9 @@ iframe,.map-frame{width:100%;height:100%;border:none}
 .donate-btn{padding:10px 20px;border:1px solid #00ffee66;background:#081821;color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:2px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s,background 0.15s,text-shadow 0.15s;border-radius:6px;margin-top:12px}
 .donate-btn:hover{background:#0c2430;transform:translateY(-2px);box-shadow:0 0 18px #00ffee88,0 0 36px #00ffee44;text-shadow:0 0 8px #00ffee;border-color:#00ffeebb}
 a{color:#00ffee;text-decoration:none}
-#splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;background-image:url('AFROSINT LOGO.png');background-size:40%;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease}#splashScreen::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(2,7,13,0.85);z-index:0}#splashScreen>*{position:relative;z-index:1}
+#splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;background-image:url('AFROSINT LOGO.png');background-size:40%;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease}
 #splashScreen.fade-out{opacity:0}
-#splashScreen video{width:140px;height:140px;border-radius:50%;border:1px solid #00ffee88;box-shadow:0 0 30px #00ffee,0 0 60px #00ffee55;animation:radarPulse 2s infinite;object-fit:cover}
+
 #splashScreen .splash-title{margin-top:20px;font-size:28px;font-weight:700;letter-spacing:3px;color:#06161c;text-shadow:0 0 30px #00ffee,0 0 60px #00ffee,0 0 100px #00ffee88}
 #splashScreen .splash-sub{font-size:13px;letter-spacing:6px;color:#00ffee;margin-top:6px;font-family:'Share Tech Mono'}
 .ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;padding:0 28px 28px}.ai-tile{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#081821;border:1px solid #00ffee33;border-radius:8px;color:#d7ffff;text-decoration:none;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s,transform 0.15s}.ai-tile:hover{border-color:#00ffee;box-shadow:0 0 18px #00ffee44,0 0 36px #00ffee22;background:#0c2430;transform:translateY(-2px);color:#00ffee;text-shadow:0 0 6px #00ffee88}.ai-tile-icon{font-size:22px;flex-shrink:0;width:30px;text-align:center}.ai-section-hdr{color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;padding:20px 28px 6px;margin:0;border-bottom:1px solid #00ffee22;text-shadow:0 0 8px #00ffee66}
@@ -114,7 +114,6 @@ a{color:#00ffee;text-decoration:none}
 </head>
 <body>
 <div id='splashScreen'>
-<video autoplay muted loop playsinline><source src='radar.mp4'></video>
 <div class='splash-title'>AfrOSINT</div>
 <div class='splash-sub'>Pan-African OSINT</div>
 <div class='loader-wrap'><div class='loader-bar'></div></div>
@@ -1029,16 +1028,19 @@ function buildTickerChannels(){const wrap=document.getElementById('tickerChannel
 buildTickerChannels();
 async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa'){feedUrl=africaTickerFeeds[cf].url;tagLabel=africaTickerFeeds[cf].tag}else{feedUrl=rss[cf];tagLabel=tags[cf]}let r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feedUrl));let d=await r.json();newsTicker.innerHTML=d.items.slice(0,10).map(i=>`<a class='headline-link' href='${safeHref(i.link)}' target='_blank'>[${tagLabel}] ${esc(i.title)}</a>`).join('')}catch(e){newsTicker.innerHTML='Tactical Feed Offline...'}}
 
-const breakingFeeds=['https://feeds.bbci.co.uk/news/world/rss.xml','https://news.google.com/rss/search?q=site:reuters.com+world&hl=en-US&gl=US&ceid=US:en','https://news.google.com/rss/search?q=site:apnews.com&hl=en-US&gl=US&ceid=US:en'];
-const breakingSources=['BBC','REUTERS','AP'];
+const breakingFeeds=['https://feeds.bbci.co.uk/news/world/rss.xml','https://news.google.com/rss/search?q=site:reuters.com+world&hl=en-US&gl=US&ceid=US:en','https://news.google.com/rss/search?q=site:apnews.com&hl=en-US&gl=US&ceid=US:en','https://news.google.com/rss/search?q=conflict+OR+war+OR+airstrike+OR+military+attack&hl=en-US&gl=US&ceid=US:en'];
+const breakingSources=['BBC','REUTERS','AP','CONFLICT'];
+const conflictKeywords=['war','conflict','attack','airstrike','missile','troops','military','combat','offensive','ceasefire','strike','bomb','shelling','invasion','siege','armed','fighting','soldier','casualt','kill','weapon','drone strike','explosion','rebel','insurgent','coup','militia'];
 let seenBreaking=new Set();
 async function checkBreaking(){
 let allItems=[];
 for(let i=0;i<breakingFeeds.length;i++){
 try{let r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(breakingFeeds[i]));let d=await r.json();
-d.items.slice(0,5).forEach(item=>{
+d.items.slice(0,10).forEach(item=>{
 let title=item.title.toLowerCase();
-if(title.includes('breaking')||title.includes('urgent')||title.includes('just in')||title.includes('developing')){
+let isBreaking=title.includes('breaking')||title.includes('urgent')||title.includes('just in')||title.includes('developing');
+let isConflict=conflictKeywords.some(k=>title.includes(k));
+if(isBreaking&&isConflict){
 if(!seenBreaking.has(item.link)){seenBreaking.add(item.link);allItems.push({source:breakingSources[i],title:item.title,link:item.link})}}
 })}catch(e){}}
 let banner=document.getElementById('breakingBanner');
@@ -1047,7 +1049,7 @@ if(allItems.length>0){
 let existing=track.innerHTML;
 let newHtml=allItems.map(a=>`<a class='breaking-link' href='${safeHref(a.link)}' target='_blank'>[${esc(a.source)}] ${esc(a.title)}</a>`).join('');
 track.innerHTML=newHtml+(existing?existing:'');
-banner.classList.add('active')}
+banner.classList.add('active')}else if(!track.innerHTML){banner.classList.remove('active')}
 }
 checkBreaking();setInterval(checkBreaking,120000);
 loadTicker();loadHeadlines();
