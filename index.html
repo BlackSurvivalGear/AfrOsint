@@ -16,7 +16,7 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .brand-wrap{display:flex;align-items:center;gap:15px}
 .radar-logo,.footer-radar{width:72px;height:72px;border-radius:50%;border:1px solid #00ffee88;box-shadow:0 0 16px #00ffee55;animation:radarPulse 4s infinite;transition:box-shadow 0.3s ease;object-fit:cover;overflow:hidden}
 @keyframes radarPulse{50%{box-shadow:0 0 26px #00ffeeaa}}
-.callsign{font-size:30px;font-weight:700;letter-spacing:2px;color:#00ffee;text-shadow:0 0 12px #00ffee,0 0 30px #00ffee88,0 0 60px #00ffee44;transition:text-shadow 0.3s ease;cursor:default}
+.callsign{font-size:30px;font-weight:700;letter-spacing:2px;color:#4dc9c2;text-shadow:0 0 8px #4dc9c244,0 0 20px #4dc9c222;transition:text-shadow 0.3s ease;cursor:default}
 .subline{font-size:16px;letter-spacing:4px;color:#fff;text-shadow:0 0 10px #00ffee,0 0 20px #00ffee88;transition:font-size 0.3s ease,text-shadow 0.3s ease}
 .OSINT.PLATFORM-sub{font-size:16px;letter-spacing:4px;color:#00ffee;transition:font-size 0.3s ease,text-shadow 0.3s ease}
 .header-center{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -1214,15 +1214,14 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 
 
 loadTicker();loadHeadlines();
-var prevPrices={gold:null,silver:null,brent:null,btc:null};
-function setPriceWithArrow(elId,value,key,fmt){var el=document.getElementById(elId);if(!el)return;var prev=prevPrices[key];var arrow='';if(prev!==null){if(value>prev)arrow=' <span style="color:#00ff66">▲</span>';else if(value<prev)arrow=' <span style="color:#ff4444">▼</span>'}prevPrices[key]=value;el.innerHTML=fmt+arrow}
+function setPrice24hr(elId,fmt,change){var el=document.getElementById(elId);if(!el)return;var arrow='';if(change>0)arrow=' <span style="color:#00ff66">▲</span>';else if(change<0)arrow=' <span style="color:#ff4444">▼</span>';el.innerHTML=fmt+arrow}
 async function fetchPrices(){
 let gotGold=false,gotSilver=false,gotBrent=false;
-try{const r=await fetch('https://scanner.tradingview.com/global/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbols:{tickers:['TVC:GOLD','TVC:SILVER','NYMEX:BB1!']},columns:['close']})});const d=await r.json();d.data.forEach(item=>{if(item.s==='TVC:GOLD'){setPriceWithArrow('priceGold',item.d[0],'gold',Math.round(item.d[0]).toLocaleString());gotGold=true}if(item.s==='TVC:SILVER'){setPriceWithArrow('priceSilver',item.d[0],'silver',item.d[0].toFixed(2));gotSilver=true}if(item.s.includes('BB1')){setPriceWithArrow('priceBrent',item.d[0],'brent',item.d[0].toFixed(1));gotBrent=true}})}catch(e){}
-if(!gotGold){try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');const d=await r.json();setPriceWithArrow('priceGold',d['pax-gold'].usd,'gold',Math.round(d['pax-gold'].usd).toLocaleString())}catch(e){}}
-if(!gotSilver){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);var sv=d.chart.result[0].meta.regularMarketPrice;setPriceWithArrow('priceSilver',sv,'silver',sv.toFixed(2))}catch(e){}}
-if(!gotBrent){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);var bv=d.chart.result[0].meta.regularMarketPrice;setPriceWithArrow('priceBrent',bv,'brent',bv.toFixed(1))}catch(e){}}
-try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');const d=await r.json();setPriceWithArrow('priceBtc',d.bitcoin.usd,'btc',Math.round(d.bitcoin.usd).toLocaleString())}catch(e){}
+try{const r=await fetch('https://scanner.tradingview.com/global/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbols:{tickers:['TVC:GOLD','TVC:SILVER','NYMEX:BB1!']},columns:['close','change']})});const d=await r.json();d.data.forEach(item=>{if(item.s==='TVC:GOLD'){setPrice24hr('priceGold',Math.round(item.d[0]).toLocaleString(),item.d[1]);gotGold=true}if(item.s==='TVC:SILVER'){setPrice24hr('priceSilver',item.d[0].toFixed(2),item.d[1]);gotSilver=true}if(item.s.includes('BB1')){setPrice24hr('priceBrent',item.d[0].toFixed(1),item.d[1]);gotBrent=true}})}catch(e){}
+if(!gotGold){try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd&include_24hr_change=true');const d=await r.json();setPrice24hr('priceGold',Math.round(d['pax-gold'].usd).toLocaleString(),d['pax-gold'].usd_24h_change||0)}catch(e){}}
+if(!gotSilver){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);var m=d.chart.result[0].meta;var sv=m.regularMarketPrice;var pc=m.chartPreviousClose||m.previousClose||sv;setPrice24hr('priceSilver',sv.toFixed(2),sv-pc)}catch(e){}}
+if(!gotBrent){try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1d'));const w=await r.json();const d=JSON.parse(w.contents);var m2=d.chart.result[0].meta;var bv=m2.regularMarketPrice;var pc2=m2.chartPreviousClose||m2.previousClose||bv;setPrice24hr('priceBrent',bv.toFixed(1),bv-pc2)}catch(e){}}
+try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');const d=await r.json();setPrice24hr('priceBtc',Math.round(d.bitcoin.usd).toLocaleString(),d.bitcoin.usd_24h_change||0)}catch(e){}
 }
 fetchPrices();setInterval(fetchPrices,60000);
 
