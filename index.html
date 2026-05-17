@@ -105,6 +105,14 @@ a{color:#00ffee;text-decoration:none}
 .popup-action-btn:hover{background:#0c2430;box-shadow:0 0 12px #00ffee66;text-shadow:0 0 8px #00ffee}
 .popup-action-btn.set-btn{border-color:#ff880055;color:#ff8800}
 .popup-action-btn.set-btn:hover{box-shadow:0 0 12px #ff880066;text-shadow:0 0 8px #ff8800}
+.ucp-bar{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 12px;padding:10px 0;border-top:1px solid #00ffee33;border-bottom:1px solid #00ffee33;align-items:center}
+.ucp-btn{padding:6px 14px;background:#081821;border:1px solid #00ffee44;border-radius:6px;color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:12px;cursor:pointer;transition:all 0.2s;letter-spacing:1px}
+.ucp-btn:hover{background:#0c2430;box-shadow:0 0 12px #00ffee66;text-shadow:0 0 8px #00ffee}
+.ucp-btn.active{background:#0c2430;border-color:#00ffee;box-shadow:0 0 12px #00ffee44;text-shadow:0 0 8px #00ffee;font-weight:700}
+.ucp-btn.map-btn{border-color:#ff880055;color:#ff8800}
+.ucp-btn.map-btn:hover{box-shadow:0 0 12px #ff880066;text-shadow:0 0 8px #ff8800;background:#1a1200}
+.ucp-btn.map-btn.active{background:#1a1200;border-color:#ff8800;box-shadow:0 0 12px #ff880044;text-shadow:0 0 8px #ff8800;font-weight:700}
+#ucpFrame{transition:opacity 0.3s ease}
 #splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;background-image:url('AFROSINT LOGO.png');background-size:40%;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease}
 #splashScreen.fade-out{opacity:0}
 
@@ -396,22 +404,7 @@ ${newsHtml}
 ${panHtml}
 </div>`;
 }
-function renderCountryHeadlines(name,iso){
-const w=document.getElementById('africaTimeWidget');
-const flag=`https://flagcdn.com/w80/${iso}.png`;
-const cMap={'Algeria':'Algeria','Angola':'Angola','Benin':'Benin','Botswana':'Botswana','Burkina Faso':'BurkinaFaso','Burundi':'Burundi','Cameroon':'Cameroon','Cape Verde':'CapeVerde','Central African Republic':'CentralAfricanRepublic','Chad':'Chad','Congo (Brazzaville)':'Congo','Congo (Kinshasa)':'DRCongo',"C\u00f4te d'Ivoire":'IvoryCoast','Djibouti':'Djibouti','Egypt':'Egypt','Equatorial Guinea':'EquatorialGuinea','Eritrea':'Eritrea','Eswatini':'Eswatini','Ethiopia':'Ethiopia','Gabon':'Gabon','Gambia':'Gambia','Ghana':'Ghana','Guinea':'Guinea','Guinea-Bissau':'GuineaBissau','Kenya':'Kenya','Lesotho':'Lesotho','Liberia':'Liberia','Libya':'Libya','Madagascar':'Madagascar','Malawi':'Malawi','Mali':'Mali','Mauritania':'Mauritania','Morocco':'Morocco','Mozambique':'Mozambique','Namibia':'Namibia','Niger':'Niger','Nigeria':'Nigeria','Rwanda':'Rwanda',"S\u00e3o Tom\u00e9 and Pr\u00edncipe":'SaoTome','Senegal':'Senegal','Sierra Leone':'SierraLeone','Somalia':'Somalia','South Africa':'SouthAfrica','South Sudan':'SouthSudan','Sudan':'Sudan','Tanzania':'Tanzania','Togo':'Togo','Tunisia':'Tunisia','Uganda':'Uganda','Zambia':'Zambia','Zimbabwe':'Zimbabwe','Antigua and Barbuda':'AntiguaAndBarbuda','Barbados':'Barbados','Brazil':'Brazil','Grenada':'Grenada','Guyana':'Guyana','Jamaica':'Jamaica','Saint Lucia':'SaintLucia','Trinidad and Tobago':'TrinidadAndTobago'};
-const dataKey=cMap[name]||'';
-let newsSources=[];
-if(dataKey){for(const reg of Object.values(africaData)){if(reg[dataKey]){newsSources=reg[dataKey];break}}}
-const linksHtml=newsSources.length?newsSources.map((s,i)=>`<button onclick="document.getElementById('chFrame').src='${safeHref(s[1])}'" style='padding:8px 14px;background:${i===0?"#0c2430":"#081821"};border:1px solid ${i===0?"#00ffee":"#00ffee44"};border-radius:6px;color:#00ffee;font-family:Share Tech Mono,monospace;font-size:13px;cursor:pointer;transition:all 0.15s;${i===0?"box-shadow:0 0 8px #00ffee44":""}'onmouseover="this.style.background='#0c2430';this.style.boxShadow='0 0 12px #00ffee66'"onmouseout="this.style.background='${i===0?"#0c2430":"#081821"}';this.style.boxShadow='${i===0?"0 0 8px #00ffee44":"none"}'">${esc(s[0])}</button>`).join(''):'<div style="color:#7fd6df;padding:10px">No news sources available for this country.</div>';
-const firstUrl=newsSources.length?safeHref(newsSources[0][1]):'about:blank';
-w.innerHTML=`<div style='padding:12px'>
-<button class='atw-small-button' onclick="atwViewCountry('${name.replace(/'/g,"\\'")}','${iso}')" style='margin-bottom:16px'>⬅ BACK</button>
-<div style='display:flex;align-items:center;gap:12px;margin-bottom:16px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name} — HEADLINES</h2><div style='color:#7fd6df;font-size:13px'>Country news sources</div></div></div>
-<div style='display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px'>${linksHtml}</div>
-<iframe id='chFrame' src='${firstUrl}' style='width:100%;height:450px;border:1px solid #00ffee33;border-radius:8px;background:#081821' sandbox='allow-scripts allow-same-origin allow-popups'></iframe>
-</div>`;
-}
+function ucpSwitch(btn,url){document.querySelectorAll('#ucpBar .ucp-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');var frame=document.getElementById('ucpFrame');frame.style.opacity='0';setTimeout(function(){frame.src=url;frame.onload=function(){frame.style.opacity='1'};setTimeout(function(){frame.style.opacity='1'},3000)},200)}
 const liveuamapUrls={
 'Algeria':'https://algeria.liveuamap.com/',
 'Angola':'https://drcongo.liveuamap.com/',
@@ -493,17 +486,17 @@ const passIdx=`https://www.passportindex.org/passport/${name.toLowerCase().repla
 let exRate='N/A';
 try{const er=await fetch('https://api.exchangerate-api.com/v4/latest/USD');const ed=await er.json();if(ed.rates&&ed.rates[currTicker])exRate=ed.rates[currTicker].toFixed(2)}catch(e){}
 const liveMapUrl=liveuamapUrls[name]||'https://africa.liveuamap.com/';
-const mapEmbed=`<iframe src='${liveMapUrl}' class='map-frame' style='width:100%;height:350px;border:none;border-radius:8px;margin-top:12px'></iframe>`;
 const countryNameMap={'Algeria':'Algeria','Angola':'Angola','Benin':'Benin','Botswana':'Botswana','Burkina Faso':'BurkinaFaso','Burundi':'Burundi','Cameroon':'Cameroon','Cape Verde':'CapeVerde','Central African Republic':'CentralAfricanRepublic','Chad':'Chad','Congo (Brazzaville)':'Congo','Congo (Kinshasa)':'DRCongo',"C\u00f4te d'Ivoire":'IvoryCoast','Djibouti':'Djibouti','Egypt':'Egypt','Equatorial Guinea':'EquatorialGuinea','Eritrea':'Eritrea','Eswatini':'Eswatini','Ethiopia':'Ethiopia','Gabon':'Gabon','Gambia':'Gambia','Ghana':'Ghana','Guinea':'Guinea','Guinea-Bissau':'GuineaBissau','Kenya':'Kenya','Lesotho':'Lesotho','Liberia':'Liberia','Libya':'Libya','Madagascar':'Madagascar','Malawi':'Malawi','Mali':'Mali','Mauritania':'Mauritania','Morocco':'Morocco','Mozambique':'Mozambique','Namibia':'Namibia','Niger':'Niger','Nigeria':'Nigeria','Rwanda':'Rwanda',"S\u00e3o Tom\u00e9 and Pr\u00edncipe":'SaoTome','Senegal':'Senegal','Sierra Leone':'SierraLeone','Somalia':'Somalia','South Africa':'SouthAfrica','South Sudan':'SouthSudan','Sudan':'Sudan','Tanzania':'Tanzania','Togo':'Togo','Tunisia':'Tunisia','Uganda':'Uganda','Zambia':'Zambia','Zimbabwe':'Zimbabwe','Antigua and Barbuda':'AntiguaAndBarbuda','Barbados':'Barbados','Brazil':'Brazil','Grenada':'Grenada','Guyana':'Guyana','Jamaica':'Jamaica','Saint Lucia':'SaintLucia','Trinidad and Tobago':'TrinidadAndTobago'};
 const dataKey=countryNameMap[name]||'';
 let newsSources=[];
 if(dataKey){for(const reg of Object.values(africaData)){if(reg[dataKey]){newsSources=reg[dataKey];break}}}
-let newsLinksHtml='';
-if(newsSources.length){newsLinksHtml='<div style="margin-top:12px"><div style="color:#00ffee;font-family:Share Tech Mono,monospace;font-size:14px;margin-bottom:8px;text-shadow:0 0 6px #00ffee88">📰 NEWS SOURCES</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+newsSources.map(s=>`<a href='${s[1]}' target='_blank' style='padding:6px 12px;background:#081821;border:1px solid #00ffee44;border-radius:6px;color:#00ffee;text-decoration:none;font-family:Share Tech Mono,monospace;font-size:12px;transition:background 0.15s,box-shadow 0.15s'onmouseover="this.style.background='#0c2430';this.style.boxShadow='0 0 12px #00ffee66'"onmouseout="this.style.background='#081821';this.style.boxShadow='none'">${s[0]}</a>`).join('')+'</div></div>'}
+let localBtns='';
+if(newsSources.length){localBtns=newsSources.map(function(s){return '<button class="ucp-btn" onclick="ucpSwitch(this,\''+safeHref(s[1])+'\')">'+esc(s[0])+'</button>'}).join('')}
+const escapedName=name.replace(/'/g,"\\'");
 w.innerHTML=`<div style='padding:12px'>
 <button class='atw-small-button' onclick='atwRestoreWidget()' style='margin-bottom:16px'>⬅ BACK</button>
 <div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name}</h2><div style='color:#7fd6df;font-size:13px'>${region} — ${subregion}</div></div></div>
-<div style='display:flex;justify-content:center;gap:10px;margin-bottom:16px'><button class='atw-small-button' onclick="renderBugoutPanel('${name.replace(/'/g,"\\'")}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button><button class='atw-small-button' onclick="renderCountryHeadlines('${name.replace(/'/g,"\\'")}','${iso}')" style='background:#0c2430'>📰 COUNTRY HEADLINES</button></div>
+<div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px'><button class='atw-small-button' onclick="renderBugoutPanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button></div>
 <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:Rajdhani,sans-serif;font-size:14px'>
 <div><span style='color:#7fd6df'>Capital:</span> ${capital}</div>
 <div><span style='color:#7fd6df'>Population:</span> ${pop}</div>
@@ -516,12 +509,15 @@ w.innerHTML=`<div style='padding:12px'>
 <div></div>
 <div><a href='${passIdx}' target='_blank' style='color:#00ffee;text-decoration:none'>🛃 Passport Index</a></div>
 </div>
-${newsLinksHtml}
-${mapEmbed}
-<div id='countryHeadlines' style='margin-top:12px'></div>
+<div id="ucpBar" class="ucp-bar">
+<button class="ucp-btn" onclick="ucpSwitch(this,'https://www.bbc.com/news/world/africa')">BBC</button>
+<button class="ucp-btn" onclick="ucpSwitch(this,'https://www.aljazeera.com/where/africa/')">AL JAZEERA</button>
+<button class="ucp-btn" onclick="ucpSwitch(this,'https://www.reuters.com/world/africa/')">REUTERS</button>
+${localBtns}
+<button class="ucp-btn map-btn active" onclick="ucpSwitch(this,'${liveMapUrl}')" style="margin-left:auto">🗺 CONFLICT MAP</button>
+</div>
+<iframe id="ucpFrame" src="${liveMapUrl}" style="width:100%;height:400px;border:1px solid #00ffee33;border-radius:8px;background:#081821" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
 </div>`;
-const countryRssFeeds={'Premium Times':'https://www.premiumtimesng.com/feed','Channels TV':'https://www.channelstv.com/feed','Leadership':'https://leadership.ng/feed','ThisDay':'https://www.thisdaylive.com/feed','Vanguard':'https://www.vanguardngr.com/feed','Punch':'https://punchng.com/feed','Daily Trust':'https://www.dailytrust.com/feed','The Cable':'https://www.thecable.ng/feed','Sahara Reporters':'https://saharareporters.com/articles/rss','Sudan Tribune':'https://sudantribune.com/feed','Addis Standard':'https://addisstandard.com/feed','Nation':'https://nation.africa/rss.xml','New Vision':'https://www.newvision.co.ug/feed','Citizen':'https://www.thecitizen.co.tz/feed','SABC News':'https://www.sabcnews.com/sabcnews/feed','News24':'https://feeds.news24.com/articles/news24/TopStories/rss','Herald':'https://www.herald.co.zw/feed','Iwacu':'https://www.iwacu-burundi.org/feed','New Times':'https://www.newtimes.co.rw/feed','Radio Okapi':'https://www.radiookapi.net/feed','Cameroon Tribune':'https://www.cameroon-tribune.cm/feed','Algeria Press Service':'https://www.aps.dz/en/component/obrss/all-news?format=feed','Libya Herald':'https://www.libyaherald.com/feed','Juba Monitor':'https://www.jubamonitor.com/feed','FrontPageAfrica':'https://www.frontpageafricaonline.com/feed','Graphic':'https://graphic.com.gh/feed','Mmegi':'https://www.mmegi.bw/feed','Namibian':'https://www.namibian.com.na/feed','Al-Ahram':'https://english.ahram.org.eg/RSS.aspx','Jamaica Gleaner':'https://jamaica-gleaner.com/feed','Stabroek News':'https://www.stabroeknews.com/feed','Kaieteur News':'https://www.kaieteurnewsonline.com/feed','Nation News':'https://nationnews.com/feed','St Lucia Times':'https://stluciatimes.com/feed','Antigua Observer':'https://antiguaobserver.com/feed','Newsday':'https://newsday.co.tt/feed','Alma Preta':'https://almapreta.com.br/feed','Now Grenada':'https://nowgrenada.com/feed','Caribbean News Global':'https://caribbeannewsglobal.com/feed'};
-if(newsSources.length){const hlDiv=document.getElementById('countryHeadlines');hlDiv.innerHTML='<div style="color:#00ffee;font-family:Share Tech Mono,monospace;font-size:14px;margin-bottom:8px;text-shadow:0 0 6px #00ffee88">📡 LATEST HEADLINES</div><div style="color:#7fd6df;font-size:12px">Loading feeds...</div>';const rssApi='https://api.rss2json.com/v1/api.json?rss_url=';let allItems=[];let fetched=0;const feedSources=newsSources.filter(s=>countryRssFeeds[s[0]]);const maxFeeds=Math.min(feedSources.length,3);if(!maxFeeds){hlDiv.innerHTML='';} else {for(let i=0;i<maxFeeds;i++){const srcName=feedSources[i][0];const rssUrl=countryRssFeeds[srcName];(async()=>{let items=[];try{const r=await fetch(rssApi+encodeURIComponent(rssUrl));const d=await r.json();if(d.status==='ok'&&d.items){d.items.slice(0,4).forEach(item=>{items.push({title:item.title,link:item.link,source:srcName,pubDate:item.pubDate})})}}catch(e){}fetched++;allItems=allItems.concat(items);if(fetched>=maxFeeds){if(allItems.length){allItems.sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate));hlDiv.innerHTML='<div style="color:#00ffee;font-family:Share Tech Mono,monospace;font-size:14px;margin-bottom:8px;text-shadow:0 0 6px #00ffee88">📡 LATEST HEADLINES</div>'+allItems.slice(0,8).map(it=>`<a href='${safeHref(it.link)}' target='_blank' style='display:block;padding:8px;margin-bottom:4px;background:#081821;border-left:2px solid #00ffee44;color:#d7ffff;text-decoration:none;font-size:13px;transition:background 0.15s'onmouseover="this.style.background='#0c2430'"onmouseout="this.style.background='#081821'"><span style='color:#00ffee;font-size:11px'>${esc(it.source)} — ${it.pubDate?new Date(it.pubDate).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</span><br>${esc(it.title)}</a>`).join('')}else{hlDiv.innerHTML=''}}})()}}}
 }catch(e){w.innerHTML=`<div style='padding:20px'><button class='atw-small-button' onclick='atwRestoreWidget()'>⬅ BACK</button><div style='text-align:center;color:#ff4444;padding:20px'>Failed to load country data.</div></div>`}}
 function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function safeHref(u){let s=String(u).trim();if(!(s.startsWith('https://')||s.startsWith('http://')))return'#';return esc(s).replace(/'/g,'&#39;')}
