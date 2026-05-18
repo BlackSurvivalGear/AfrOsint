@@ -564,6 +564,42 @@ panel.innerHTML=h}
 function hideBugoutSlidePanel(){var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
 function showPopupFxRates(){_autoShowFx=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
 function showPopupBugout(){_autoShowBugout=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
+function showPopupFxSlide(){
+var panel=document.getElementById('popupFxSlide');if(!panel)return;
+var bp=document.getElementById('popupBugoutSlide');if(bp){bp.style.transform='translateX(100%)';bp.style.display='none'}
+var info=_lastPopupInfo;var currTicker=(info.currCodes&&info.currCodes.length>0)?info.currCodes[0]:'USD';
+panel.innerHTML="<div style='text-align:center;padding:20px;color:#00ffee;font-size:11px'>Loading FX rates...</div>";
+panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
+fetch('https://api.exchangerate-api.com/v4/latest/USD').then(function(r){return r.json()}).then(function(data){
+var targets=['USD','GBP','EUR','CNY','RUB','CAD'];var localRate=data.rates[currTicker]||1;
+var h="<button class='popup-action-btn' onclick='hidePopupFxSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button>";
+h+="<div style='color:#00ffee;font-size:11px;margin-bottom:8px;text-shadow:0 0 6px #00ffee66'>\uD83D\uDCB1 FX \u2014 "+info.name+" ("+currTicker+")</div>";
+h+="<div style='display:grid;gap:4px'>";
+targets.forEach(function(t){if(t===currTicker)return;var targetRate=data.rates[t]||1;var crossRate=localRate/targetRate;
+h+="<div style='display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#081821;border:1px solid #00ffee22;border-radius:4px'>";
+h+="<span style='color:#7fd6df;font-size:11px'>1 "+t+"</span>";
+h+="<span style='color:#ffcc00;font-size:12px;font-weight:bold'>"+crossRate.toFixed(2)+" "+currTicker+"</span></div>"});
+h+="</div>";panel.innerHTML=h;
+}).catch(function(){panel.innerHTML="<button class='popup-action-btn' onclick='hidePopupFxSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button><div style='color:#ff4444;padding:12px;text-align:center;font-size:11px'>Failed to load FX rates.</div>"})}
+function hidePopupFxSlide(){var panel=document.getElementById('popupFxSlide');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+function showPopupBugoutSlide(){
+var panel=document.getElementById('popupBugoutSlide');if(!panel)return;
+var fp=document.getElementById('popupFxSlide');if(fp){fp.style.transform='translateX(100%)';fp.style.display='none'}
+var info=_lastPopupInfo;var d=bugoutData[info.name];
+if(!d){panel.innerHTML="<button class='popup-action-btn' onclick='hidePopupBugoutSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button><div style='color:#ff4444;padding:12px;text-align:center;font-size:11px'>No bugout data for "+info.name+".</div>";panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);return}
+panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
+function ml(item){if(!item||!item.url)return '<div style="padding:1px 0"><span style="color:#7fd6df;font-size:11px">'+(item?item.name:'')+'</span></div>';return '<div style="padding:1px 0"><a href="'+item.url+'" target="_blank" style="color:#00ffee;text-decoration:none;font-size:11px">'+item.name+'</a></div>'}
+function ms(icon,title,links){return '<div style="margin-bottom:8px"><div style="color:#ff8800;font-size:10px;margin-bottom:2px;text-shadow:0 0 4px #ff880044">'+icon+' '+title+'</div><div style="padding-left:6px">'+links+'</div></div>'}
+var h="<button class='popup-action-btn' onclick='hidePopupBugoutSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button>";
+h+="<div style='color:#ff8800;font-size:11px;margin-bottom:8px;text-shadow:0 0 6px #ff880066'>\uD83D\uDE81 BUGOUT \u2014 "+info.name+"</div>";
+var tl=d.travel.map(ml).join('');h+=ms('\uD83D\uDEC2','TRAVEL DOCUMENTS',tl);
+var al='';if(d.air.national)al+=ml({name:d.air.national+' (National)',url:d.air.nationalUrl});al+=d.air.regional.map(ml).join('');al+=ml(d.air.search);h+=ms('\u2708\uFE0F','AIR MOBILITY',al);
+h+=ms('\uD83D\uDE95','GROUND TRANSPORT',d.ground.map(ml).join(''));
+h+=ms('\uD83C\uDFE8','ACCOMMODATION',d.accommodation.map(ml).join(''));
+h+=ms('\uD83D\uDCE1','COMMUNICATIONS',d.comms.map(ml).join(''));
+h+=ms('\uD83D\uDCB0','FINANCIAL',d.financial.map(ml).join(''));
+panel.innerHTML=h}
+function hidePopupBugoutSlide(){var panel=document.getElementById('popupBugoutSlide');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
 function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function safeHref(u){let s=String(u).trim();if(!(s.startsWith('https://')||s.startsWith('http://')))return'#';return esc(s).replace(/'/g,'&#39;')}
 let full=false,idx=0;
@@ -1089,7 +1125,8 @@ function renderCountryPopup(info,latlng){
 if(!afrMapInstance)return;
 _lastPopupInfo=info;
 var flagHtml=info.flag?'<img src="'+info.flag+'" style="width:36px;height:auto;border-radius:3px;border:1px solid #00ffee44;vertical-align:middle;margin-right:8px">':'';
-var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-width:220px;max-width:320px">'+
+var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-width:220px;max-width:320px;position:relative;overflow:hidden">'+
+'<div id="popupMainView">'+
 '<div style="display:flex;align-items:center;margin-bottom:8px;border-bottom:1px solid #00ffee33;padding-bottom:6px">'+flagHtml+'<strong style="color:#00ffee;font-size:14px;letter-spacing:1px">'+info.name+'</strong></div>'+
 (info.official?'<div style="color:#8899aa;font-size:10px;margin-bottom:6px">'+info.official+'</div>':'')+
 (info.aes?'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 10px;background:rgba(0,100,0,0.3);border:1px solid #00660066;border-radius:4px"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Flag_of_the_Alliance_of_Sahel_States.svg/320px-Flag_of_the_Alliance_of_Sahel_States.svg.png" style="width:28px;height:auto;border-radius:2px;border:1px solid #00660044"><span style="color:#44ff88;font-size:11px;font-weight:bold;letter-spacing:1px">AES — Alliance of Sahel States</span></div>':'')+
@@ -1105,7 +1142,10 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Black Population</td><td style="color:#ffcc00">'+(blackPopPct[info.name]!==undefined?blackPopPct[info.name]+'%':'N/A')+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Timezone</td><td style="color:#d7ffff">'+info.timezone+'</td></tr>'+
 '</table>'+
-'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupFxRates()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugout()" style="border-color:#ff880055;color:#ff8800">🚁 BUGOUT</button></div>'+
+'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupFxSlide()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugoutSlide()" style="border-color:#ff880055;color:#ff8800">🚁 BUGOUT</button></div>'+
+'</div>'+
+'<div id="popupFxSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
+'<div id="popupBugoutSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
 '</div>';
 L.popup({className:'afr-country-popup',maxWidth:340}).setLatLng(latlng).setContent(html).openOn(afrMapInstance);
 }
