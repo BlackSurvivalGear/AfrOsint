@@ -464,6 +464,7 @@ const liveuamapUrls={
 };
 const blackPopPct={'Algeria':1,'Angola':98,'Benin':98,'Botswana':79,'Burkina Faso':98,'Burundi':85,'Cameroon':98,'Cape Verde':71,'Central African Republic':98,'Chad':53,"Congo (Brazzaville)":98,"Congo (Kinshasa)":98,"C\u00f4te d'Ivoire":98,'Djibouti':60,'Egypt':2,'Equatorial Guinea':98,'Eritrea':98,'Eswatini':97,'Ethiopia':98,'Gabon':98,'Gambia':98,'Ghana':98,'Guinea':98,'Guinea-Bissau':98,'Kenya':97,'Lesotho':99,'Liberia':95,'Libya':5,'Madagascar':36,'Malawi':98,'Mali':98,'Mauritania':40,'Morocco':1,'Mozambique':99,'Namibia':87,'Niger':98,'Nigeria':98,'Rwanda':98,"S\u00e3o Tom\u00e9 and Pr\u00edncipe":90,'Senegal':98,'Seychelles':76,'Sierra Leone':98,'Somalia':98,'South Africa':81,'South Sudan':98,'Sudan':52,'Tanzania':99,'Togo':98,'Tunisia':1,'Uganda':98,'Zambia':98,'Zimbabwe':98,'Antigua and Barbuda':87,'Barbados':92,'Brazil':56,'Grenada':82,'Guyana':29,'Jamaica':92,'Saint Lucia':83,'Trinidad and Tobago':35};
 var _autoShowFx=false;
+var _autoShowBugout=false;
 async function atwViewCountry(name,iso){
 const w=document.getElementById('africaTimeWidget');
 w.innerHTML=`<div style='text-align:center;padding:40px;color:#00ffee;font-family:Share Tech Mono,monospace'>Loading ${name}...</div>`;
@@ -500,7 +501,7 @@ const escapedName=name.replace(/'/g,"\\'");
 w.innerHTML=`<div style='padding:12px'>
 <button class='atw-small-button' onclick='atwRestoreWidget()' style='margin-bottom:16px'>⬅ BACK</button>
 <div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name}</h2><div style='color:#7fd6df;font-size:13px'>${region} — ${subregion}</div></div></div>
-<div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px'><button class='atw-small-button' onclick="renderBugoutPanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button></div>
+<div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px'><button class='atw-small-button' onclick="showBugoutSlidePanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button></div>
 <div style='position:relative;overflow:hidden'><div id='countryDataMain'>
 <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:Rajdhani,sans-serif;font-size:14px'>
 <div><span style='color:#7fd6df'>Capital:</span> ${capital}</div>
@@ -521,9 +522,11 @@ ${localBtns}
 <iframe id="ucpFrame" src="${liveMapUrl}" style="width:100%;height:400px;border:1px solid #00ffee33;border-radius:8px;background:#081821" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
 </div>
 <div id='fxPanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
+<div id='bugoutSlidePanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
 </div>
 </div>`;
 if(_autoShowFx){_autoShowFx=false;setTimeout(function(){showFxPanel(currTicker,name)},200)}
+if(_autoShowBugout){_autoShowBugout=false;setTimeout(function(){showBugoutSlidePanel(name,iso)},200)}
 }catch(e){w.innerHTML=`<div style='padding:20px'><button class='atw-small-button' onclick='atwRestoreWidget()'>⬅ BACK</button><div style='text-align:center;color:#ff4444;padding:20px'>Failed to load country data.</div></div>`}}
 function showFxPanel(currTicker,countryName){
 var panel=document.getElementById('fxPanel');if(!panel)return;
@@ -542,7 +545,25 @@ h+="<span style='color:#ffcc00;font-family:Share Tech Mono,monospace;font-size:1
 h+="</div>";panel.innerHTML=h;
 }).catch(function(){panel.innerHTML="<button class='atw-small-button' onclick='hideFxPanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>Failed to load FX rates.</div>"})}
 function hideFxPanel(){var panel=document.getElementById('fxPanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+function showBugoutSlidePanel(name,iso){
+var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;
+var d=bugoutData[name];
+if(!d){panel.innerHTML="<button class='atw-small-button' onclick='hideBugoutSlidePanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>No bugout data for "+name+".</div>";panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);return}
+panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
+function ml(item){if(!item||!item.url)return '<div style="padding:2px 0"><span style="color:#7fd6df;font-size:13px">'+(item?item.name:'')+'</span></div>';return '<div style="padding:2px 0"><a href="'+item.url+'" target="_blank" style="color:#00ffee;text-decoration:none;font-size:13px;font-family:Rajdhani,sans-serif">'+item.name+'</a></div>'}
+function ms(icon,title,links){return '<div style="margin-bottom:14px"><div style="color:#ff8800;font-family:Share Tech Mono,monospace;font-size:12px;margin-bottom:4px;text-shadow:0 0 6px #ff880066">'+icon+' '+title+'</div><div style="padding-left:8px">'+links+'</div></div>'}
+var h="<button class='atw-small-button' onclick='hideBugoutSlidePanel()' style='margin-bottom:12px'>\u2B05 BACK</button>";
+h+="<h3 style='color:#ff8800;font-family:Share Tech Mono,monospace;margin-bottom:12px;text-shadow:0 0 8px #ff880066'>\uD83D\uDE81 BUGOUT \u2014 "+name+"</h3>";
+var tl=d.travel.map(ml).join('');h+=ms('\uD83D\uDEC2','TRAVEL DOCUMENTS',tl);
+var al='';if(d.air.national)al+=ml({name:d.air.national+' (National)',url:d.air.nationalUrl});al+=d.air.regional.map(ml).join('');al+=ml(d.air.search);h+=ms('\u2708\uFE0F','AIR MOBILITY',al);
+h+=ms('\uD83D\uDE95','GROUND TRANSPORT',d.ground.map(ml).join(''));
+h+=ms('\uD83C\uDFE8','ACCOMMODATION',d.accommodation.map(ml).join(''));
+h+=ms('\uD83D\uDCE1','COMMUNICATIONS',d.comms.map(ml).join(''));
+h+=ms('\uD83D\uDCB0','FINANCIAL',d.financial.map(ml).join(''));
+panel.innerHTML=h}
+function hideBugoutSlidePanel(){var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
 function showPopupFxRates(){_autoShowFx=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
+function showPopupBugout(){_autoShowBugout=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
 function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function safeHref(u){let s=String(u).trim();if(!(s.startsWith('https://')||s.startsWith('http://')))return'#';return esc(s).replace(/'/g,'&#39;')}
 let full=false,idx=0;
@@ -1084,7 +1105,7 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Black Population</td><td style="color:#ffcc00">'+(blackPopPct[info.name]!==undefined?blackPopPct[info.name]+'%':'N/A')+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Timezone</td><td style="color:#d7ffff">'+info.timezone+'</td></tr>'+
 '</table>'+
-'<div style="display:flex;gap:6px;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupFxRates()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button></div>'+
+'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupFxRates()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugout()" style="border-color:#ff880055;color:#ff8800">🚁 BUGOUT</button></div>'+
 '</div>';
 L.popup({className:'afr-country-popup',maxWidth:340}).setLatLng(latlng).setContent(html).openOn(afrMapInstance);
 }
