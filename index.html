@@ -462,6 +462,8 @@ const liveuamapUrls={
 'Zambia':'https://zimbabwe.liveuamap.com/',
 'Zimbabwe':'https://zimbabwe.liveuamap.com/'
 };
+const blackPopPct={'Algeria':1,'Angola':98,'Benin':98,'Botswana':79,'Burkina Faso':98,'Burundi':85,'Cameroon':98,'Cape Verde':71,'Central African Republic':98,'Chad':53,"Congo (Brazzaville)":98,"Congo (Kinshasa)":98,"C\u00f4te d'Ivoire":98,'Djibouti':60,'Egypt':2,'Equatorial Guinea':98,'Eritrea':98,'Eswatini':97,'Ethiopia':98,'Gabon':98,'Gambia':98,'Ghana':98,'Guinea':98,'Guinea-Bissau':98,'Kenya':97,'Lesotho':99,'Liberia':95,'Libya':5,'Madagascar':36,'Malawi':98,'Mali':98,'Mauritania':40,'Morocco':1,'Mozambique':99,'Namibia':87,'Niger':98,'Nigeria':98,'Rwanda':98,"S\u00e3o Tom\u00e9 and Pr\u00edncipe":90,'Senegal':98,'Seychelles':76,'Sierra Leone':98,'Somalia':98,'South Africa':81,'South Sudan':98,'Sudan':52,'Tanzania':99,'Togo':98,'Tunisia':1,'Uganda':98,'Zambia':98,'Zimbabwe':98,'Antigua and Barbuda':87,'Barbados':92,'Brazil':56,'Grenada':82,'Guyana':29,'Jamaica':92,'Saint Lucia':83,'Trinidad and Tobago':35};
+var _autoShowFx=false;
 async function atwViewCountry(name,iso){
 const w=document.getElementById('africaTimeWidget');
 w.innerHTML=`<div style='text-align:center;padding:40px;color:#00ffee;font-family:Share Tech Mono,monospace'>Loading ${name}...</div>`;
@@ -486,6 +488,7 @@ const gmap=coords.length?`https://www.google.com/maps/search/?q=${coords[0]},${c
 const passIdx=`https://www.passportindex.org/passport/${name.toLowerCase().replace(/ /g,'-')}/`;
 let exRate='N/A';
 try{const er=await fetch('https://api.exchangerate-api.com/v4/latest/USD');const ed=await er.json();if(ed.rates&&ed.rates[currTicker])exRate=ed.rates[currTicker].toFixed(2)}catch(e){}
+const bpop=blackPopPct[name];const bpopStr=bpop!==undefined?bpop+'%':'N/A';
 const liveMapUrl=liveuamapUrls[name]||'https://africa.liveuamap.com/';
 const countryNameMap={'Algeria':'Algeria','Angola':'Angola','Benin':'Benin','Botswana':'Botswana','Burkina Faso':'BurkinaFaso','Burundi':'Burundi','Cameroon':'Cameroon','Cape Verde':'CapeVerde','Central African Republic':'CentralAfricanRepublic','Chad':'Chad','Congo (Brazzaville)':'Congo','Congo (Kinshasa)':'DRCongo',"C\u00f4te d'Ivoire":'IvoryCoast','Djibouti':'Djibouti','Egypt':'Egypt','Equatorial Guinea':'EquatorialGuinea','Eritrea':'Eritrea','Eswatini':'Eswatini','Ethiopia':'Ethiopia','Gabon':'Gabon','Gambia':'Gambia','Ghana':'Ghana','Guinea':'Guinea','Guinea-Bissau':'GuineaBissau','Kenya':'Kenya','Lesotho':'Lesotho','Liberia':'Liberia','Libya':'Libya','Madagascar':'Madagascar','Malawi':'Malawi','Mali':'Mali','Mauritania':'Mauritania','Morocco':'Morocco','Mozambique':'Mozambique','Namibia':'Namibia','Niger':'Niger','Nigeria':'Nigeria','Rwanda':'Rwanda',"S\u00e3o Tom\u00e9 and Pr\u00edncipe":'SaoTome','Senegal':'Senegal','Sierra Leone':'SierraLeone','Somalia':'Somalia','South Africa':'SouthAfrica','South Sudan':'SouthSudan','Sudan':'Sudan','Tanzania':'Tanzania','Togo':'Togo','Tunisia':'Tunisia','Uganda':'Uganda','Zambia':'Zambia','Zimbabwe':'Zimbabwe','Antigua and Barbuda':'AntiguaAndBarbuda','Barbados':'Barbados','Brazil':'Brazil','Grenada':'Grenada','Guyana':'Guyana','Jamaica':'Jamaica','Saint Lucia':'SaintLucia','Trinidad and Tobago':'TrinidadAndTobago'};
 const dataKey=countryNameMap[name]||'';
@@ -497,7 +500,8 @@ const escapedName=name.replace(/'/g,"\\'");
 w.innerHTML=`<div style='padding:12px'>
 <button class='atw-small-button' onclick='atwRestoreWidget()' style='margin-bottom:16px'>⬅ BACK</button>
 <div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name}</h2><div style='color:#7fd6df;font-size:13px'>${region} — ${subregion}</div></div></div>
-<div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px'><button class='atw-small-button' onclick="renderBugoutPanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button></div>
+<div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px'><button class='atw-small-button' onclick="renderBugoutPanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button></div>
+<div style='position:relative;overflow:hidden'><div id='countryDataMain'>
 <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:Rajdhani,sans-serif;font-size:14px'>
 <div><span style='color:#7fd6df'>Capital:</span> ${capital}</div>
 <div><span style='color:#7fd6df'>Population:</span> ${pop}</div>
@@ -505,9 +509,9 @@ w.innerHTML=`<div style='padding:12px'>
 <div><span style='color:#7fd6df'>Area:</span> ${area}</div>
 <div><span style='color:#7fd6df'>Exchange Rate (USD):</span> ${exRate}</div>
 <div><span style='color:#7fd6df'>Calling Code:</span> ${code}</div>
+<div><span style='color:#7fd6df'>Black Population:</span> <span style='color:#ffcc00'>${bpopStr}</span></div>
 <div><span style='color:#7fd6df'>Language:</span> ${lang}</div>
 <div><a href='${gmap}' target='_blank' style='color:#00ffee;text-decoration:none'>📍 Google Maps</a></div>
-<div></div>
 <div><a href='${passIdx}' target='_blank' style='color:#00ffee;text-decoration:none'>🛃 Passport Index</a></div>
 </div>
 <div id="ucpBar" class="ucp-bar">
@@ -515,8 +519,30 @@ ${localBtns}
 <button class="ucp-btn map-btn active" onclick="ucpSwitch(this,'${liveMapUrl}')" style="margin-left:auto">🗺 CONFLICT MAP</button>
 </div>
 <iframe id="ucpFrame" src="${liveMapUrl}" style="width:100%;height:400px;border:1px solid #00ffee33;border-radius:8px;background:#081821" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+</div>
+<div id='fxPanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
+</div>
 </div>`;
+if(_autoShowFx){_autoShowFx=false;setTimeout(function(){showFxPanel(currTicker,name)},200)}
 }catch(e){w.innerHTML=`<div style='padding:20px'><button class='atw-small-button' onclick='atwRestoreWidget()'>⬅ BACK</button><div style='text-align:center;color:#ff4444;padding:20px'>Failed to load country data.</div></div>`}}
+function showFxPanel(currTicker,countryName){
+var panel=document.getElementById('fxPanel');if(!panel)return;
+panel.innerHTML="<div style='text-align:center;padding:30px;color:#00ffee;font-family:Share Tech Mono,monospace'>Loading FX rates...</div>";
+panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
+fetch('https://api.exchangerate-api.com/v4/latest/USD').then(function(r){return r.json()}).then(function(data){
+var targets=['USD','GBP','EUR','CNY','RUB','CAD'];var localRate=data.rates[currTicker]||1;
+var h="<button class='atw-small-button' onclick='hideFxPanel()' style='margin-bottom:12px'>\u2B05 BACK</button>";
+h+="<h3 style='color:#00ffee;font-family:Share Tech Mono,monospace;margin-bottom:12px;text-shadow:0 0 8px #00ffee66'>\uD83D\uDCB1 FX RATES</h3>";
+h+="<div style='color:#7fd6df;font-size:12px;margin-bottom:12px'>"+countryName+" ("+currTicker+")</div>";
+h+="<div style='display:grid;gap:8px'>";
+targets.forEach(function(t){if(t===currTicker)return;var targetRate=data.rates[t]||1;var crossRate=localRate/targetRate;
+h+="<div style='display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#081821;border:1px solid #00ffee33;border-radius:6px'>";
+h+="<span style='color:#7fd6df;font-family:Share Tech Mono,monospace;font-size:13px'>1 "+t+"</span>";
+h+="<span style='color:#ffcc00;font-family:Share Tech Mono,monospace;font-size:15px;font-weight:bold'>"+crossRate.toFixed(2)+" "+currTicker+"</span></div>"});
+h+="</div>";panel.innerHTML=h;
+}).catch(function(){panel.innerHTML="<button class='atw-small-button' onclick='hideFxPanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>Failed to load FX rates.</div>"})}
+function hideFxPanel(){var panel=document.getElementById('fxPanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+function showPopupFxRates(){_autoShowFx=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
 function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function safeHref(u){let s=String(u).trim();if(!(s.startsWith('https://')||s.startsWith('http://')))return'#';return esc(s).replace(/'/g,'&#39;')}
 let full=false,idx=0;
@@ -1055,9 +1081,10 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Calling Code</td><td style="color:#d7ffff">'+info.callingCode+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Currency</td><td style="color:#d7ffff">'+info.currencies+'</td></tr>'+
 (info.exchangeRate?'<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Exchange Rate</td><td style="color:#ffcc00">'+info.exchangeRate+'</td></tr>':'')+
+'<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Black Population</td><td style="color:#ffcc00">'+(blackPopPct[info.name]!==undefined?blackPopPct[info.name]+'%':'N/A')+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Timezone</td><td style="color:#d7ffff">'+info.timezone+'</td></tr>'+
 '</table>'+
-'<div style="display:flex;gap:6px;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button></div>'+
+'<div style="display:flex;gap:6px;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupFxRates()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button></div>'+
 '</div>';
 L.popup({className:'afr-country-popup',maxWidth:340}).setLatLng(latlng).setContent(html).openOn(afrMapInstance);
 }
