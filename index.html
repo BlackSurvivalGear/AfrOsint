@@ -27,7 +27,7 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .channel:hover{background:#0c2430!important;box-shadow:0 0 12px #00ffee66;text-shadow:0 0 8px #00ffee;color:#00ffee}
 #gmtClock{text-align:center;color:#00ffee;width:100%;cursor:pointer;user-select:none}
 #gmtClock:hover{text-shadow:0 0 8px #00ffee}
-#africaTimePanel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:10000;width:min(960px,92vw);max-height:80vh;overflow-y:auto;border-radius:12px;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44}
+#africaTimePanel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:10000;width:min(960px,92vw);max-height:80vh;overflow-y:auto;overscroll-behavior:contain;border-radius:12px;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44}
 #africaTimePanel.open{display:block}
 #africaTimeWidget{font-family:Rajdhani,sans-serif;background:#061018;color:#f1f5f9;border-radius:12px;padding:16px;box-sizing:border-box;border:1px solid #00ffee44}
 #africaTimeWidget h2{text-align:center;color:#00ffee;margin-bottom:10px;margin-top:0;font-family:'Share Tech Mono',monospace;letter-spacing:2px;text-shadow:0 0 10px #00ffee88}
@@ -351,6 +351,7 @@ atwSelect.addEventListener('change',()=>{const idx=atwSelect.value;if(idx!==''){
 atwHourFormat.addEventListener('change',atwUpdateTimes);
 document.addEventListener('click',function(e){const panel=document.getElementById('africaTimePanel');const clock=document.getElementById('gmtClock');const flag=document.getElementById('gmtClockFlag');const setBtn=document.getElementById('setCountryBtn');if(africaTimePanelOpen&&document.contains(e.target)&&!panel.contains(e.target)&&!clock.contains(e.target)&&!(flag&&flag.contains(e.target))&&!(setBtn&&setBtn.contains(e.target))){panel.classList.remove('open');africaTimePanelOpen=false}});
 function atwRestoreWidget(){
+document.getElementById('africaTimePanel').onmouseleave=scheduleAfricaTimeHide;
 const w=document.getElementById('africaTimeWidget');
 w.innerHTML=atwOriginalHTML;
 atwGrid=document.getElementById('atwCityGrid');
@@ -366,6 +367,7 @@ atwRender();atwUpdateTimes()}
 function bugoutLink(item){if(!item.url)return `<span style='color:#7fd6df;font-size:13px;padding:6px 0;display:inline-block'>${esc(item.name)}</span>`;return `<a href='${safeHref(item.url)}' target='_blank' style='display:inline-block;padding:6px 12px;background:#081821;border:1px solid #00ffee44;border-radius:6px;color:#00ffee;text-decoration:none;font-family:Share Tech Mono,monospace;font-size:12px;transition:background 0.15s,box-shadow 0.15s' onmouseover="this.style.background='#0c2430';this.style.boxShadow='0 0 12px #00ffee66'" onmouseout="this.style.background='#081821';this.style.boxShadow='none'">${esc(item.name)}</a>`}
 function bugoutSection(icon,title,content){return `<div style='margin-bottom:16px'><div style='color:#ff8800;font-family:Share Tech Mono,monospace;font-size:14px;margin-bottom:6px;text-shadow:0 0 6px #ff880066'>${icon} ${title}</div><div style='display:flex;flex-wrap:wrap;gap:6px'>${content}</div></div>`}
 async function renderBugoutPanel(name,iso){
+const p=document.getElementById('africaTimePanel');p.onmouseleave=null;clearAfricaTimeHide();p.scrollTop=0;
 const w=document.getElementById('africaTimeWidget');
 w.innerHTML=`<div style='text-align:center;padding:40px;color:#ff8800;font-family:Share Tech Mono,monospace'>Loading ${name} Bugout Panel...</div>`;
 const d=bugoutData[name];
