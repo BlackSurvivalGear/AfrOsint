@@ -384,6 +384,8 @@ let groundHtml=d.ground.map(g=>bugoutLink(g)).join('');
 let accomHtml=d.accommodation.map(a=>bugoutLink(a)).join('');
 let commsHtml=d.comms.map(c=>bugoutLink(c)).join('');
 let finHtml=d.financial.map(f=>bugoutLink(f)).join('');
+let visaFreeHtml='';
+if(d.visaFree&&d.visaFree.length){visaFreeHtml=bugoutSection('🌐','VISA-FREE DESTINATIONS ('+d.visaFree.length+')',d.visaFree.map(v=>bugoutLink({name:v.name+(v.days?' ('+v.days+' days)':''),url:null})).join(''))}
 let newsHtml='';
 const dNews=typeof diasporaNewsSources!=='undefined'?diasporaNewsSources[name]:null;
 if(dNews&&dNews.length){newsHtml=bugoutSection('📰','NEWS SOURCES',dNews.map(s=>bugoutLink({name:s[0],url:s[1]})).join(''))}
@@ -400,6 +402,7 @@ ${bugoutSection('🏨','ACCOMMODATION',accomHtml)}
 ${bugoutSection('📡','COMMUNICATIONS',commsHtml)}
 ${bugoutSection('💰','FINANCIAL',finHtml)}
 ${fxHtml?bugoutSection('📊','FX WATCH (LIVE)',fxHtml):''}
+${visaFreeHtml}
 ${newsHtml}
 ${panHtml}
 </div>`;
@@ -561,6 +564,7 @@ h+=ms('\uD83D\uDE95','GROUND TRANSPORT',d.ground.map(ml).join(''));
 h+=ms('\uD83C\uDFE8','ACCOMMODATION',d.accommodation.map(ml).join(''));
 h+=ms('\uD83D\uDCE1','COMMUNICATIONS',d.comms.map(ml).join(''));
 h+=ms('\uD83D\uDCB0','FINANCIAL',d.financial.map(ml).join(''));
+if(d.visaFree&&d.visaFree.length){h+=ms('\uD83C\uDF10','VISA-FREE DESTINATIONS ('+d.visaFree.length+')',d.visaFree.map(function(v){return ml({name:v.name+(v.days?' ('+v.days+' days)':''),url:null})}).join(''))}
 panel.innerHTML=h}
 function hideBugoutSlidePanel(){var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
 function showPopupFxRates(){_autoShowFx=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
@@ -601,6 +605,7 @@ h+=ms('\uD83D\uDE95','GROUND TRANSPORT',d.ground.map(ml).join(''));
 h+=ms('\uD83C\uDFE8','ACCOMMODATION',d.accommodation.map(ml).join(''));
 h+=ms('\uD83D\uDCE1','COMMUNICATIONS',d.comms.map(ml).join(''));
 h+=ms('\uD83D\uDCB0','FINANCIAL',d.financial.map(ml).join(''));
+if(d.visaFree&&d.visaFree.length){h+=ms('\uD83C\uDF10','VISA-FREE DESTINATIONS ('+d.visaFree.length+')',d.visaFree.map(function(v){return ml({name:v.name+(v.days?' ('+v.days+' days)':''),url:null})}).join(''))}
 panel.innerHTML=h}
 function hidePopupBugoutSlide(){var panel=document.getElementById('popupBugoutSlide');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
 function showPopupNewsSlide(){
