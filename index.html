@@ -27,7 +27,11 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .channel:hover{background:#0c2430!important;box-shadow:0 0 12px #00ffee66;text-shadow:0 0 8px #00ffee;color:#00ffee}
 #gmtClock{text-align:center;color:#00ffee;width:100%;cursor:pointer;user-select:none}
 #gmtClock:hover{text-shadow:0 0 8px #00ffee}
-#africaTimePanel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:10000;width:min(960px,92vw);max-height:80vh;overflow-y:auto;overscroll-behavior:contain;border-radius:12px;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44}
+#africaTimePanel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:10000;width:min(960px,92vw);max-height:calc(100vh - 80px);overflow-y:auto;overscroll-behavior:contain;border-radius:12px;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44}
+#africaTimePanel::-webkit-scrollbar{width:8px}
+#africaTimePanel::-webkit-scrollbar-track{background:#061018;border-radius:4px}
+#africaTimePanel::-webkit-scrollbar-thumb{background:#00ffee44;border-radius:4px}
+#africaTimePanel::-webkit-scrollbar-thumb:hover{background:#00ffee88}
 #africaTimePanel.open{display:block}
 #africaTimeWidget{font-family:Rajdhani,sans-serif;background:#061018;color:#f1f5f9;border-radius:12px;padding:16px;box-sizing:border-box;border:1px solid #00ffee44}
 #africaTimeWidget h2{text-align:center;color:#00ffee;margin-bottom:10px;margin-top:0;font-family:'Share Tech Mono',monospace;letter-spacing:2px;text-shadow:0 0 10px #00ffee88}
