@@ -610,6 +610,7 @@ function showPopupFxSlide(){
 var panel=document.getElementById('popupFxSlide');if(!panel)return;
 var bp=document.getElementById('popupBugoutSlide');if(bp){bp.style.transform='translateX(100%)';bp.style.display='none'}
 var np=document.getElementById('popupNewsSlide');if(np){np.style.transform='translateX(100%)';np.style.display='none'}
+var hp=document.getElementById('popupHeadlineSlide');if(hp){hp.style.transform='translateX(100%)';hp.style.display='none'}
 var info=_lastPopupInfo;var currTicker=(info.currCodes&&info.currCodes.length>0)?info.currCodes[0]:'USD';
 panel.innerHTML="<div style='text-align:center;padding:20px;color:#00ffee;font-size:11px'>Loading FX rates...</div>";
 panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
@@ -625,10 +626,38 @@ h+="<span style='color:#ffcc00;font-size:12px;font-weight:bold'>"+crossRate.toFi
 h+="</div>";panel.innerHTML=h;
 }).catch(function(){panel.innerHTML="<button class='popup-action-btn' onclick='hidePopupFxSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button><div style='color:#ff4444;padding:12px;text-align:center;font-size:11px'>Failed to load FX rates.</div>"})}
 function hidePopupFxSlide(){var panel=document.getElementById('popupFxSlide');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+function showPopupHeadlineSlide(){
+var panel=document.getElementById('popupHeadlineSlide');if(!panel)return;
+var fp=document.getElementById('popupFxSlide');if(fp){fp.style.transform='translateX(100%)';fp.style.display='none'}
+var bp=document.getElementById('popupBugoutSlide');if(bp){bp.style.transform='translateX(100%)';bp.style.display='none'}
+var np=document.getElementById('popupNewsSlide');if(np){np.style.transform='translateX(100%)';np.style.display='none'}
+var info=_lastPopupInfo;
+panel.innerHTML="<button class='popup-action-btn' onclick='hidePopupHeadlineSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button><div style='color:#d7a0ff;font-size:11px;margin-bottom:8px;text-shadow:0 0 6px #d7a0ff66'>\uD83D\uDCCB HEADLINES \u2014 "+info.name+"</div><div id='popupHeadlineList' style='text-align:center;color:#7fd6df;font-size:10px;padding:12px'>Loading headlines...</div>";
+panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
+_fetchPopupHeadlines(info.name)}
+function _fetchPopupHeadlines(countryName){
+var container=document.getElementById('popupHeadlineList');if(!container)return;
+var feeds=africaRssFeeds.slice(0,10);
+var allItems=[];var done=0;
+feeds.forEach(function(f){
+fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url)).then(function(r){return r.json()}).then(function(d){
+if(d.status==='ok'&&d.items){d.items.slice(0,5).forEach(function(item){
+allItems.push({title:item.title,link:item.link,pubDate:item.pubDate,source:f.tag})})}}).catch(function(){}).finally(function(){
+done++;if(done>=feeds.length){allItems.sort(function(a,b){return new Date(b.pubDate)-new Date(a.pubDate)});
+if(!allItems.length){container.innerHTML='<div style="color:#ff4444;padding:12px;text-align:center;font-size:10px">No headlines available.</div>';return}
+var h='';allItems.slice(0,30).forEach(function(item){
+var timeStr=item.pubDate?new Date(item.pubDate).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+h+='<a href="'+safeHref(item.link)+'" target="_blank" style="text-decoration:none;display:block;margin-bottom:4px">';
+h+='<div style="background:#081821;border-left:3px solid #d7a0ff;border-radius:0 4px 4px 0;padding:6px 8px;transition:background 0.15s" onmouseenter="this.style.background=\'#0c2a35\'" onmouseleave="this.style.background=\'#081821\'">';
+h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px"><span style="color:#d7a0ff;font-family:Share Tech Mono,monospace;font-size:9px;letter-spacing:1px">'+esc(item.source)+'</span><span style="color:#7fd6df;font-family:Share Tech Mono,monospace;font-size:9px">'+timeStr+'</span></div>';
+h+='<div style="color:#f1f5f9;font-family:Rajdhani,sans-serif;font-size:12px;line-height:1.3">'+esc(item.title)+'</div>';
+h+='</div></a>'});container.innerHTML=h}})})}
+function hidePopupHeadlineSlide(){var panel=document.getElementById('popupHeadlineSlide');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
 function showPopupBugoutSlide(){
 var panel=document.getElementById('popupBugoutSlide');if(!panel)return;
 var fp=document.getElementById('popupFxSlide');if(fp){fp.style.transform='translateX(100%)';fp.style.display='none'}
 var np=document.getElementById('popupNewsSlide');if(np){np.style.transform='translateX(100%)';np.style.display='none'}
+var hp=document.getElementById('popupHeadlineSlide');if(hp){hp.style.transform='translateX(100%)';hp.style.display='none'}
 var info=_lastPopupInfo;var d=bugoutData[info.name];
 if(!d){panel.innerHTML="<button class='popup-action-btn' onclick='hidePopupBugoutSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button><div style='color:#ff4444;padding:12px;text-align:center;font-size:11px'>No bugout data for "+info.name+".</div>";panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);return}
 panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
@@ -651,6 +680,7 @@ function showPopupNewsSlide(){
 var panel=document.getElementById('popupNewsSlide');if(!panel)return;
 var fp=document.getElementById('popupFxSlide');if(fp){fp.style.transform='translateX(100%)';fp.style.display='none'}
 var bp=document.getElementById('popupBugoutSlide');if(bp){bp.style.transform='translateX(100%)';bp.style.display='none'}
+var hp=document.getElementById('popupHeadlineSlide');if(hp){hp.style.transform='translateX(100%)';hp.style.display='none'}
 var info=_lastPopupInfo;
 _popupChIdx=0;
 _renderPopupChannel(panel,info)}
@@ -1226,11 +1256,12 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Black Population</td><td style="color:#ffcc00">'+(blackPopPct[info.name]!==undefined?blackPopPct[info.name]+'%':'N/A')+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Timezone</td><td style="color:#d7ffff">'+info.timezone+'</td></tr>'+
 '</table>'+
-'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupFxSlide()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugoutSlide()" style="border-color:#ff880055;color:#ff8800">🚁 BUGOUT</button><button class="popup-action-btn" onclick="showPopupNewsSlide()" style="border-color:#44ff8855;color:#44ff88">📰 NEWS</button></div>'+
+'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupFxSlide()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugoutSlide()" style="border-color:#ff880055;color:#ff8800">🚁 BUGOUT</button><button class="popup-action-btn" onclick="showPopupNewsSlide()" style="border-color:#44ff8855;color:#44ff88">📰 NEWS</button><button class="popup-action-btn" onclick="showPopupHeadlineSlide()" style="border-color:#d7a0ff55;color:#d7a0ff">📋 HEADLINES</button></div>'+
 '</div>'+
 '<div id="popupFxSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
 '<div id="popupBugoutSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
 '<div id="popupNewsSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
+'<div id="popupHeadlineSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
 '</div>';
 L.popup({className:'afr-country-popup',maxWidth:340}).setLatLng(latlng).setContent(html).openOn(afrMapInstance);
 }
