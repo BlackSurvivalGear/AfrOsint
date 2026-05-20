@@ -541,6 +541,7 @@ if(_autoShowFx){_autoShowFx=false;setTimeout(function(){showFxPanel(currTicker,n
 if(_autoShowBugout){_autoShowBugout=false;setTimeout(function(){showBugoutSlidePanel(name,iso)},200)}
 }catch(e){w.innerHTML=`<div style='padding:20px'><button class='atw-small-button' onclick='atwRestoreWidget()'>⬅ BACK</button><div style='text-align:center;color:#ff4444;padding:20px'>Failed to load country data.</div></div>`}}
 function showFxPanel(currTicker,countryName){
+_hideAllCountryPanels();
 var panel=document.getElementById('fxPanel');if(!panel)return;
 panel.innerHTML="<div style='text-align:center;padding:30px;color:#00ffee;font-family:Share Tech Mono,monospace'>Loading FX rates...</div>";
 panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
@@ -556,9 +557,11 @@ h+="<span style='color:#7fd6df;font-family:Share Tech Mono,monospace;font-size:1
 h+="<span style='color:#ffcc00;font-family:Share Tech Mono,monospace;font-size:15px;font-weight:bold'>"+crossRate.toFixed(2)+" "+currTicker+"</span></div>"});
 h+="</div>";panel.innerHTML=h;
 }).catch(function(){panel.innerHTML="<button class='atw-small-button' onclick='hideFxPanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>Failed to load FX rates.</div>"})}
-function hideFxPanel(){var panel=document.getElementById('fxPanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+function _hideAllCountryPanels(){['fxPanel','bugoutSlidePanel','liveNewsPanel'].forEach(function(id){var p=document.getElementById(id);if(p){p.style.transform='translateX(100%)';p.style.display='none';var ifr=p.querySelector('iframe');if(ifr)ifr.src='about:blank'}});var atp=document.getElementById('africaTimePanel');if(atp)atp.scrollTop=0}
+function hideFxPanel(){_hideAllCountryPanels()}
 var _liveNewsPanelIdx=0;
 function showLiveNewsPanel(countryName){
+_hideAllCountryPanels();
 var panel=document.getElementById('liveNewsPanel');if(!panel)return;
 panel.dataset.country=countryName;
 var channels=_getPopupChannels(countryName);
@@ -581,8 +584,9 @@ if(channels.length>1){h+="<div style='text-align:center;margin-top:8px'><span st
 panel.innerHTML=h}
 function liveNewsPanelPrev(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;var countryName=panel.dataset.country;var channels=_getPopupChannels(countryName);_liveNewsPanelIdx=(_liveNewsPanelIdx-1+channels.length)%channels.length;_renderLiveNewsPanel(panel,countryName,channels)}
 function liveNewsPanelNext(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;var countryName=panel.dataset.country;var channels=_getPopupChannels(countryName);_liveNewsPanelIdx=(_liveNewsPanelIdx+1)%channels.length;_renderLiveNewsPanel(panel,countryName,channels)}
-function hideLiveNewsPanel(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+function hideLiveNewsPanel(){_hideAllCountryPanels()}
 function showBugoutSlidePanel(name,iso){
+_hideAllCountryPanels();
 var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;
 var d=bugoutData[name];
 if(!d){panel.innerHTML="<button class='atw-small-button' onclick='hideBugoutSlidePanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>No bugout data for "+name+".</div>";panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);return}
@@ -599,7 +603,7 @@ h+=ms('\uD83D\uDCE1','COMMUNICATIONS',d.comms.map(ml).join(''));
 h+=ms('\uD83D\uDCB0','FINANCIAL',d.financial.map(ml).join(''));
 if(d.visaFree&&d.visaFree.length){h+=ms('\uD83C\uDF10','VISA-FREE DESTINATIONS ('+d.visaFree.length+')',d.visaFree.map(function(v){var label=v.name+(v.days?' ('+v.days+' days)':'');var nameEsc=v.name.replace(/'/g,"\\'");return '<div style="padding:2px 0"><span onclick="navigateToVisaFreeCountry(\''+nameEsc+'\')" style="color:#7fd6df;font-size:13px;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onmouseover="this.style.color=\'#00ffee\'" onmouseout="this.style.color=\'#7fd6df\'">'+label+'</span></div>'}).join(''))}
 panel.innerHTML=h}
-function hideBugoutSlidePanel(){var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+function hideBugoutSlidePanel(){_hideAllCountryPanels()}
 function showPopupFxRates(){_autoShowFx=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
 function showPopupBugout(){_autoShowBugout=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
 function showPopupFxSlide(){
