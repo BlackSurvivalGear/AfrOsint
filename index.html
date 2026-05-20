@@ -512,7 +512,7 @@ const escapedName=name.replace(/'/g,"\\'");
 w.innerHTML=`<div style='padding:12px'>
 <button class='atw-small-button' onclick='atwRestoreWidget()' style='margin-bottom:16px'>⬅ BACK</button>
 <div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name}</h2><div style='color:#7fd6df;font-size:13px'>${region} — ${subregion}</div></div></div>
-<div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px'><button class='atw-small-button' onclick="showBugoutSlidePanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button></div>
+<div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px'><button class='atw-small-button' onclick="showBugoutSlidePanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>🚁 BUGOUT</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button><button class='atw-small-button' onclick="showLiveNewsPanel('${escapedName}')" style='background:#0c2430;border-color:#44ff88;color:#44ff88;text-shadow:0 0 6px #44ff8888'>📺 LIVE NEWS</button></div>
 <div style='position:relative;overflow:hidden'><div id='countryDataMain'>
 <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:Rajdhani,sans-serif;font-size:14px'>
 <div><span style='color:#7fd6df'>Capital:</span> ${capital}</div>
@@ -534,6 +534,7 @@ ${localBtns}
 </div>
 <div id='fxPanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
 <div id='bugoutSlidePanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
+<div id='liveNewsPanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
 </div>
 </div>`;
 if(_autoShowFx){_autoShowFx=false;setTimeout(function(){showFxPanel(currTicker,name)},200)}
@@ -556,6 +557,31 @@ h+="<span style='color:#ffcc00;font-family:Share Tech Mono,monospace;font-size:1
 h+="</div>";panel.innerHTML=h;
 }).catch(function(){panel.innerHTML="<button class='atw-small-button' onclick='hideFxPanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>Failed to load FX rates.</div>"})}
 function hideFxPanel(){var panel=document.getElementById('fxPanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
+var _liveNewsPanelIdx=0;
+function showLiveNewsPanel(countryName){
+var panel=document.getElementById('liveNewsPanel');if(!panel)return;
+panel.dataset.country=countryName;
+var channels=_getPopupChannels(countryName);
+_liveNewsPanelIdx=0;
+_renderLiveNewsPanel(panel,countryName,channels);
+panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10)}
+function _renderLiveNewsPanel(panel,countryName,channels){
+var ch=channels[_liveNewsPanelIdx%channels.length];
+var embedSrc=ch.embed.indexOf('youtube.com')>=0?(ch.embed+'?autoplay=1&mute=0'):ch.embed;
+var h="<button class='atw-small-button' onclick='hideLiveNewsPanel()' style='margin-bottom:12px'>\u2B05 BACK</button>";
+h+="<h3 style='color:#44ff88;font-family:Share Tech Mono,monospace;margin-bottom:8px;text-shadow:0 0 8px #44ff8866'>\uD83D\uDCFA LIVE NEWS</h3>";
+h+="<div style='color:#7fd6df;font-size:12px;margin-bottom:10px'>"+countryName+"</div>";
+h+="<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:8px'>";
+if(channels.length>1){h+="<button onclick='event.stopPropagation();liveNewsPanelPrev()' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:14px;cursor:pointer;padding:4px 12px;border-radius:3px;font-family:Share Tech Mono,monospace'>&#9664;</button>"}else{h+="<span></span>"}
+h+="<div style='display:flex;align-items:center;gap:6px'><span style='color:#ff4444;font-size:10px'>&#9679;</span><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:13px;letter-spacing:1px'>"+ch.name+"</span></div>";
+if(channels.length>1){h+="<button onclick='event.stopPropagation();liveNewsPanelNext()' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:14px;cursor:pointer;padding:4px 12px;border-radius:3px;font-family:Share Tech Mono,monospace'>&#9654;</button>"}else{h+="<span></span>"}
+h+="</div>";
+h+="<iframe src='"+embedSrc+"' style='width:100%;height:400px;border:1px solid #00ffee33;border-radius:8px;background:#081821' frameborder='0' allow='autoplay;encrypted-media' allowfullscreen></iframe>";
+if(channels.length>1){h+="<div style='text-align:center;margin-top:8px'><span style='color:#7fd6df;font-size:11px;font-family:Share Tech Mono,monospace'>"+(_liveNewsPanelIdx%channels.length+1)+" / "+channels.length+"</span></div>"}
+panel.innerHTML=h}
+function liveNewsPanelPrev(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;var countryName=panel.dataset.country;var channels=_getPopupChannels(countryName);_liveNewsPanelIdx=(_liveNewsPanelIdx-1+channels.length)%channels.length;_renderLiveNewsPanel(panel,countryName,channels)}
+function liveNewsPanelNext(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;var countryName=panel.dataset.country;var channels=_getPopupChannels(countryName);_liveNewsPanelIdx=(_liveNewsPanelIdx+1)%channels.length;_renderLiveNewsPanel(panel,countryName,channels)}
+function hideLiveNewsPanel(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;panel.style.transform='translateX(100%)';setTimeout(function(){panel.style.display='none'},300)}
 function showBugoutSlidePanel(name,iso){
 var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;
 var d=bugoutData[name];
