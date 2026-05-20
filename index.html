@@ -635,16 +635,26 @@ var info=_lastPopupInfo;
 panel.innerHTML="<button class='popup-action-btn' onclick='hidePopupHeadlineSlide()' style='margin-bottom:8px;font-size:10px'>\u2B05 BACK</button><div style='color:#d7a0ff;font-size:11px;margin-bottom:8px;text-shadow:0 0 6px #d7a0ff66'>\uD83D\uDCCB HEADLINES \u2014 "+info.name+"</div><div id='popupHeadlineList' style='text-align:center;color:#7fd6df;font-size:10px;padding:12px'>Loading headlines...</div>";
 panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
 _fetchPopupHeadlines(info.name)}
+function _getCountryNewsSources(countryName){
+var dataKey=countryNameMap[countryName]||'';
+if(!dataKey)return[];
+for(var reg of Object.values(africaData)){if(reg[dataKey])return reg[dataKey]}
+return[]}
 function _fetchPopupHeadlines(countryName){
 var container=document.getElementById('popupHeadlineList');if(!container)return;
-var feeds=africaRssFeeds.slice(0,10);
+var countrySources=_getCountryNewsSources(countryName);
+var rssUrls=countrySources.map(function(s){var base=s[1].replace(/\/$/,'');return{url:base+'/feed',tag:s[0]}});
+var countryLower=countryName.toLowerCase();
+var allFeeds=rssUrls.concat(africaRssFeeds.slice(0,10).map(function(f){return{url:f.url,tag:f.tag,filterByCountry:true}}));
+if(!allFeeds.length){container.innerHTML='<div style="color:#ff4444;padding:12px;text-align:center;font-size:10px">No sources for '+esc(countryName)+'.</div>';return}
 var allItems=[];var done=0;
-feeds.forEach(function(f){
+allFeeds.forEach(function(f){
 fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url)).then(function(r){return r.json()}).then(function(d){
-if(d.status==='ok'&&d.items){d.items.slice(0,5).forEach(function(item){
+if(d.status==='ok'&&d.items){d.items.slice(0,8).forEach(function(item){
+if(f.filterByCountry){var t=(item.title||'').toLowerCase();if(t.indexOf(countryLower)<0)return}
 allItems.push({title:item.title,link:item.link,pubDate:item.pubDate,source:f.tag})})}}).catch(function(){}).finally(function(){
-done++;if(done>=feeds.length){allItems.sort(function(a,b){return new Date(b.pubDate)-new Date(a.pubDate)});
-if(!allItems.length){container.innerHTML='<div style="color:#ff4444;padding:12px;text-align:center;font-size:10px">No headlines available.</div>';return}
+done++;if(done>=allFeeds.length){allItems.sort(function(a,b){return new Date(b.pubDate)-new Date(a.pubDate)});
+if(!allItems.length){container.innerHTML='<div style="color:#7fd6df;padding:12px;text-align:center;font-size:10px">No recent headlines for '+esc(countryName)+'.</div>';return}
 var h='';allItems.slice(0,30).forEach(function(item){
 var timeStr=item.pubDate?new Date(item.pubDate).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
 h+='<a href="'+safeHref(item.link)+'" target="_blank" style="text-decoration:none;display:block;margin-bottom:4px">';
