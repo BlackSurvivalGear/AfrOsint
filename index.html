@@ -1248,7 +1248,7 @@ marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:11
 '<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,170,0,0.08);border-left:2px solid #ffaa00;border-radius:0 4px 4px 0"><span style="color:#ffaa00;font-weight:bold">⊕ STABILITY:</span><br><span style="color:#e0e8ef">'+c.stability+'</span></div>'+
 '<div style="margin-bottom:8px;padding:6px 8px;background:rgba(102,204,255,0.08);border-left:2px solid #66ccff;border-radius:0 4px 4px 0"><span style="color:#66ccff;font-weight:bold">♜ HUMANITARIAN:</span><br><span style="color:#e0e8ef">'+c.humanitarian+'</span></div>'+
 '<div style="padding:6px 8px;background:rgba(68,255,136,0.08);border-left:2px solid #44ff88;border-radius:0 4px 4px 0"><span style="color:#44ff88;font-weight:bold">⟳ AI FORECAST:</span><br><span style="color:#e0e8ef">'+c.forecast+'</span></div>'+
-'<div style="margin-top:10px;border-top:1px solid #44ff8833;padding-top:8px"><button onclick="aiDeepDive(\''+c.name.replace(/'/g,"\\'")+'\')" style="width:100%;padding:7px;background:#0a2a1a;border:1px solid #44ff88;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px">🔬 AI DEEP DIVE</button></div>'+
+'<div style="margin-top:10px;border-top:1px solid #44ff8833;padding-top:8px"><button onclick="aiSitRep(\''+c.name.replace(/'/g,"\\'")+'\')" style="width:100%;padding:7px;background:#0a2a1a;border:1px solid #44ff88;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px">📋 AI SITREP</button></div>'+
 '</div>',{maxWidth:360,className:'ai-ds-popup'});
 marker.addTo(aiDSLayer);
 });
@@ -1306,19 +1306,19 @@ btn.disabled=false;btn.style.opacity='1';
 });
 }
 
-// === AI DEEP DIVE ===
-function aiDeepDive(countryName){
+// === AI SITREP ===
+function aiSitRep(countryName){
 if(!aiDSApiKey){alert('Enter your OpenAI API key in the AI Decision Support panel first, then click UPDATE INTEL.');return}
 var overlay=document.createElement('div');
-overlay.id='aiDeepDiveOverlay';
+overlay.id='aiSitRepOverlay';
 overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-overlay.innerHTML='<div style="background:rgba(6,16,24,0.98);border:1px solid #44ff88;border-radius:8px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:20px;font-family:Share Tech Mono,monospace;color:#d7ffff;font-size:12px;line-height:1.6;position:relative"><button onclick="document.getElementById(\'aiDeepDiveOverlay\').remove()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#ff4444;font-size:18px;cursor:pointer">✕</button><div style="color:#44ff88;font-size:14px;letter-spacing:2px;margin-bottom:12px;text-shadow:0 0 8px #44ff8866">🔬 DEEP DIVE: '+esc(countryName)+'</div><div id="aiDeepDiveContent" style="color:#7fd6df">⟳ Generating comprehensive intelligence brief...</div></div>';
+overlay.innerHTML='<div style="background:rgba(6,16,24,0.98);border:1px solid #44ff88;border-radius:8px;max-width:650px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;font-family:Share Tech Mono,monospace;color:#d7ffff;font-size:12px;line-height:1.6;position:relative"><button onclick="document.getElementById(\'aiSitRepOverlay\').remove()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#ff4444;font-size:18px;cursor:pointer">✕</button><div style="color:#44ff88;font-size:14px;letter-spacing:2px;margin-bottom:12px;text-shadow:0 0 8px #44ff8866">📋 AI SITREP: '+esc(countryName)+'</div><div id="aiSitRepContent" style="color:#7fd6df">⟳ Generating situational report...</div></div>';
 document.body.appendChild(overlay);
-var prompt='Generate a comprehensive intelligence brief for '+countryName+'. Include these sections:\n\n1. POLITICAL LANDSCAPE: Key political actors, factions, power dynamics, government structure\n2. SECURITY ENVIRONMENT: Armed groups, crime networks, areas of control, no-go zones\n3. KEY ACTORS & ALLIANCES: Major domestic and foreign players, their interests and alliances\n4. ENTRY/EXIT ROUTES: Major border crossings, airports, ports, and their safety status\n5. COMMUNICATIONS: Internet/phone reliability, censorship, secure comms recommendations\n6. ECONOMIC FACTORS: Currency stability, inflation, sanctions, black market\n7. RECOMMENDED ACTIONS: For travelers/operators in this country\n\nFormat with clear headers. Be specific with names, locations, and actionable details. Write concisely.';
+var prompt='Generate a comprehensive SITREP (Situational Report) for '+countryName+' from a Pan-African perspective. This report is for someone evaluating the country for potential relocation or long-term stay. Include these sections:\n\n1. PAN-AFRICAN NEWS DIGEST: Key recent events, headlines, and developments affecting this country within the African context. Focus on regional relationships, AU involvement, and pan-African implications.\n2. CONFLICT & SECURITY STATUS: Active conflicts, armed groups, insurgencies, crime levels, safe vs dangerous regions. Include border tensions with neighbors.\n3. POLITICAL LANDSCAPE: Government type, stability, corruption index, rule of law, press freedom, political trajectory (improving/declining). Recent elections or power changes.\n4. ECONOMIC OVERVIEW: GDP trend, currency stability, inflation, cost of living, job market, key industries, trade relationships. Compare to regional averages.\n5. RELOCATION VIABILITY ASSESSMENT: Rate 1-10 with detailed justification. Cover: visa/residency options, healthcare quality, education, infrastructure, internet connectivity, English/French proficiency, diaspora community, quality of life, safety for foreigners, property ownership rights.\n6. OPPORTUNITIES & RISKS: Key opportunities for entrepreneurs/professionals and major risks to be aware of.\n7. VERDICT: A clear, honest 2-3 sentence summary on whether this country is viable for relocation and for whom it would be best suited.\n\nBe honest, specific, and data-driven. Include numbers where possible. Write from a Pan-African lens — consider how this country fits into the broader African landscape.';
 fetch('https://api.openai.com/v1/chat/completions',{
 method:'POST',
 headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiDSApiKey},
-body:JSON.stringify({model:'gpt-4o',messages:[{role:'system',content:'You are a senior intelligence analyst specializing in African geopolitics. Provide detailed, actionable intelligence briefs. Use markdown-style formatting with ## headers and bullet points.'},{role:'user',content:prompt}],temperature:0.7,max_tokens:3000})
+body:JSON.stringify({model:'gpt-4o',messages:[{role:'system',content:'You are a senior Pan-African intelligence analyst and relocation advisor. You provide honest, detailed situational reports focused on African countries from a pan-African perspective. Your audience is African diaspora and pan-African professionals evaluating countries for relocation, business, or long-term stay. Use markdown-style formatting with ## headers and bullet points. Be data-driven and specific.'},{role:'user',content:prompt}],temperature:0.7,max_tokens:4000})
 }).then(function(r){if(!r.ok)throw new Error('API error: '+r.status);return r.json()}).then(function(data){
 var content=data.choices[0].message.content;
 content=content.replace(/^## (.+)$/gm,'<div style="color:#44ff88;font-size:12px;letter-spacing:1px;margin-top:14px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #44ff8833">$1</div>');
@@ -1326,9 +1326,9 @@ content=content.replace(/^### (.+)$/gm,'<div style="color:#ffaa00;font-size:11px
 content=content.replace(/^\- (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">• $1</div>');
 content=content.replace(/\*\*(.+?)\*\*/g,'<span style="color:#ffffff;font-weight:bold">$1</span>');
 content=content.replace(/\n/g,'<br>');
-document.getElementById('aiDeepDiveContent').innerHTML=content;
+document.getElementById('aiSitRepContent').innerHTML=content;
 }).catch(function(err){
-document.getElementById('aiDeepDiveContent').innerHTML='<span style="color:#ff4444">Error: '+err.message+'</span>';
+document.getElementById('aiSitRepContent').innerHTML='<span style="color:#ff4444">Error: '+err.message+'</span>';
 });
 }
 
