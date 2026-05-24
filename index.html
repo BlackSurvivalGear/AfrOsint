@@ -105,6 +105,10 @@ a{color:#00ffee;text-decoration:none}
 .afr-country-popup .leaflet-popup-content-wrapper{background:rgba(6,16,24,0.95);color:#d7ffff;border:1px solid #00ffee44;border-radius:6px;box-shadow:0 0 20px #00ffee22}
 .afr-country-popup .leaflet-popup-tip{background:rgba(6,16,24,0.95);border:1px solid #00ffee44}
 .afr-country-popup .leaflet-popup-close-button{color:#00ffee !important}
+.ai-ds-popup .leaflet-popup-content-wrapper{background:rgba(6,16,24,0.96);color:#d7ffff;border:1px solid #44ff8844;border-radius:8px;box-shadow:0 0 24px rgba(68,255,136,0.15),0 4px 16px rgba(0,0,0,0.6)}
+.ai-ds-popup .leaflet-popup-tip{background:rgba(6,16,24,0.96);border:1px solid #44ff8844}
+.ai-ds-popup .leaflet-popup-close-button{color:#44ff88 !important;font-size:18px}
+.ai-ds-popup .leaflet-popup-content{margin:12px 14px}
 .popup-action-btn{display:inline-block;padding:4px 12px;background:#081821;border:1px solid #00ffee55;color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer;border-radius:4px;transition:background 0.15s,box-shadow 0.15s,text-shadow 0.15s}
 .popup-action-btn:hover{background:#0c2430;box-shadow:0 0 12px #00ffee66;text-shadow:0 0 8px #00ffee}
 .popup-action-btn.set-btn{border-color:#ff880055;color:#ff8800}
@@ -1232,18 +1236,19 @@ const aiDSCountryRisk=[
 
 var aiDSLayer=null;var aiDSVisible=false;
 function initAiDecisionSupport(){
+if(!afrMapInstance.getPane('aiDSPane')){var p=afrMapInstance.createPane('aiDSPane');p.style.zIndex=650}
 aiDSLayer=L.layerGroup();
 aiDSCountryRisk.forEach(function(c){
 var riskColor=c.color;
-var marker=L.circleMarker([c.lat,c.lng],{radius:c.score*1.8,color:riskColor,fillColor:riskColor,fillOpacity:0.25,weight:2,opacity:0.8});
-marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:11px;max-width:320px;line-height:1.4">'+
-'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><strong style="color:'+riskColor+';font-size:13px">'+c.name+'</strong><span style="background:'+riskColor+';color:#000;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:bold">'+c.risk+'</span></div>'+
-'<div style="margin-bottom:6px;color:#7fd6df">RISK SCORE: <span style="color:'+riskColor+';font-weight:bold">'+c.score+'/10</span> — Travel: '+c.travel+'</div>'+
-'<div style="margin-bottom:6px"><span style="color:#ff6666">⚠ THREATS:</span><br>'+c.threats.map(function(t){return'• '+t}).join('<br>')+'</div>'+
-'<div style="margin-bottom:6px"><span style="color:#ffaa00">⊕ STABILITY:</span> '+c.stability+'</div>'+
-'<div style="margin-bottom:6px"><span style="color:#66ccff">♜ HUMANITARIAN:</span> '+c.humanitarian+'</div>'+
-'<div><span style="color:#44ff88">⟳ AI FORECAST:</span> '+c.forecast+'</div>'+
-'</div>',{maxWidth:340});
+var marker=L.circleMarker([c.lat,c.lng],{radius:c.score*1.8,color:riskColor,fillColor:riskColor,fillOpacity:0.25,weight:2,opacity:0.8,pane:'aiDSPane'});
+marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:11px;max-width:320px;line-height:1.5;color:#d7ffff">'+
+'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #44ff8833"><strong style="color:'+riskColor+';font-size:14px;text-shadow:0 0 8px '+riskColor+'66">'+c.name+'</strong><span style="background:'+riskColor+';color:#000;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:bold;letter-spacing:1px">'+c.risk+'</span></div>'+
+'<div style="margin-bottom:8px;color:#7fd6df;font-size:12px">RISK SCORE: <span style="color:'+riskColor+';font-weight:bold;text-shadow:0 0 6px '+riskColor+'44">'+c.score+'/10</span> — Travel: <span style="color:#ffcc00">'+c.travel+'</span></div>'+
+'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,100,100,0.08);border-left:2px solid #ff6666;border-radius:0 4px 4px 0"><span style="color:#ff6666;font-weight:bold">⚠ THREATS:</span><br><span style="color:#e0e8ef">'+c.threats.map(function(t){return'• '+t}).join('<br>')+'</span></div>'+
+'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,170,0,0.08);border-left:2px solid #ffaa00;border-radius:0 4px 4px 0"><span style="color:#ffaa00;font-weight:bold">⊕ STABILITY:</span><br><span style="color:#e0e8ef">'+c.stability+'</span></div>'+
+'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(102,204,255,0.08);border-left:2px solid #66ccff;border-radius:0 4px 4px 0"><span style="color:#66ccff;font-weight:bold">♜ HUMANITARIAN:</span><br><span style="color:#e0e8ef">'+c.humanitarian+'</span></div>'+
+'<div style="padding:6px 8px;background:rgba(68,255,136,0.08);border-left:2px solid #44ff88;border-radius:0 4px 4px 0"><span style="color:#44ff88;font-weight:bold">⟳ AI FORECAST:</span><br><span style="color:#e0e8ef">'+c.forecast+'</span></div>'+
+'</div>',{maxWidth:360,className:'ai-ds-popup'});
 marker.addTo(aiDSLayer);
 });
 aiDSVisible=false;
