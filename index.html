@@ -12,7 +12,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 #opsViewport,#panAfricaViewport,#channelHubViewport,#headlinesFrame,.ai-grid{scrollbar-width:none}#opsViewport::-webkit-scrollbar,#panAfricaViewport::-webkit-scrollbar,#channelHubViewport::-webkit-scrollbar,#headlinesFrame::-webkit-scrollbar,.ai-grid::-webkit-scrollbar{display:none}
 body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:hidden}
-#commandHeader{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;padding:18px 24px;background:linear-gradient(180deg,#07141c,#050b12);background-image:linear-gradient(180deg,rgba(7,20,28,0.88),rgba(5,11,18,0.92)),url('AFROSINT LOGO.png');background-size:cover;background-position:center;border-bottom:2px solid #00ffee55}
+#commandHeader{position:relative;display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;padding:18px 24px;background:linear-gradient(180deg,#07141c,#050b12);background-image:linear-gradient(180deg,rgba(7,20,28,0.88),rgba(5,11,18,0.92)),url('AFROSINT LOGO.png');background-size:cover;background-position:center;border-bottom:2px solid #00ffee55}
 .brand-wrap{display:flex;align-items:center;gap:15px}
 .radar-logo,.footer-radar{width:96px;height:96px;border-radius:50%;border:1px solid #00ffee88;box-shadow:0 0 16px #00ffee55;animation:radarPulse 4s infinite;transition:box-shadow 0.3s ease;object-fit:cover;overflow:hidden}
 @keyframes radarPulse{50%{box-shadow:0 0 26px #00ffeeaa}}
@@ -126,39 +126,68 @@ a{color:#00ffee;text-decoration:none}
 .loader-wrap{margin-top:32px;width:260px;height:3px;background:#0a1a22;border-radius:2px;overflow:hidden}
 .loader-bar{width:0;height:100%;background:linear-gradient(90deg,#00ffee,#00ffeedd);border-radius:2px;animation:loadBar 5s ease-in-out forwards}
 @keyframes loadBar{0%{width:0}100%{width:100%}}
+/* Mobile hamburger button - hidden on desktop */
+#mobileMenuBtn{display:none;background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:22px;padding:6px 10px;cursor:pointer;border-radius:4px;font-family:'Share Tech Mono';line-height:1}
+#mobileMenuBtn:hover{background:#0c2430;box-shadow:0 0 12px #00ffee66}
+
 @media(max-width:768px){
-#commandHeader{grid-template-columns:1fr;gap:8px;padding:10px 12px;text-align:center}
-.brand-wrap{justify-content:center}
-.radar-logo,.footer-radar{width:60px;height:60px}
-.callsign{font-size:20px}
-.subline{font-size:12px;letter-spacing:2px}
-.header-center{gap:4px;justify-content:center}
-.command-btn{padding:8px 10px;font-size:11px}
-.header-right{flex-direction:column;align-items:center}
-.header-right .price-row{flex-wrap:wrap;justify-content:center;gap:4px}
-.market-price{font-size:16px}
-.market-box{padding:2px 4px}
-.donate-btn{font-size:11px;padding:8px 14px}
-.placeholder{height:calc(100vh - 80px)}
-.ops-bay{width:100%;height:calc(100vh - 80px);border:none}
-#opsMenu{display:none}
+#mobileMenuBtn{display:block}
+#commandHeader{grid-template-columns:auto 1fr auto;gap:6px;padding:8px 10px;text-align:center}
+.brand-wrap{justify-content:flex-start;gap:8px}
+.radar-logo,.footer-radar{width:40px;height:40px}
+.callsign{font-size:16px;letter-spacing:1px}
+.subline{display:none}
+.header-center{display:none;position:absolute;top:100%;left:0;right:0;z-index:9999;background:#07141c;border-bottom:2px solid #00ffee55;padding:12px;flex-direction:column;gap:6px;box-shadow:0 8px 24px rgba(0,0,0,0.6)}
+.header-center.mobile-open{display:flex}
+#navBtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
+.command-btn{padding:12px 10px;font-size:12px;width:100%;text-align:center}
+#gmtClock{font-size:13px;padding:8px 0;border-top:1px solid #00ffee22;margin-top:4px}
+#setCountryBtn{display:none}
+.header-right{align-items:flex-end;gap:4px}
+.header-right .price-row{display:none}
+.donate-btn{font-size:10px;padding:6px 10px;white-space:nowrap}
+.placeholder{height:calc(100vh - 56px)}
+.ops-bay{width:100%;height:calc(100vh - 56px);border:none;border-radius:0}
+#opsMenu{position:fixed;top:56px;left:0;width:0;height:calc(100vh - 56px);z-index:9998;overflow:hidden;transition:width 0.2s;background:#07141c}
+#opsMenu .panel-trigger{position:fixed;top:62px;left:6px;z-index:9999;width:36px;height:36px;font-size:16px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
+#opsMenu.open{width:220px;overflow-y:auto;border-right:1px solid #00ffee55;box-shadow:4px 0 24px rgba(0,0,0,0.6)}
 #opsViewport{margin-left:0}
-#africaTimePanel{width:96vw}
-.atw-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+#africaTimePanel{width:96vw;left:2vw;transform:none}
+.atw-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .atw-time{font-size:16px}
-#donatePanel{width:96vw}
-.leaflet-popup-content{max-width:280px !important}
-.tacticalLayerPanel,.survivalLayerPanel{width:180px !important;font-size:10px !important}
-#persistentNewsBoxes .afrNewsBox,#persistentNewsBoxes>div{width:260px !important;height:180px !important}
+#donatePanel{width:96vw;right:-40vw}
+.leaflet-popup-content{max-width:260px !important}
+#tacticalLayerPanel,#survivalLayerPanel{top:auto !important;bottom:60px !important;right:6px !important;left:auto !important;width:170px !important;font-size:10px !important;max-height:50vh;overflow-y:auto}
+#persistentNewsBoxes .afrNewsBox,#persistentNewsBoxes>div{width:200px !important;height:140px !important}
+#newsTickerWrap{font-size:14px}
+.ticker-window{height:28px !important}
+.headline-link{font-size:14px;line-height:28px;padding-right:50px}
+.channel{padding:0 8px;font-size:10px}
+#newsGrid{grid-template-columns:1fr !important;grid-template-rows:none !important;overflow-y:auto !important}
+#newsGrid .feed-panel{min-height:200px}
+#opsViewport>div[style*="display:flex"][style*="gap:4px"]{flex-direction:column !important}
+#opsViewport>div[style*="display:flex"][style*="gap:4px"]>div{min-height:45vh}
+#afrGoogleDirections{width:220px !important;bottom:6px !important;left:6px !important}
+#afrGoogleDirections input{font-size:10px;padding:5px}
+#afrGoogleDirections button{font-size:9px;padding:5px}
+.ai-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;padding:0 12px 12px}
+.ai-tile{padding:12px;font-size:11px;gap:8px}
+.ai-section-hdr{padding:14px 12px 4px;font-size:12px}
+.ucp-bar{gap:4px;padding:6px 0;margin:8px 0}
+.ucp-btn{padding:5px 8px;font-size:10px}
 }
 @media(max-width:480px){
-.command-btn{padding:6px 8px;font-size:10px}
-.callsign{font-size:16px}
-.subline{font-size:10px}
-.radar-logo,.footer-radar{width:36px;height:36px}
-.header-center{gap:3px}
-.market-price{font-size:14px}
-.atw-grid{grid-template-columns:1fr}
+#commandHeader{padding:6px 8px}
+.radar-logo,.footer-radar{width:32px;height:32px}
+.callsign{font-size:14px}
+#navBtns{grid-template-columns:1fr 1fr}
+.command-btn{padding:10px 6px;font-size:11px}
+.header-right .price-row{display:none}
+.donate-btn{font-size:9px;padding:5px 8px}
+.atw-grid{grid-template-columns:1fr 1fr}
+#tacticalLayerPanel,#survivalLayerPanel{width:150px !important;font-size:9px !important}
+#persistentNewsBoxes .afrNewsBox,#persistentNewsBoxes>div{width:160px !important;height:110px !important}
+.ai-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -173,6 +202,7 @@ a{color:#00ffee;text-decoration:none}
 <a href='#' target='_blank'><img class='radar-logo' src='AFROSINT LOGO.png' alt='AfrOSINT' style='cursor:pointer'></a>
 <div><div class='callsign'>AfrOSINT</div><div class='subline'>Pan-African OSINT</div></div>
 </div>
+<button id='mobileMenuBtn' onclick='document.querySelector(".header-center").classList.toggle("mobile-open");this.textContent=this.textContent==="☰"?"✕":"☰"' aria-label='Menu'>☰</button>
 <div class='header-center' style='position:relative'>
 <div id='navBtns'>
 <button id='afrMapBtn' class='command-btn'>AfrOSINT MAP</button>
@@ -1455,6 +1485,14 @@ function switchDonateNetwork(net){donateNetwork=net;const w=donateWallets[net];d
 function copyDonateAddr(){if(!donateWallets[donateNetwork])return;const addr=donateWallets[donateNetwork].addr;navigator.clipboard.writeText(addr).then(()=>{const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)}).catch(()=>{const t=document.createElement('textarea');t.value=addr;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)})}
 document.addEventListener('click',function(e){const panel=document.getElementById('donatePanel');const btn=document.querySelector('.donate-btn');if(panel.classList.contains('open')&&!panel.contains(e.target)&&!btn.contains(e.target)){panel.classList.remove('open')}});
 loadAfrMap();
+
+// Mobile nav: close menu when a nav button is clicked
+document.querySelectorAll('#navBtns .command-btn').forEach(function(btn){
+btn.addEventListener('click',function(){
+var hc=document.querySelector('.header-center');
+var mb=document.getElementById('mobileMenuBtn');
+if(hc&&hc.classList.contains('mobile-open')){hc.classList.remove('mobile-open');if(mb)mb.textContent='☰'}
+})});
 </script>
 </body>
 </html>
