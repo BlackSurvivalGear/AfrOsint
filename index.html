@@ -1326,9 +1326,9 @@ content=content.replace(/^### (.+)$/gm,'<div style="color:#ffaa00;font-size:11px
 content=content.replace(/^\- (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">• $1</div>');
 content=content.replace(/\*\*(.+?)\*\*/g,'<span style="color:#ffffff;font-weight:bold">$1</span>');
 content=content.replace(/\n/g,'<br>');
-document.getElementById('aiDeepDiveContent').innerHTML=content;
+var el=document.getElementById('aiDeepDiveContent');if(el)el.innerHTML=content;
 }).catch(function(err){
-document.getElementById('aiDeepDiveContent').innerHTML='<span style="color:#ff4444">Error: '+err.message+'</span>';
+var el=document.getElementById('aiDeepDiveContent');if(el)el.innerHTML='<span style="color:#ff4444">Error: '+err.message+'</span>';
 });
 }
 // === AI SITREP ===
@@ -1351,9 +1351,9 @@ content=content.replace(/^### (.+)$/gm,'<div style="color:#ffaa00;font-size:11px
 content=content.replace(/^\- (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">• $1</div>');
 content=content.replace(/\*\*(.+?)\*\*/g,'<span style="color:#ffffff;font-weight:bold">$1</span>');
 content=content.replace(/\n/g,'<br>');
-document.getElementById('aiSitRepContent').innerHTML=content;
+var el=document.getElementById('aiSitRepContent');if(el)el.innerHTML=content;
 }).catch(function(err){
-document.getElementById('aiSitRepContent').innerHTML='<span style="color:#ff4444">Error: '+err.message+'</span>';
+var el=document.getElementById('aiSitRepContent');if(el)el.innerHTML='<span style="color:#ff4444">Error: '+err.message+'</span>';
 });
 }
 
