@@ -871,17 +871,17 @@ document.getElementById('channelBar').innerHTML=_renderModeBar();
 _newsWallSwitch();
 }
 
-function setConflict(z){const m={iran:'https://iran.liveuamap.com/',sudan:'https://sudan.liveuamap.com/',nigeria:'https://nigeria.liveuamap.com/',sahel:'https://sahel.liveuamap.com/',drcongo:'https://drcongo.liveuamap.com/',ethiopia:'https://ethiopia.liveuamap.com/',somalia:'https://somalia.liveuamap.com/'};document.getElementById('opsViewport').innerHTML=`<iframe class='map-frame' src='${m[z]}'></iframe>`}
+function setConflict(z){const m={iran:'https://iran.liveuamap.com/',sudan:'https://sudan.liveuamap.com/',nigeria:'https://nigeria.liveuamap.com/',sahel:'https://sahel.liveuamap.com/',drcongo:'https://drcongo.liveuamap.com/',ethiopia:'https://ethiopia.liveuamap.com/',somalia:'https://somalia.liveuamap.com/'};window.open(m[z],'_blank')}
 function loadConflict(){active('afrMapBtn');renderOps(`
 <button class='command-btn' onclick='loadAfrMap()'>← BACK</button><br><br>
-<button class='command-btn' onclick=\"setConflict('iran')\">MIDDLE EAST</button><br><br>
-<button class='command-btn' onclick=\"setConflict('sudan')\">SUDAN</button><br><br>
-<button class='command-btn' onclick=\"setConflict('nigeria')\">NIGERIA</button><br><br>
-<button class='command-btn' onclick=\"setConflict('sahel')\">SAHEL</button><br><br>
-<button class='command-btn' onclick=\"setConflict('drcongo')\">DR CONGO</button><br><br>
-<button class='command-btn' onclick=\"setConflict('ethiopia')\">ETHIOPIA</button><br><br>
-<button class='command-btn' onclick=\"setConflict('somalia')\">SOMALIA</button>
-`,`<iframe class='map-frame' src='https://drcongo.liveuamap.com/'></iframe>`);showLayerPanels()}
+<button class='command-btn' onclick=\"setConflict('iran')\">MIDDLE EAST ↗</button><br><br>
+<button class='command-btn' onclick=\"setConflict('sudan')\">SUDAN ↗</button><br><br>
+<button class='command-btn' onclick=\"setConflict('nigeria')\">NIGERIA ↗</button><br><br>
+<button class='command-btn' onclick=\"setConflict('sahel')\">SAHEL ↗</button><br><br>
+<button class='command-btn' onclick=\"setConflict('drcongo')\">DR CONGO ↗</button><br><br>
+<button class='command-btn' onclick=\"setConflict('ethiopia')\">ETHIOPIA ↗</button><br><br>
+<button class='command-btn' onclick=\"setConflict('somalia')\">SOMALIA ↗</button>
+`,`<div style='display:flex;align-items:center;justify-content:center;height:100%;font-family:Share Tech Mono,monospace;color:#7fd6df;font-size:14px;text-align:center;padding:40px'><div><div style='font-size:40px;margin-bottom:16px'>🗺</div><div style='color:#00ffee;font-size:16px;letter-spacing:2px;margin-bottom:12px'>CONFLICT MAP</div><div style='color:#7fd6df;font-size:12px;line-height:1.6'>Select a region from the left panel.<br>Maps open in a new tab via liveuamap.com</div></div></div>`);showLayerPanels()}
 function setMarine(z){const f={hormuz:'https://www.marinetraffic.com/en/ais/embed/zoom:6/centery:25.9/centerx:57.6/maptype:4',bab:'https://www.marinetraffic.com/en/ais/embed/zoom:6/centery:12.6/centerx:43.3/maptype:4',suez:'https://www.marinetraffic.com/en/ais/embed/zoom:7/centery:30.5/centerx:32.3/maptype:4',bosporus:'https://www.marinetraffic.com/en/ais/embed/zoom:8/centery:41/centerx:29/maptype:4',malacca:'https://www.marinetraffic.com/en/ais/embed/zoom:5/centery:3.5/centerx:100.5/maptype:4',panama:'https://www.marinetraffic.com/en/ais/embed/zoom:8/centery:9.1/centerx:-79.7/maptype:4',gibraltar:'https://www.marinetraffic.com/en/ais/embed/zoom:8/centery:36/centerx:-5.5/maptype:4'};document.getElementById('marineFrame').innerHTML=`<iframe class='map-frame' src='${f[z]}'></iframe>`}
 function loadMarine(){active('afrMapBtn');renderOps(`
 <button class='command-btn' onclick='loadAfrMap()'>← BACK</button><br><br>
