@@ -1271,7 +1271,7 @@ var keyField=document.getElementById('aiDSKeyField');
 if(!aiDSApiKey){
 var k=keyField.value.trim();
 if(!k){statusEl.style.display='block';statusEl.innerHTML='<span style="color:#ffaa00">⚠ Enter your OpenAI API key above first</span>';return}
-aiDSApiKey=k;
+aiDSApiKey=k.replace(/[^\x20-\x7E]/g,'');
 keyField.style.display='none';
 document.getElementById('aiDSKeyInput').style.display='none';
 }
