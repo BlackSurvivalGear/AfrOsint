@@ -1530,7 +1530,7 @@ function loadAfrMap(){afrRegionIdx=0;active('afrMapBtn');renderOps(`
 <button class='command-btn' onclick='aiNewsAnalysis()' style='border-color:#ffaa0044;color:#ffaa00'>📡 NEWS INTEL</button><br><br>
 <button class='command-btn' onclick='aiDiasporaBrief()' style='border-color:#00ccff44;color:#00ccff'>🌍 DIASPORA BRIEF</button><br><br>
 <button class='command-btn' onclick='aiBugoutPlan()' style='border-color:#ff880044;color:#ff8800'>🚁 AI BUGOUT</button>
-`,`<div id='afrMapContainer' style='height:100%;width:100%;position:relative'><div id='afrGoogleDirections' style='position:absolute;bottom:10px;left:10px;z-index:1001;background:rgba(6,16,24,0.92);border:1px solid #00ffee44;border-radius:6px;padding:0;font-family:Share Tech Mono,monospace;width:280px;cursor:default'><div id='afrGDragHandle' style='color:#00ffee;font-size:11px;letter-spacing:2px;padding:10px 14px 8px;text-shadow:0 0 6px #00ffee66;cursor:move;display:flex;justify-content:space-between;align-items:center;user-select:none' onmousedown='afrStartDrag(event)'><span>AfrOSINT MAP TOOL</span><span style='cursor:pointer;font-size:9px' onclick='var body=document.getElementById("afrGBody");var arrow=this;if(body.style.display==="none"){body.style.display="block";arrow.textContent="▼"}else{body.style.display="none";arrow.textContent="▶"}'>▼</span></div><div id='afrGBody' style='padding:0 14px 10px'><input id='afrGFrom' placeholder='From (or leave blank for map center)' style='width:100%;padding:6px;margin-bottom:6px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><input id='afrGTo' placeholder='To (destination)' style='width:100%;padding:6px;margin-bottom:8px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><button onclick='afrGoogleDirectionsGo()' style='width:100%;padding:6px;background:#00ffee22;border:1px solid #00ffee;color:#00ffee;font-size:11px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>DIRECTIONS</button><button onclick='aiRouteRisk()' style='width:100%;padding:6px;margin-top:6px;background:#44ff8811;border:1px solid #44ff8844;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>🛡️ AI ROUTE RISK</button><div style='margin-top:6px;display:flex;gap:6px'><button onclick='afrGoogleSearch()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>SEARCH</button><button onclick='afrGoogleStreetView()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>STREET VIEW</button></div></div></div><div id='afrNewsBoxes' style='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1100'></div><div id='mapFeedPanel' style='position:absolute;top:10px;right:10px;width:380px;height:70%;z-index:1150;background:rgba(6,16,24,0.96);border:1px solid #00ffee44;border-radius:6px;pointer-events:auto;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.5)'><div id='mapFeedDragHandle' style='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #00ffee44;flex-shrink:0;cursor:move;user-select:none' onmousedown='startPanelDrag(event,"mapFeedPanel")' ontouchstart='startPanelDrag(event,"mapFeedPanel")'><div style='display:flex;align-items:center;gap:8px'><span style='color:#ff4444;font-size:10px'>&#9679;</span><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:12px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66'>LIVE FEED</span></div><div style='display:flex;gap:6px'><button onclick='event.stopPropagation();collapseMapFeed()' id='mapFeedCollapseBtn' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Collapse'>&#9660;</button><button onclick='event.stopPropagation();toggleMapFeedPanel()' style='background:transparent;border:1px solid #ff444444;color:#ff4444;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Close'>&#10005;</button></div></div><div id='mapFeedContent' style='flex:1;overflow-y:auto;padding:10px;min-height:0'></div></div></div>`);setTimeout(()=>{if(afrMapInstance){afrMapInstance.remove();afrMapInstance=null}afrCountryGeoLayer=null;afrHighlightLayer=null;afrMapInstance=L.map('afrMapContainer',{zoomControl:true,attributionControl:false}).setView([5,20],3);afrTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19});afrTileLayer.addTo(afrMapInstance);afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='GOOGLE MAP';L.control.attribution({prefix:false,position:'bottomright'}).addAttribution('AfrOSINT').addTo(afrMapInstance);var gd=document.getElementById('afrGoogleDirections');if(gd){L.DomEvent.disableClickPropagation(gd);L.DomEvent.disableScrollPropagation(gd)}initAfrLayers();initCountryBorders();afrNewsBoxCount=0;document.getElementById('afrNewsBoxes').innerHTML='';afrAddNewsBox();showLayerPanels();_showMapFeedOnLoad()},100)}
+`,`<div id='afrMapContainer' style='height:100%;width:100%;position:relative'><div id='afrGoogleDirections' style='position:absolute;bottom:10px;left:10px;z-index:1001;background:rgba(6,16,24,0.92);border:1px solid #00ffee44;border-radius:6px;padding:0;font-family:Share Tech Mono,monospace;width:280px;cursor:default'><div id='afrGDragHandle' style='color:#00ffee;font-size:11px;letter-spacing:2px;padding:10px 14px 8px;text-shadow:0 0 6px #00ffee66;cursor:move;display:flex;justify-content:space-between;align-items:center;user-select:none' onmousedown='afrStartDrag(event)'><span>AfrOSINT MAP TOOL</span><span style='cursor:pointer;font-size:9px' onclick='var body=document.getElementById("afrGBody");var arrow=this;if(body.style.display==="none"){body.style.display="block";arrow.textContent="▼"}else{body.style.display="none";arrow.textContent="▶"}'>▼</span></div><div id='afrGBody' style='padding:0 14px 10px'><input id='afrGFrom' placeholder='From (or leave blank for map center)' style='width:100%;padding:6px;margin-bottom:6px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><input id='afrGTo' placeholder='To (destination)' style='width:100%;padding:6px;margin-bottom:8px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><button onclick='afrGoogleDirectionsGo()' style='width:100%;padding:6px;background:#00ffee22;border:1px solid #00ffee;color:#00ffee;font-size:11px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>DIRECTIONS</button><button onclick='aiRouteRisk()' style='width:100%;padding:6px;margin-top:6px;background:#44ff8811;border:1px solid #44ff8844;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>🛡️ AI ROUTE RISK</button><div style='margin-top:6px;display:flex;gap:6px'><button onclick='afrGoogleSearch()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>SEARCH</button><button onclick='afrGoogleStreetView()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>STREET VIEW</button></div></div></div><div id='afrNewsBoxes' style='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1100'></div><div id='mapFeedPanel' style='position:absolute;top:50px;right:10px;width:380px;height:65%;z-index:1150;background:rgba(6,16,24,0.96);border:1px solid #00ffee44;border-radius:6px;pointer-events:auto;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.5)'><div id='mapFeedDragHandle' style='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #00ffee44;flex-shrink:0;cursor:move;user-select:none'><div style='display:flex;align-items:center;gap:8px'><span style='color:#ff4444;font-size:10px'>&#9679;</span><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:12px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66'>LIVE FEED</span></div><div style='display:flex;gap:6px'><button id='mapFeedCollapseBtn' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Collapse'>&#9660;</button><button id='mapFeedCloseBtn' style='background:transparent;border:1px solid #ff444444;color:#ff4444;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Close'>&#10005;</button></div></div><div id='mapFeedContent' style='flex:1;overflow-y:auto;padding:10px;min-height:0'></div></div></div>`);setTimeout(()=>{if(afrMapInstance){afrMapInstance.remove();afrMapInstance=null}afrCountryGeoLayer=null;afrHighlightLayer=null;afrMapInstance=L.map('afrMapContainer',{zoomControl:true,attributionControl:false}).setView([5,20],3);afrTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19});afrTileLayer.addTo(afrMapInstance);afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='GOOGLE MAP';L.control.attribution({prefix:false,position:'bottomright'}).addAttribution('AfrOSINT').addTo(afrMapInstance);var gd=document.getElementById('afrGoogleDirections');if(gd){L.DomEvent.disableClickPropagation(gd);L.DomEvent.disableScrollPropagation(gd)}initAfrLayers();initCountryBorders();afrNewsBoxCount=0;document.getElementById('afrNewsBoxes').innerHTML='';afrAddNewsBox();showLayerPanels();_showMapFeedOnLoad()},100)}
 function initAfrLayers(){afrConflictLayer=L.layerGroup();afrConflictZones.forEach(z=>{L.circle([z.lat,z.lng],{radius:z.radius,color:z.color,fillColor:z.color,fillOpacity:0.15,weight:1.5,opacity:0.7}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#ff4444'>${z.name}</strong><br>${z.info}</div>`).addTo(afrConflictLayer)});afrConflictVisible=false;const baseColors={US:'#4488ff',UK:'#44cc44',FR:'#ffffff'};afrBasesLayer=L.layerGroup();afrMilitaryBases.forEach(b=>{const c=baseColors[b.co]||'#4488ff';L.circleMarker([b.lat,b.lng],{radius:6,color:c,fillColor:c,fillOpacity:0.8,weight:1.5}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:${c}'>${b.name}</strong><br>${b.info}</div>`).addTo(afrBasesLayer)});afrBasesVisible=false;afrShippingLayer=L.layerGroup();afrShippingRoutes.forEach(r=>{L.polyline(r.points,{color:'#44ddff',weight:2.5,opacity:0.6,dashArray:'8,6'}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#44ddff'>${r.name}</strong><br>${r.info}</div>`).addTo(afrShippingLayer)});afrShippingVisible=false;afrOilLayer=L.layerGroup();afrOilGas.forEach(o=>{L.circleMarker([o.lat,o.lng],{radius:5,color:'#ffaa00',fillColor:'#ffaa00',fillOpacity:0.8,weight:1.5}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#ffaa00'>${o.name}</strong><br>${o.info}</div>`).addTo(afrOilLayer)});afrOilVisible=false;afrDisputedLayer=L.layerGroup();afrDisputedTerritories.forEach(d=>{L.circle([d.lat,d.lng],{radius:d.radius,color:'#cc44ff',fillColor:'#cc44ff',fillOpacity:0.1,weight:1.5,opacity:0.5,dashArray:'6,4'}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#cc44ff'>${d.name}</strong><br>${d.info}</div>`).addTo(afrDisputedLayer)});afrDisputedVisible=false;const langColors={en:'#ff6666',fr:'#6699ff',pt:'#66ff66',de:'#ffcc00',es:'#ff9933',nl:'#ff66cc',ar:'#00ffcc'};afrLangLayer=L.layerGroup();afrLangZones.forEach(z=>{const c=langColors[z.lang]||'#ffffff';L.circle([z.lat,z.lng],{radius:z.radius,color:c,fillColor:c,fillOpacity:0.15,weight:1.5,opacity:0.6}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:${c}'>${z.name}</strong><br>${z.info}</div>`).addTo(afrLangLayer)});afrLangVisible=false}
 var afrCountryGeoLayer=null,afrHighlightLayer=null,afrCountryDataCache={};
 function initCountryBorders(){
@@ -1788,7 +1788,39 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 
 loadTicker();loadHeadlines();
 
-var _mapFeedVisible=true,_mapFeedCollapsed=false;
+var _mapFeedVisible=true,_mapFeedCollapsed=false,_mapFeedScrollInit=false;
+var _mfDragEl=null,_mfDragOX=0,_mfDragOY=0;
+function _mfDragStart(e){
+if(e.target.tagName==='BUTTON')return;
+var t=e.touches?e.touches[0]:e;
+_mfDragEl=document.getElementById('mapFeedPanel');
+if(!_mfDragEl)return;
+e.preventDefault();
+var r=_mfDragEl.getBoundingClientRect();
+var p=_mfDragEl.parentElement.getBoundingClientRect();
+_mfDragOX=t.clientX-r.left;_mfDragOY=t.clientY-r.top;
+_mfDragEl.style.right='auto';
+_mfDragEl.style.left=(r.left-p.left)+'px';
+_mfDragEl.style.top=(r.top-p.top)+'px';
+document.addEventListener('mousemove',_mfDragMove);
+document.addEventListener('mouseup',_mfDragEnd);
+document.addEventListener('touchmove',_mfDragMove,{passive:false});
+document.addEventListener('touchend',_mfDragEnd);
+}
+function _mfDragMove(e){
+if(!_mfDragEl)return;e.preventDefault();
+var t=e.touches?e.touches[0]:e;
+var p=_mfDragEl.parentElement.getBoundingClientRect();
+_mfDragEl.style.left=Math.max(0,t.clientX-_mfDragOX-p.left)+'px';
+_mfDragEl.style.top=Math.max(0,t.clientY-_mfDragOY-p.top)+'px';
+}
+function _mfDragEnd(){
+document.removeEventListener('mousemove',_mfDragMove);
+document.removeEventListener('mouseup',_mfDragEnd);
+document.removeEventListener('touchmove',_mfDragMove);
+document.removeEventListener('touchend',_mfDragEnd);
+_mfDragEl=null;
+}
 function toggleMapFeedPanel(){
 var panel=document.getElementById('mapFeedPanel');
 if(!panel)return;
@@ -1796,7 +1828,9 @@ _mapFeedVisible=!_mapFeedVisible;
 var btn=document.getElementById('mapFeedToggleBtn');
 if(_mapFeedVisible){
 panel.style.display='flex';
-if(_mapFeedCollapsed){_mapFeedCollapsed=false;panel.style.height='70%';var content=document.getElementById('mapFeedContent');if(content)content.style.display='block';var cbtn=document.getElementById('mapFeedCollapseBtn');if(cbtn)cbtn.innerHTML='&#9660;'}
+_mapFeedCollapsed=false;panel.style.height='65%';
+var content=document.getElementById('mapFeedContent');if(content)content.style.display='block';
+var cbtn=document.getElementById('mapFeedCollapseBtn');if(cbtn)cbtn.innerHTML='&#9660;';
 if(btn){btn.style.borderColor='#ff4444';btn.style.color='#ff4444';btn.textContent='CLOSE FEED'}
 _initMapFeedScroll();
 _loadMapFeed();
@@ -1804,40 +1838,39 @@ _loadMapFeed();
 panel.style.display='none';
 if(btn){btn.style.borderColor='#ff444444';btn.style.color='#ff4444';btn.textContent='LIVE FEED'}
 }}
-function collapseMapFeed(){
-var panel=document.getElementById('mapFeedPanel');
-var content=document.getElementById('mapFeedContent');
-var btn=document.getElementById('mapFeedCollapseBtn');
-if(!panel||!content)return;
-_mapFeedCollapsed=!_mapFeedCollapsed;
-if(_mapFeedCollapsed){
-content.style.display='none';
-panel.style.height='auto';
-if(btn)btn.innerHTML='&#9650;';
-}else{
-content.style.display='block';
-panel.style.height='70%';
-if(btn)btn.innerHTML='&#9660;';
-}}
-var _mapFeedScrollInit=false;
 function _initMapFeedScroll(){
-if(_mapFeedScrollInit)return;
 var panel=document.getElementById('mapFeedPanel');
 var content=document.getElementById('mapFeedContent');
+var handle=document.getElementById('mapFeedDragHandle');
+var colBtn=document.getElementById('mapFeedCollapseBtn');
+var clsBtn=document.getElementById('mapFeedCloseBtn');
 if(!panel||!content)return;
+if(!_mapFeedScrollInit){
 _mapFeedScrollInit=true;
 panel.addEventListener('wheel',function(e){e.stopPropagation()},{passive:false});
 panel.addEventListener('touchmove',function(e){e.stopPropagation()},{passive:false});
 content.addEventListener('wheel',function(e){e.stopPropagation()},{passive:false});
 content.addEventListener('touchmove',function(e){e.stopPropagation()},{passive:false});
+if(handle){handle.addEventListener('mousedown',_mfDragStart);handle.addEventListener('touchstart',_mfDragStart,{passive:false})}
+if(colBtn){colBtn.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();
+var p=document.getElementById('mapFeedPanel');
+var c=document.getElementById('mapFeedContent');
+var b=document.getElementById('mapFeedCollapseBtn');
+if(!p||!c)return;
+_mapFeedCollapsed=!_mapFeedCollapsed;
+if(_mapFeedCollapsed){c.style.display='none';p.style.height='auto';if(b)b.innerHTML='&#9650;'}
+else{c.style.display='block';p.style.height='65%';if(b)b.innerHTML='&#9660;'}
+})}
+if(clsBtn){clsBtn.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();toggleMapFeedPanel()})}
 if(window.L&&window.L.DomEvent){L.DomEvent.disableClickPropagation(panel);L.DomEvent.disableScrollPropagation(panel)}
-}
+}}
 function _showMapFeedOnLoad(){
 var panel=document.getElementById('mapFeedPanel');
 if(!panel)return;
-_mapFeedVisible=true;_mapFeedCollapsed=false;
+_mapFeedVisible=true;_mapFeedCollapsed=false;_mapFeedScrollInit=false;
 panel.style.display='flex';
-panel.style.height='70%';
+panel.style.height='65%';
+panel.style.top='50px';panel.style.right='10px';panel.style.left='';
 var content=document.getElementById('mapFeedContent');
 if(content)content.style.display='block';
 var btn=document.getElementById('mapFeedToggleBtn');
