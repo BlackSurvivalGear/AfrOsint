@@ -1812,12 +1812,47 @@ if(_liveFeedMode==='osint'){_fetchOsintTweets(vp)}else{_fetchLiveNews(vp)}
 async function _fetchOsintTweets(vp){
 var accounts=['Conflict_Radar','Natsecjeff','sentdefender','Osint613','MenchOsint'];
 var allTweets=[];
+var apiBaseUrls=['https://situation-monitor.vercel.app','https://situation-monitor-one.vercel.app','https://situation-monitor-two.vercel.app'];
+var fetched=false;
+for(var b=0;b<apiBaseUrls.length&&!fetched;b++){
+try{
+var apiUrl=apiBaseUrls[b]+'/api/nitter?users='+accounts.join(',');
+var r=await fetch(apiUrl);
+if(r.ok){
+var d=await r.json();
+var tweets=d.data||[];
+if(tweets.length>0){
+tweets.forEach(function(t){
+allTweets.push({
+text:t.full_text||'',
+created_at:t.created_at||'',
+user:{name:(t.user&&t.user.name)||'',screen_name:(t.user&&t.user.screen_name)||'',profile_image_url:(t.user&&t.user.profile_image_url)||''},
+media:[],
+retweet_count:0,
+favorite_count:0,
+reply_count:0
+})});
+fetched=true}}
+}catch(e){console.warn('Situation monitor API failed ('+apiBaseUrls[b]+'):',e)}}
+if(!fetched){
+try{
+var backendUrl='https://situation-monitor-api.vercel.app/nitter';
+var proxyUrl='https://api.allorigins.win/get?url='+encodeURIComponent(backendUrl);
+var r2=await fetch(proxyUrl);
+if(r2.ok){
+var wrapper=await r2.json();
+if(wrapper.contents){
+try{
+var parsed=JSON.parse(wrapper.contents);
+if(parsed.error&&parsed.error.indexOf('Cannot GET')>-1)throw new Error('GET not supported');
+}catch(parseErr){}}}}catch(e){console.warn('Backend API fallback failed:',e)}}
+if(!fetched){
 for(var i=0;i<accounts.length;i++){
 try{
 var synUrl='https://syndication.twitter.com/srv/timeline-profile/screen-name/'+accounts[i];
-var r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(synUrl));
-if(r.ok){
-var html=await r.text();
+var r3=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(synUrl));
+if(r3.ok){
+var html=await r3.text();
 var match=html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
 if(match&&match[1]){
 var pageData=JSON.parse(match[1]);
@@ -1838,13 +1873,17 @@ retweet_count:tw.retweet_count||0,
 favorite_count:tw.favorite_count||0,
 reply_count:tw.reply_count||0
 })})}}
-}catch(e){console.error('Tweet fetch error for '+accounts[i]+':',e)}}
-allTweets.sort(function(a,b){try{return new Date(b.created_at).getTime()-new Date(a.created_at).getTime()}catch(e){return 0}});
+}catch(e){console.error('Tweet fetch error for '+accounts[i]+':',e)}}}
+allTweets.sort(function(a,b){
+try{
+var da=new Date(a.created_at.replace(' · ',' ')).getTime();
+var db=new Date(b.created_at.replace(' · ',' ')).getTime();
+return db-da}catch(e){return 0}});
 if(!allTweets.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">Unable to load tweets. The feed may be temporarily unavailable.</div>';return}
 vp.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">'+allTweets.map(function(t){
 var imgHtml=t.media&&t.media[0]?'<img src="'+esc(t.media[0])+'" style="width:100%;max-height:240px;object-fit:cover;border-radius:6px;border:1px solid #00ffee22;margin-bottom:8px" onerror="this.style.display=\'none\'">':'';
 var avatarHtml=t.user&&t.user.profile_image_url?'<img src="'+esc(t.user.profile_image_url)+'" style="width:36px;height:36px;border-radius:50%;border:1px solid #00ffee44;flex-shrink:0" onerror="this.style.display=\'none\'">':'';
-var dateStr='';try{var dd=new Date(t.created_at);if(!isNaN(dd))dateStr=dd.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){}
+var dateStr='';try{var rawDate=t.created_at.replace(' · ',' ');var dd=new Date(rawDate);if(!isNaN(dd))dateStr=dd.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){}
 return '<a href="https://x.com/'+esc(t.user.screen_name)+'" target="_blank" style="text-decoration:none;display:block"><div style="background:#081821;border:1px solid #00ffee33;border-radius:8px;padding:14px;transition:border-color 0.15s,box-shadow 0.15s" onmouseenter="this.style.borderColor=\'#00ffee\';this.style.boxShadow=\'0 0 12px #00ffee44\'" onmouseleave="this.style.borderColor=\'#00ffee33\';this.style.boxShadow=\'none\'">'
 +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
 +avatarHtml
