@@ -1796,6 +1796,7 @@ _mapFeedVisible=!_mapFeedVisible;
 var btn=document.getElementById('mapFeedToggleBtn');
 if(_mapFeedVisible){
 panel.style.display='flex';
+if(_mapFeedCollapsed){_mapFeedCollapsed=false;panel.style.height='70%';var content=document.getElementById('mapFeedContent');if(content)content.style.display='block';var cbtn=document.getElementById('mapFeedCollapseBtn');if(cbtn)cbtn.innerHTML='&#9660;'}
 if(btn){btn.style.borderColor='#ff4444';btn.style.color='#ff4444';btn.textContent='CLOSE FEED'}
 _initMapFeedScroll();
 _loadMapFeed();
@@ -1818,10 +1819,13 @@ content.style.display='block';
 panel.style.height='70%';
 if(btn)btn.innerHTML='&#9660;';
 }}
+var _mapFeedScrollInit=false;
 function _initMapFeedScroll(){
+if(_mapFeedScrollInit)return;
 var panel=document.getElementById('mapFeedPanel');
 var content=document.getElementById('mapFeedContent');
 if(!panel||!content)return;
+_mapFeedScrollInit=true;
 panel.addEventListener('wheel',function(e){e.stopPropagation()},{passive:false});
 panel.addEventListener('touchmove',function(e){e.stopPropagation()},{passive:false});
 content.addEventListener('wheel',function(e){e.stopPropagation()},{passive:false});
