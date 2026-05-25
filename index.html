@@ -1884,7 +1884,7 @@ async function _loadMapFeed(){
 var content=document.getElementById('mapFeedContent');
 if(!content)return;
 content.innerHTML='<div style="text-align:center;color:#00ffee;font-family:Share Tech Mono,monospace;padding:30px;letter-spacing:2px;font-size:11px">LOADING FEED...</div>';
-var accounts=['Conflict_Radar','Natsecjeff','sentdefender','Osint613','MenchOsint'];
+var accounts=['Conflict_Radar','Natsecjeff','sentdefender','Osint613','MenchOsint','AfriMEOSINT','AfriOSINT1'];
 var allItems=[];
 var fetches=accounts.map(function(acct){
 return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://nitter.net/'+acct+'/rss'))
@@ -1954,7 +1954,7 @@ if(_liveFeedMode==='osint'){_fetchOsintTweets(vp)}else{_fetchLiveNews(vp)}
 }
 
 async function _fetchOsintTweets(vp){
-var accounts=['Conflict_Radar','Natsecjeff','sentdefender','Osint613','MenchOsint'];
+var accounts=['Conflict_Radar','Natsecjeff','sentdefender','Osint613','MenchOsint','AfriMEOSINT','AfriOSINT1'];
 var allTweets=[];
 var fetches=accounts.map(function(acct){
 return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://nitter.net/'+acct+'/rss'))
