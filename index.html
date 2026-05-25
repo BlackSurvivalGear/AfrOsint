@@ -1357,6 +1357,32 @@ document.getElementById('aiSitRepContent').innerHTML='<span style="color:#ff4444
 });
 }
 
+// === AI BUGOUT PLANNER ===
+function aiBugoutPlan(countryName){
+if(!aiDSApiKey){alert('Enter your OpenAI API key in the AI Decision Support panel first, then click UPDATE INTEL.');return}
+var overlay=document.createElement('div');
+overlay.id='aiBugoutOverlay';
+overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+overlay.innerHTML='<div style="background:rgba(6,16,24,0.98);border:1px solid #ff8800;border-radius:8px;max-width:650px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;font-family:Share Tech Mono,monospace;color:#d7ffff;font-size:12px;line-height:1.6;position:relative"><button onclick="document.getElementById(\'aiBugoutOverlay\').remove()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#ff4444;font-size:18px;cursor:pointer">✕</button><div style="color:#ff8800;font-size:14px;letter-spacing:2px;margin-bottom:12px;text-shadow:0 0 8px #ff880066">🚁 AI BUGOUT PLAN: '+esc(countryName)+'</div><div id="aiBugoutContent" style="color:#7fd6df">⟳ Generating evacuation plan...</div></div>';
+document.body.appendChild(overlay);
+var prompt='Generate a comprehensive BUGOUT / EVACUATION PLAN for someone currently in '+countryName+'. This is a survival-focused operational plan for emergency extraction. Include these sections:\n\n1. THREAT ASSESSMENT: Current threat level, most likely crisis scenarios (coup, civil unrest, natural disaster, conflict spillover), and early warning indicators to watch for.\n2. NEAREST EMBASSIES & CONSULATES: List the major embassies in the capital and key cities (US, UK, EU, AU, ECOWAS). Include general district/area locations.\n3. EXTRACTION ROUTES: Primary and secondary overland routes out of the country. Include border crossings, which borders are safest, and which to avoid. Note terrain challenges.\n4. AIR EVACUATION: International airports, regional airstrips, airlines with frequent departures, and charter options. Which airports are likely to remain operational in a crisis.\n5. SAFE HAVENS & RALLY POINTS: Types of safe locations (international hotels, religious compounds, UN compounds, embassy areas). General areas to move toward vs. avoid.\n6. COMMUNICATIONS PLAN: Local emergency numbers, which networks/carriers work best, satellite phone necessity, internet reliability, offline map recommendations, radio frequencies if relevant.\n7. GO-BAG ESSENTIALS: Region-specific survival kit recommendations. Consider climate, terrain, local currency needs, documents to carry, medical supplies, water purification needs.\n8. TIMING & TRIGGERS: What signals should trigger immediate departure vs. elevated alertness. Historical patterns of instability in this country.\n9. NEIGHBORING COUNTRY OPTIONS: Rank neighboring countries by safety for evacuation. Include visa requirements, reception of refugees/evacuees, and infrastructure at border towns.\n10. CRITICAL WARNINGS: Country-specific dangers — roadblocks, checkpoints, bribery protocols, areas controlled by armed groups, seasonal hazards, health risks.\n\nBe specific, actionable, and realistic. This is life-or-death planning — no fluff. Include practical details that someone on the ground would need.';
+fetch('https://api.openai.com/v1/chat/completions',{
+method:'POST',
+headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiDSApiKey},
+body:JSON.stringify({model:'gpt-4o',messages:[{role:'system',content:'You are a senior crisis evacuation planner and survival specialist with deep knowledge of African geopolitics, terrain, and infrastructure. You create actionable bugout plans for people in potentially dangerous situations across Africa. Your advice must be practical, specific, and grounded in reality. Use markdown-style formatting with ## headers and bullet points. Prioritize life safety above all else.'},{role:'user',content:prompt}],temperature:0.7,max_tokens:4000})
+}).then(function(r){if(!r.ok)throw new Error('API error: '+r.status);return r.json()}).then(function(data){
+var content=data.choices[0].message.content;
+content=content.replace(/^## (.+)$/gm,'<div style="color:#ff8800;font-size:12px;letter-spacing:1px;margin-top:14px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #ff880033">$1</div>');
+content=content.replace(/^### (.+)$/gm,'<div style="color:#ffcc00;font-size:11px;margin-top:10px;margin-bottom:4px">$1</div>');
+content=content.replace(/^\- (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">• $1</div>');
+content=content.replace(/\*\*(.+?)\*\*/g,'<span style="color:#ffffff;font-weight:bold">$1</span>');
+content=content.replace(/\n/g,'<br>');
+var el=document.getElementById('aiBugoutContent');if(el)el.innerHTML=content;
+}).catch(function(err){
+var el=document.getElementById('aiBugoutContent');if(el)el.innerHTML='<span style="color:#ff4444">Error: '+err.message+'</span>';
+});
+}
+
 // === SCENARIO PLANNER ===
 function aiScenarioPlanner(){
 var input=document.getElementById('aiScenarioInput');
@@ -1538,7 +1564,7 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Black Population</td><td style="color:#ffcc00">'+(blackPopPct[info.name]!==undefined?blackPopPct[info.name]+'%':'N/A')+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Timezone</td><td style="color:#d7ffff">'+info.timezone+'</td></tr>'+
 '</table>'+
-'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupHeadlineSlide()" style="border-color:#d7a0ff55;color:#d7a0ff">📋 HEADLINES</button><button class="popup-action-btn" onclick="showPopupNewsSlide()" style="border-color:#44ff8855;color:#44ff88">📰 LIVE NEWS</button><button class="popup-action-btn" onclick="showPopupFxSlide()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugoutSlide()" style="border-color:#ff880055;color:#ff8800">🚁 BUGOUT</button><button class="popup-action-btn" onclick="aiSitRep(_lastPopupInfo.name);afrMapInstance.closePopup()" style="border-color:#44ff8855;color:#44ff88">📋 SITREP</button></div>'+
+'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupHeadlineSlide()" style="border-color:#d7a0ff55;color:#d7a0ff">📋 HEADLINES</button><button class="popup-action-btn" onclick="showPopupNewsSlide()" style="border-color:#44ff8855;color:#44ff88">📰 LIVE NEWS</button><button class="popup-action-btn" onclick="showPopupFxSlide()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugoutSlide()" style="border-color:#ff880055;color:#ff8800">🚁 BUGOUT</button><button class="popup-action-btn" onclick="aiSitRep(_lastPopupInfo.name);afrMapInstance.closePopup()" style="border-color:#44ff8855;color:#44ff88">📋 SITREP</button><button class="popup-action-btn" onclick="aiBugoutPlan(_lastPopupInfo.name);afrMapInstance.closePopup()" style="border-color:#ff880055;color:#ff8800">🚁 AI BUGOUT</button></div>'+
 '</div>'+
 '<div id="popupFxSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
 '<div id="popupBugoutSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
