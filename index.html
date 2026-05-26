@@ -1530,7 +1530,7 @@ function loadAfrMap(){afrRegionIdx=0;active('afrMapBtn');renderOps(`
 <button class='command-btn' onclick='aiNewsAnalysis()' style='border-color:#ffaa0044;color:#ffaa00'>📡 NEWS INTEL</button><br><br>
 <button class='command-btn' onclick='aiDiasporaBrief()' style='border-color:#00ccff44;color:#00ccff'>🌍 DIASPORA BRIEF</button><br><br>
 <button class='command-btn' onclick='aiBugoutPlan()' style='border-color:#ff880044;color:#ff8800'>🚁 AI BUGOUT</button>
-`,`<div id='afrMapContainer' style='height:100%;width:100%;position:relative'><div id='afrGoogleDirections' style='position:absolute;bottom:10px;left:10px;z-index:1001;background:rgba(6,16,24,0.92);border:1px solid #00ffee44;border-radius:6px;padding:0;font-family:Share Tech Mono,monospace;width:280px;cursor:default'><div id='afrGDragHandle' style='color:#00ffee;font-size:11px;letter-spacing:2px;padding:10px 14px 8px;text-shadow:0 0 6px #00ffee66;cursor:move;display:flex;justify-content:space-between;align-items:center;user-select:none' onmousedown='afrStartDrag(event)'><span>AfrOSINT MAP TOOL</span><span style='cursor:pointer;font-size:9px' onclick='var body=document.getElementById("afrGBody");var arrow=this;if(body.style.display==="none"){body.style.display="block";arrow.textContent="▼"}else{body.style.display="none";arrow.textContent="▶"}'>▼</span></div><div id='afrGBody' style='padding:0 14px 10px'><input id='afrGFrom' placeholder='From (or leave blank for map center)' style='width:100%;padding:6px;margin-bottom:6px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><input id='afrGTo' placeholder='To (destination)' style='width:100%;padding:6px;margin-bottom:8px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><button onclick='afrGoogleDirectionsGo()' style='width:100%;padding:6px;background:#00ffee22;border:1px solid #00ffee;color:#00ffee;font-size:11px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>DIRECTIONS</button><button onclick='aiRouteRisk()' style='width:100%;padding:6px;margin-top:6px;background:#44ff8811;border:1px solid #44ff8844;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>🛡️ AI ROUTE RISK</button><div style='margin-top:6px;display:flex;gap:6px'><button onclick='afrGoogleSearch()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>SEARCH</button><button onclick='afrGoogleStreetView()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>STREET VIEW</button></div></div></div><div id='afrNewsBoxes' style='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1100'></div><div id='mapFeedPanel' style='position:absolute;top:50px;right:10px;width:380px;height:65%;z-index:1150;background:rgba(6,16,24,0.96);border:1px solid #00ffee44;border-radius:6px;pointer-events:auto;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.5)'><div id='mapFeedDragHandle' style='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #00ffee44;flex-shrink:0;cursor:move;user-select:none'><div style='display:flex;align-items:center;gap:8px'><span style='color:#ff4444;font-size:10px'>&#9679;</span><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:12px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66'>LIVE FEED</span></div><div style='display:flex;gap:6px'><button id='mapFeedCollapseBtn' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Collapse'>&#9660;</button><button id='mapFeedCloseBtn' style='background:transparent;border:1px solid #ff444444;color:#ff4444;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Close'>&#10005;</button></div></div><div id='mapFeedContent' style='flex:1;overflow-y:auto;padding:10px;min-height:0'></div></div></div>`);setTimeout(()=>{if(afrMapInstance){afrMapInstance.remove();afrMapInstance=null}afrCountryGeoLayer=null;afrHighlightLayer=null;afrMapInstance=L.map('afrMapContainer',{zoomControl:true,attributionControl:false}).setView([5,20],3);afrTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19});afrTileLayer.addTo(afrMapInstance);afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='GOOGLE MAP';L.control.attribution({prefix:false,position:'bottomright'}).addAttribution('AfrOSINT').addTo(afrMapInstance);var gd=document.getElementById('afrGoogleDirections');if(gd){L.DomEvent.disableClickPropagation(gd);L.DomEvent.disableScrollPropagation(gd)}initAfrLayers();initCountryBorders();afrNewsBoxCount=0;document.getElementById('afrNewsBoxes').innerHTML='';afrAddNewsBox();showLayerPanels();_showMapFeedOnLoad()},100)}
+`,`<div id='afrMapContainer' style='height:100%;width:100%;position:relative'><div id='afrGoogleDirections' style='position:absolute;bottom:10px;left:10px;z-index:1001;background:rgba(6,16,24,0.92);border:1px solid #00ffee44;border-radius:6px;padding:0;font-family:Share Tech Mono,monospace;width:280px;cursor:default'><div id='afrGDragHandle' style='color:#00ffee;font-size:11px;letter-spacing:2px;padding:10px 14px 8px;text-shadow:0 0 6px #00ffee66;cursor:move;display:flex;justify-content:space-between;align-items:center;user-select:none' onmousedown='afrStartDrag(event)'><span>AfrOSINT MAP TOOL</span><span style='cursor:pointer;font-size:9px' onclick='var body=document.getElementById("afrGBody");var arrow=this;if(body.style.display==="none"){body.style.display="block";arrow.textContent="▼"}else{body.style.display="none";arrow.textContent="▶"}'>▼</span></div><div id='afrGBody' style='padding:0 14px 10px'><input id='afrGFrom' placeholder='From (or leave blank for map center)' style='width:100%;padding:6px;margin-bottom:6px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><input id='afrGTo' placeholder='To (destination)' style='width:100%;padding:6px;margin-bottom:8px;background:#0a1a28;border:1px solid #00ffee44;color:#d7ffff;font-size:11px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box' /><button onclick='afrGoogleDirectionsGo()' style='width:100%;padding:6px;background:#00ffee22;border:1px solid #00ffee;color:#00ffee;font-size:11px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>DIRECTIONS</button><button onclick='aiRouteRisk()' style='width:100%;padding:6px;margin-top:6px;background:#44ff8811;border:1px solid #44ff8844;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px'>🛡️ AI ROUTE RISK</button><div style='margin-top:6px;display:flex;gap:6px'><button onclick='afrGoogleSearch()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>SEARCH</button><button onclick='afrGoogleStreetView()' style='flex:1;padding:5px;background:#00ffee11;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace'>STREET VIEW</button></div></div></div><div id='afrNewsBoxes' style='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1100'></div><div id='mapFeedPanel' style='position:absolute;top:50px;right:10px;width:380px;height:65%;z-index:1150;background:rgba(6,16,24,0.96);border:1px solid #00ffee44;border-radius:6px;pointer-events:auto;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.5)'><div id='mapFeedDragHandle' style='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #00ffee44;flex-shrink:0;cursor:move;user-select:none'><div style='display:flex;align-items:center;gap:8px'><span style='color:#ff4444;font-size:10px'>&#9679;</span><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:12px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66'>LIVE FEED</span></div><div style='display:flex;gap:6px'><button id='mapFeedCollapseBtn' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Collapse'>&#9660;</button><button id='mapFeedCloseBtn' style='background:transparent;border:1px solid #ff444444;color:#ff4444;font-size:11px;cursor:pointer;padding:2px 8px;border-radius:3px;font-family:Share Tech Mono,monospace' title='Close'>&#10005;</button></div></div><div id='mapFeedTabs' style='display:flex;gap:0;border-bottom:1px solid #00ffee44;flex-shrink:0'><button id='mapFeedTabAll' style='flex:1;padding:6px 0;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:1px;border:none;cursor:pointer;background:#00ffee;color:#061018'>ALL</button><button id='mapFeedTabAfrica' style='flex:1;padding:6px 0;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:1px;border:none;border-left:1px solid #00ffee22;cursor:pointer;background:transparent;color:#00ffee'>AFRICA</button><button id='mapFeedTabGlobal' style='flex:1;padding:6px 0;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:1px;border:none;border-left:1px solid #00ffee22;cursor:pointer;background:transparent;color:#00ffee'>GLOBAL</button></div><div id='mapFeedContent' style='flex:1;overflow-y:auto;padding:10px;min-height:0'></div></div></div>`);setTimeout(()=>{if(afrMapInstance){afrMapInstance.remove();afrMapInstance=null}afrCountryGeoLayer=null;afrHighlightLayer=null;afrMapInstance=L.map('afrMapContainer',{zoomControl:true,attributionControl:false}).setView([5,20],3);afrTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19});afrTileLayer.addTo(afrMapInstance);afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='GOOGLE MAP';L.control.attribution({prefix:false,position:'bottomright'}).addAttribution('AfrOSINT').addTo(afrMapInstance);var gd=document.getElementById('afrGoogleDirections');if(gd){L.DomEvent.disableClickPropagation(gd);L.DomEvent.disableScrollPropagation(gd)}initAfrLayers();initCountryBorders();afrNewsBoxCount=0;document.getElementById('afrNewsBoxes').innerHTML='';afrAddNewsBox();showLayerPanels();_showMapFeedOnLoad()},100)}
 function initAfrLayers(){afrConflictLayer=L.layerGroup();afrConflictZones.forEach(z=>{L.circle([z.lat,z.lng],{radius:z.radius,color:z.color,fillColor:z.color,fillOpacity:0.15,weight:1.5,opacity:0.7}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#ff4444'>${z.name}</strong><br>${z.info}</div>`).addTo(afrConflictLayer)});afrConflictVisible=false;const baseColors={US:'#4488ff',UK:'#44cc44',FR:'#ffffff'};afrBasesLayer=L.layerGroup();afrMilitaryBases.forEach(b=>{const c=baseColors[b.co]||'#4488ff';L.circleMarker([b.lat,b.lng],{radius:6,color:c,fillColor:c,fillOpacity:0.8,weight:1.5}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:${c}'>${b.name}</strong><br>${b.info}</div>`).addTo(afrBasesLayer)});afrBasesVisible=false;afrShippingLayer=L.layerGroup();afrShippingRoutes.forEach(r=>{L.polyline(r.points,{color:'#44ddff',weight:2.5,opacity:0.6,dashArray:'8,6'}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#44ddff'>${r.name}</strong><br>${r.info}</div>`).addTo(afrShippingLayer)});afrShippingVisible=false;afrOilLayer=L.layerGroup();afrOilGas.forEach(o=>{L.circleMarker([o.lat,o.lng],{radius:5,color:'#ffaa00',fillColor:'#ffaa00',fillOpacity:0.8,weight:1.5}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#ffaa00'>${o.name}</strong><br>${o.info}</div>`).addTo(afrOilLayer)});afrOilVisible=false;afrDisputedLayer=L.layerGroup();afrDisputedTerritories.forEach(d=>{L.circle([d.lat,d.lng],{radius:d.radius,color:'#cc44ff',fillColor:'#cc44ff',fillOpacity:0.1,weight:1.5,opacity:0.5,dashArray:'6,4'}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:#cc44ff'>${d.name}</strong><br>${d.info}</div>`).addTo(afrDisputedLayer)});afrDisputedVisible=false;const langColors={en:'#ff6666',fr:'#6699ff',pt:'#66ff66',de:'#ffcc00',es:'#ff9933',nl:'#ff66cc',ar:'#00ffcc'};afrLangLayer=L.layerGroup();afrLangZones.forEach(z=>{const c=langColors[z.lang]||'#ffffff';L.circle([z.lat,z.lng],{radius:z.radius,color:c,fillColor:c,fillOpacity:0.15,weight:1.5,opacity:0.6}).bindPopup(`<div style='font-family:Share Tech Mono,monospace;font-size:12px'><strong style='color:${c}'>${z.name}</strong><br>${z.info}</div>`).addTo(afrLangLayer)});afrLangVisible=false}
 var afrCountryGeoLayer=null,afrHighlightLayer=null,afrCountryDataCache={};
 function initCountryBorders(){
@@ -1788,6 +1788,24 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 
 loadTicker();loadHeadlines();
 
+var _osintAccounts=[
+{handle:'Conflict_Radar',region:'global'},
+{handle:'Natsecjeff',region:'global'},
+{handle:'sentdefender',region:'global'},
+{handle:'Osint613',region:'global'},
+{handle:'MenchOsint',region:'global'},
+{handle:'AfriMEOSINT',region:'africa'},
+{handle:'AfriOSINT1',region:'africa'},
+{handle:'war_noir',region:'global'},
+{handle:'PopularFront_',region:'global'},
+{handle:'TheAfricaCorps',region:'africa'},
+{handle:'AJEnglish',region:'global'},
+{handle:'ReutersWorld',region:'global'},
+{handle:'ReutersAfrica',region:'africa'},
+{handle:'allafrica',region:'africa'},
+{handle:'DefenseNigeria',region:'africa'}
+];
+var _mapFeedTab='all',_mapFeedAllItems=[];
 var _mapFeedVisible=true,_mapFeedCollapsed=false,_mapFeedScrollInit=false;
 var _mfDragEl=null,_mfDragOX=0,_mfDragOY=0;
 function _mfDragStart(e){
@@ -1862,6 +1880,12 @@ if(_mapFeedCollapsed){c.style.display='none';p.style.height='auto';if(b)b.innerH
 else{c.style.display='block';p.style.height='65%';if(b)b.innerHTML='&#9660;'}
 })}
 if(clsBtn){clsBtn.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();toggleMapFeedPanel()})}
+var tabAll=document.getElementById('mapFeedTabAll');
+var tabAfrica=document.getElementById('mapFeedTabAfrica');
+var tabGlobal=document.getElementById('mapFeedTabGlobal');
+if(tabAll){tabAll.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();_switchMapFeedTab('all')})}
+if(tabAfrica){tabAfrica.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();_switchMapFeedTab('africa')})}
+if(tabGlobal){tabGlobal.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();_switchMapFeedTab('global')})}
 if(window.L&&window.L.DomEvent){L.DomEvent.disableClickPropagation(panel);L.DomEvent.disableScrollPropagation(panel)}
 }}
 function _showMapFeedOnLoad(){
@@ -1880,12 +1904,46 @@ if(cbtn)cbtn.innerHTML='&#9660;';
 _initMapFeedScroll();
 _loadMapFeed();
 }
+function _switchMapFeedTab(tab){
+_mapFeedTab=tab;
+var tabs=['All','Africa','Global'];
+tabs.forEach(function(t){
+var btn=document.getElementById('mapFeedTab'+t);
+if(!btn)return;
+if(t.toLowerCase()===tab){btn.style.background='#00ffee';btn.style.color='#061018'}
+else{btn.style.background='transparent';btn.style.color='#00ffee'}
+});
+_renderMapFeedItems();
+}
+function _renderMapFeedItems(){
+var content=document.getElementById('mapFeedContent');
+if(!content)return;
+var items=_mapFeedAllItems;
+if(_mapFeedTab==='africa')items=items.filter(function(t){return t._region==='africa'});
+else if(_mapFeedTab==='global')items=items.filter(function(t){return t._region==='global'});
+if(!items.length){content.innerHTML='<div style="text-align:center;color:#ff4444;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">No items for this filter</div>';return}
+content.innerHTML=items.map(function(t){
+var dateStr='';try{var dd=new Date(t.created_at);if(!isNaN(dd)){var now=new Date();var diff=now-dd;var mins=Math.floor(diff/60000);var hrs=Math.floor(diff/3600000);if(mins<60)dateStr=mins+'m ago';else if(hrs<24)dateStr=hrs+'h ago';else dateStr=dd.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}}catch(e){}
+var avatarHtml=t.user&&t.user.profile_image_url?'<img src="'+esc(t.user.profile_image_url)+'" style="width:32px;height:32px;border-radius:50%;border:1px solid #00ffee44;flex-shrink:0" onerror="this.style.display=\'none\'">':'';
+var imgHtml=t.media&&t.media[0]?'<img src="'+esc(t.media[0])+'" style="width:100%;max-height:180px;object-fit:cover;border-radius:6px;border:1px solid #00ffee22;margin-top:8px" onerror="this.style.display=\'none\'">':'';
+var tweetUrl=t.link||('https://x.com/'+t.user.screen_name);
+return '<a href="'+esc(tweetUrl)+'" target="_blank" style="text-decoration:none;display:block;margin-bottom:8px"><div style="background:#081821;border:1px solid #00ffee22;border-radius:8px;padding:12px;transition:border-color 0.15s,box-shadow 0.15s" onmouseenter="this.style.borderColor=\'#00ffee\';this.style.boxShadow=\'0 0 10px #00ffee33\'" onmouseleave="this.style.borderColor=\'#00ffee22\';this.style.boxShadow=\'none\'">'
++'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
++avatarHtml
++'<div style="flex:1;min-width:0"><div style="color:#f1f5f9;font-weight:bold;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.user.name)+'</div><div style="color:#7fd6df;font-size:10px;font-family:Share Tech Mono,monospace">@'+esc(t.user.screen_name)+'</div></div>'
++'<div style="color:#7fd6df;font-size:10px;font-family:Share Tech Mono,monospace;white-space:nowrap;flex-shrink:0">'+esc(dateStr)+'</div></div>'
++'<div style="color:#d7ffff;font-size:13px;line-height:1.6;word-break:break-word">'+esc(t.text)+'</div>'
++imgHtml
++'</div></a>'
+}).join('');
+}
 async function _loadMapFeed(){
 var content=document.getElementById('mapFeedContent');
 if(!content)return;
 content.innerHTML='<div style="text-align:center;color:#00ffee;font-family:Share Tech Mono,monospace;padding:30px;letter-spacing:2px;font-size:11px">LOADING FEED...</div>';
-var accounts=['Conflict_Radar','Natsecjeff','sentdefender','Osint613','MenchOsint','AfriMEOSINT','AfriOSINT1'];
-var allItems=[];
+var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCase()]=a.region});
+var accounts=_osintAccounts.map(function(a){return a.handle});
+_mapFeedAllItems=[];
 var fetches=accounts.map(function(acct){
 return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://nitter.net/'+acct+'/rss'))
 .then(function(r){return r.json()})
@@ -1902,35 +1960,23 @@ if(desc.length>cleanText.length)cleanText=desc;
 var author=item.author||('@'+acct);
 var screenName=author.replace(/^@/,'');
 var tweetLink=(item.link||'').replace('nitter.net','x.com');
-allItems.push({
+_mapFeedAllItems.push({
 text:cleanText,
 created_at:item.pubDate||'',
 user:{name:feedName.replace(/ \/ @.*/,''),screen_name:screenName,profile_image_url:feedImg},
 media:mediaUrl?[mediaUrl]:[],
-link:tweetLink
+link:tweetLink,
+_region:regionMap[screenName.toLowerCase()]||regionMap[acct.toLowerCase()]||'global'
 })})}
 }).catch(function(e){console.warn('Map feed RSS failed for '+acct+':',e)})
 });
 await Promise.all(fetches);
-allItems.sort(function(a,b){try{return new Date(b.created_at).getTime()-new Date(a.created_at).getTime()}catch(e){return 0}});
-if(!allItems.length){content.innerHTML='<div style="text-align:center;color:#ff4444;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">Feed unavailable</div>';return}
-content.innerHTML=allItems.map(function(t){
-var dateStr='';try{var dd=new Date(t.created_at);if(!isNaN(dd)){var now=new Date();var diff=now-dd;var mins=Math.floor(diff/60000);var hrs=Math.floor(diff/3600000);if(mins<60)dateStr=mins+'m ago';else if(hrs<24)dateStr=hrs+'h ago';else dateStr=dd.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}}catch(e){}
-var avatarHtml=t.user&&t.user.profile_image_url?'<img src="'+esc(t.user.profile_image_url)+'" style="width:32px;height:32px;border-radius:50%;border:1px solid #00ffee44;flex-shrink:0" onerror="this.style.display=\'none\'">':'';
-var imgHtml=t.media&&t.media[0]?'<img src="'+esc(t.media[0])+'" style="width:100%;max-height:180px;object-fit:cover;border-radius:6px;border:1px solid #00ffee22;margin-top:8px" onerror="this.style.display=\'none\'">':'';
-var tweetUrl=t.link||('https://x.com/'+t.user.screen_name);
-return '<a href="'+esc(tweetUrl)+'" target="_blank" style="text-decoration:none;display:block;margin-bottom:8px"><div style="background:#081821;border:1px solid #00ffee22;border-radius:8px;padding:12px;transition:border-color 0.15s,box-shadow 0.15s" onmouseenter="this.style.borderColor=\'#00ffee\';this.style.boxShadow=\'0 0 10px #00ffee33\'" onmouseleave="this.style.borderColor=\'#00ffee22\';this.style.boxShadow=\'none\'">'
-+'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-+avatarHtml
-+'<div style="flex:1;min-width:0"><div style="color:#f1f5f9;font-weight:bold;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.user.name)+'</div><div style="color:#7fd6df;font-size:10px;font-family:Share Tech Mono,monospace">@'+esc(t.user.screen_name)+'</div></div>'
-+'<div style="color:#7fd6df;font-size:10px;font-family:Share Tech Mono,monospace;white-space:nowrap;flex-shrink:0">'+esc(dateStr)+'</div></div>'
-+'<div style="color:#d7ffff;font-size:13px;line-height:1.6;word-break:break-word">'+esc(t.text)+'</div>'
-+imgHtml
-+'</div></a>'
-}).join('');
+_mapFeedAllItems.sort(function(a,b){try{return new Date(b.created_at).getTime()-new Date(a.created_at).getTime()}catch(e){return 0}});
+if(!_mapFeedAllItems.length){content.innerHTML='<div style="text-align:center;color:#ff4444;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">Feed unavailable</div>';return}
+_renderMapFeedItems();
 }
 
-var _liveFeedMode='osint';
+var _liveFeedMode='osint',_liveFeedRegion='all';
 function loadLiveFeed(){
 active('liveFeedBtn');
 var nb=document.getElementById('persistentNewsBoxes');if(nb)nb.innerHTML='';
@@ -1945,7 +1991,18 @@ function _renderLiveFeedBar(){
 var oActive=_liveFeedMode==='osint';var nActive=_liveFeedMode==='news';
 var oStyle=oActive?'background:#00ffee;color:#061018;text-shadow:none;box-shadow:0 0 12px #00ffee66':'background:transparent;color:#00ffee;text-shadow:0 0 6px #00ffee88';
 var nStyle=nActive?'background:#00ffee;color:#061018;text-shadow:none;box-shadow:0 0 12px #00ffee66':'background:transparent;color:#00ffee;text-shadow:0 0 6px #00ffee88';
-return '<div style="display:flex;gap:0;border-bottom:1px solid #00ffee44;background:#061018;flex-shrink:0"><button onclick="_liveFeedMode=\'osint\';document.getElementById(\'liveFeedBar\').innerHTML=_renderLiveFeedBar();_loadLiveFeedContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:13px;letter-spacing:2px;border:none;border-right:1px solid #00ffee22;cursor:pointer;transition:all 0.2s;'+oStyle+'">OSINT TWEETS</button><button onclick="_liveFeedMode=\'news\';document.getElementById(\'liveFeedBar\').innerHTML=_renderLiveFeedBar();_loadLiveFeedContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:13px;letter-spacing:2px;border:none;border-right:1px solid #00ffee22;cursor:pointer;transition:all 0.2s;'+nStyle+'">NEWS ARTICLES</button></div>'
+var regionBar='';
+if(oActive){
+var regions=['all','africa','global'];
+regionBar='<div style="display:flex;gap:0;border-bottom:1px solid #00ffee22;background:#0a1a28;flex-shrink:0">';
+regions.forEach(function(r){
+var active=_liveFeedRegion===r;
+var rStyle=active?'background:#00ffee33;color:#00ffee;border-bottom:2px solid #00ffee':'background:transparent;color:#00ffee88;border-bottom:2px solid transparent';
+regionBar+='<button onclick="_liveFeedRegion=\''+r+'\';document.getElementById(\'liveFeedBar\').innerHTML=_renderLiveFeedBar();_loadLiveFeedContent()" style="padding:6px 18px;font-family:Share Tech Mono,monospace;font-size:11px;letter-spacing:1px;border:none;cursor:pointer;transition:all 0.2s;'+rStyle+'">'+r.toUpperCase()+'</button>';
+});
+regionBar+='</div>';
+}
+return '<div style="display:flex;gap:0;border-bottom:1px solid #00ffee44;background:#061018;flex-shrink:0"><button onclick="_liveFeedMode=\'osint\';document.getElementById(\'liveFeedBar\').innerHTML=_renderLiveFeedBar();_loadLiveFeedContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:13px;letter-spacing:2px;border:none;border-right:1px solid #00ffee22;cursor:pointer;transition:all 0.2s;'+oStyle+'">OSINT TWEETS</button><button onclick="_liveFeedMode=\'news\';document.getElementById(\'liveFeedBar\').innerHTML=_renderLiveFeedBar();_loadLiveFeedContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:13px;letter-spacing:2px;border:none;border-right:1px solid #00ffee22;cursor:pointer;transition:all 0.2s;'+nStyle+'">NEWS ARTICLES</button></div>'+regionBar
 }
 function _loadLiveFeedContent(){
 var vp=document.getElementById('liveFeedViewport');
@@ -1954,7 +2011,8 @@ if(_liveFeedMode==='osint'){_fetchOsintTweets(vp)}else{_fetchLiveNews(vp)}
 }
 
 async function _fetchOsintTweets(vp){
-var accounts=['Conflict_Radar','Natsecjeff','sentdefender','Osint613','MenchOsint','AfriMEOSINT','AfriOSINT1'];
+var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCase()]=a.region});
+var accounts=_osintAccounts.map(function(a){return a.handle});
 var allTweets=[];
 var fetches=accounts.map(function(acct){
 return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://nitter.net/'+acct+'/rss'))
@@ -1980,7 +2038,8 @@ media:mediaUrl?[mediaUrl]:[],
 retweet_count:0,
 favorite_count:0,
 reply_count:0,
-link:tweetLink
+link:tweetLink,
+_region:regionMap[screenName.toLowerCase()]||regionMap[acct.toLowerCase()]||'global'
 })})}
 }).catch(function(e){console.warn('Nitter RSS failed for '+acct+':',e)})
 });
@@ -1996,21 +2055,27 @@ var d=await r.json();
 var tweets=d.data||[];
 if(tweets.length>0){
 tweets.forEach(function(t){
+var sn=(t.user&&t.user.screen_name)||'';
 allTweets.push({
 text:t.full_text||'',
 created_at:t.created_at||'',
-user:{name:(t.user&&t.user.name)||'',screen_name:(t.user&&t.user.screen_name)||'',profile_image_url:(t.user&&t.user.profile_image_url)||''},
+user:{name:(t.user&&t.user.name)||'',screen_name:sn,profile_image_url:(t.user&&t.user.profile_image_url)||''},
 media:[],
 retweet_count:0,
 favorite_count:0,
-reply_count:0
+reply_count:0,
+_region:regionMap[sn.toLowerCase()]||'global'
 })});
 break}}
 }catch(e){console.warn('Situation monitor API failed:',e)}}}
 allTweets.sort(function(a,b){
 try{return new Date(b.created_at).getTime()-new Date(a.created_at).getTime()}catch(e){return 0}});
 if(!allTweets.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">Unable to load tweets. The feed may be temporarily unavailable.</div>';return}
-vp.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">'+allTweets.map(function(t){
+var filtered=allTweets;
+if(_liveFeedRegion==='africa')filtered=allTweets.filter(function(t){return t._region==='africa'});
+else if(_liveFeedRegion==='global')filtered=allTweets.filter(function(t){return t._region==='global'});
+if(!filtered.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">No tweets for this filter.</div>';return}
+vp.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">'+filtered.map(function(t){
 var imgHtml=t.media&&t.media[0]?'<img src="'+esc(t.media[0])+'" style="width:100%;max-height:240px;object-fit:cover;border-radius:6px;border:1px solid #00ffee22;margin-bottom:8px" onerror="this.style.display=\'none\'">':'';
 var avatarHtml=t.user&&t.user.profile_image_url?'<img src="'+esc(t.user.profile_image_url)+'" style="width:36px;height:36px;border-radius:50%;border:1px solid #00ffee44;flex-shrink:0" onerror="this.style.display=\'none\'">':'';
 var dateStr='';try{var rawDate=t.created_at.replace(' · ',' ');var dd=new Date(rawDate);if(!isNaN(dd))dateStr=dd.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){}
