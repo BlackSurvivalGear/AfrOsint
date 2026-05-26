@@ -1931,7 +1931,7 @@ if(!content)return;
 var items=_mapFeedAllItems;
 if(_mapFeedTab==='africa')items=items.filter(function(t){return t._region==='africa'||t._region==='aes'});
 else if(_mapFeedTab==='global')items=items.filter(function(t){return t._region==='global'});
-else if(_mapFeedTab==='aes')items=items.filter(function(t){return t._region==='aes'});
+else if(_mapFeedTab==='aes')items=items.filter(function(t){return t._region==='aes'||/\b(sahel|mali|burkina faso|niger|niamey|bamako|ouagadougou|wagner|africa corps|jnim|al qaeda|tuareg|azawad|fama|ecowas|coup|junta|traore|goita|tiani|mnla|aqim)\b/i.test(t.text)});
 else if(_mapFeedTab==='iran')items=items.filter(function(t){return /\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi)\b/i.test(t.text)});
 if(!items.length){content.innerHTML='<div style="text-align:center;color:#ff4444;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">No items for this filter</div>';return}
 content.innerHTML=items.map(function(t){
@@ -2086,7 +2086,7 @@ if(!allTweets.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;
 var filtered=allTweets;
 if(_liveFeedRegion==='africa')filtered=allTweets.filter(function(t){return t._region==='africa'||t._region==='aes'});
 else if(_liveFeedRegion==='global')filtered=allTweets.filter(function(t){return t._region==='global'});
-else if(_liveFeedRegion==='aes')filtered=allTweets.filter(function(t){return t._region==='aes'});
+else if(_liveFeedRegion==='aes')filtered=allTweets.filter(function(t){return t._region==='aes'||/\b(sahel|mali|burkina faso|niger|niamey|bamako|ouagadougou|wagner|africa corps|jnim|al qaeda|tuareg|azawad|fama|ecowas|coup|junta|traore|goita|tiani|mnla|aqim)\b/i.test(t.text)});
 else if(_liveFeedRegion==='iran')filtered=allTweets.filter(function(t){return /\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi)\b/i.test(t.text)});
 if(!filtered.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">No tweets for this filter.</div>';return}
 vp.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">'+filtered.map(function(t){
