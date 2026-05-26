@@ -1962,8 +1962,11 @@ if(d.status==='ok'&&d.items){
 var feedName=(d.feed&&d.feed.title)||acct;
 var feedImg=(d.feed&&d.feed.image)||'';
 d.items.forEach(function(item){
-var imgMatch=item.description&&item.description.match(/<img[^>]+src="([^"]+)"/);
-var mediaUrl=imgMatch?imgMatch[1].replace(/nitter\.net\/pic\//,'https://pbs.twimg.com/'):'';
+var mediaUrl='';
+if(item.enclosure&&item.enclosure.link)mediaUrl=item.enclosure.link;
+else if(item.thumbnail)mediaUrl=item.thumbnail;
+else{var imgMatch=item.description&&item.description.match(/<img[^>]+src="([^"]+)"/);if(imgMatch)mediaUrl=imgMatch[1]}
+if(mediaUrl)mediaUrl=mediaUrl.replace(/nitter\.net\/pic\//,'https://pbs.twimg.com/').replace(/nitter\.net\/pic\/enc\/([^"]+)/,function(m,p){try{return decodeURIComponent(p)}catch(e){return m}});
 var cleanText=(item.title||'').replace(/<[^>]+>/g,'');
 var desc=(item.description||'').replace(/<[^>]+>/g,'').trim();
 if(desc.length>cleanText.length)cleanText=desc;
@@ -2032,8 +2035,11 @@ if(d.status==='ok'&&d.items){
 var feedName=(d.feed&&d.feed.title)||acct;
 var feedImg=(d.feed&&d.feed.image)||'';
 d.items.forEach(function(item){
-var imgMatch=item.description&&item.description.match(/<img[^>]+src="([^"]+)"/);
-var mediaUrl=imgMatch?imgMatch[1].replace(/nitter\.net\/pic\//,'https://pbs.twimg.com/'):'';
+var mediaUrl='';
+if(item.enclosure&&item.enclosure.link)mediaUrl=item.enclosure.link;
+else if(item.thumbnail)mediaUrl=item.thumbnail;
+else{var imgMatch=item.description&&item.description.match(/<img[^>]+src="([^"]+)"/);if(imgMatch)mediaUrl=imgMatch[1]}
+if(mediaUrl)mediaUrl=mediaUrl.replace(/nitter\.net\/pic\//,'https://pbs.twimg.com/').replace(/nitter\.net\/pic\/enc\/([^"]+)/,function(m,p){try{return decodeURIComponent(p)}catch(e){return m}});
 var cleanText=(item.title||'').replace(/<[^>]+>/g,'');
 var desc=(item.description||'').replace(/<[^>]+>/g,'').trim();
 if(desc.length>cleanText.length)cleanText=desc;
