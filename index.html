@@ -1932,7 +1932,7 @@ var items=_mapFeedAllItems;
 if(_mapFeedTab==='africa')items=items.filter(function(t){return t._region==='africa'||t._region==='aes'});
 else if(_mapFeedTab==='global')items=items.filter(function(t){return t._region==='global'});
 else if(_mapFeedTab==='aes')items=items.filter(function(t){return t._region==='aes'});
-else if(_mapFeedTab==='iran')items=items.filter(function(t){return t._region==='iran'});
+else if(_mapFeedTab==='iran')items=items.filter(function(t){return /\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi)\b/i.test(t.text)});
 if(!items.length){content.innerHTML='<div style="text-align:center;color:#ff4444;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">No items for this filter</div>';return}
 content.innerHTML=items.map(function(t){
 var dateStr='';try{var dd=new Date(t.created_at);if(!isNaN(dd)){var now=new Date();var diff=now-dd;var mins=Math.floor(diff/60000);var hrs=Math.floor(diff/3600000);if(mins<60)dateStr=mins+'m ago';else if(hrs<24)dateStr=hrs+'h ago';else dateStr=dd.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}}catch(e){}
@@ -2087,7 +2087,7 @@ var filtered=allTweets;
 if(_liveFeedRegion==='africa')filtered=allTweets.filter(function(t){return t._region==='africa'||t._region==='aes'});
 else if(_liveFeedRegion==='global')filtered=allTweets.filter(function(t){return t._region==='global'});
 else if(_liveFeedRegion==='aes')filtered=allTweets.filter(function(t){return t._region==='aes'});
-else if(_liveFeedRegion==='iran')filtered=allTweets.filter(function(t){return t._region==='iran'});
+else if(_liveFeedRegion==='iran')filtered=allTweets.filter(function(t){return /\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi)\b/i.test(t.text)});
 if(!filtered.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">No tweets for this filter.</div>';return}
 vp.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">'+filtered.map(function(t){
 var imgHtml=t.media&&t.media[0]?'<img src="'+esc(t.media[0])+'" style="width:100%;max-height:240px;object-fit:cover;border-radius:6px;border:1px solid #00ffee22;margin-bottom:8px" onerror="this.style.display=\'none\'">':'';
