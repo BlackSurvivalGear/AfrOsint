@@ -2055,14 +2055,16 @@ var d=await r.json();
 var tweets=d.data||[];
 if(tweets.length>0){
 tweets.forEach(function(t){
+var sn=(t.user&&t.user.screen_name)||'';
 allTweets.push({
 text:t.full_text||'',
 created_at:t.created_at||'',
-user:{name:(t.user&&t.user.name)||'',screen_name:(t.user&&t.user.screen_name)||'',profile_image_url:(t.user&&t.user.profile_image_url)||''},
+user:{name:(t.user&&t.user.name)||'',screen_name:sn,profile_image_url:(t.user&&t.user.profile_image_url)||''},
 media:[],
 retweet_count:0,
 favorite_count:0,
-reply_count:0
+reply_count:0,
+_region:regionMap[sn.toLowerCase()]||'global'
 })});
 break}}
 }catch(e){console.warn('Situation monitor API failed:',e)}}}
