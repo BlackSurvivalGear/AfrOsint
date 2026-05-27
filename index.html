@@ -1955,7 +1955,9 @@ var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCa
 var accounts=_osintAccounts.filter(function(a){return a.type==='osint'}).map(function(a){return a.handle});
 _mapFeedAllItems=[];
 var fetches=accounts.map(function(acct){
-return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://nitter.net/'+acct+'/rss'))
+var _nitterBase='https://nitter.perennialte.ch/';
+var _cacheBust='&_t='+Math.floor(Date.now()/60000);
+return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(_nitterBase+acct+'/rss')+_cacheBust)
 .then(function(r){return r.json()})
 .then(function(d){
 if(d.status==='ok'&&d.items){
@@ -1966,13 +1968,13 @@ var mediaUrl='';
 if(item.enclosure&&item.enclosure.link)mediaUrl=item.enclosure.link;
 else if(item.thumbnail)mediaUrl=item.thumbnail;
 else{var imgMatch=item.description&&item.description.match(/<img[^>]+src="([^"]+)"/);if(imgMatch)mediaUrl=imgMatch[1]}
-if(mediaUrl)mediaUrl=mediaUrl.replace(/nitter\.net\/pic\//,'https://pbs.twimg.com/').replace(/nitter\.net\/pic\/enc\/([^"]+)/,function(m,p){try{return decodeURIComponent(p)}catch(e){return m}});
+if(mediaUrl)mediaUrl=mediaUrl.replace(/nitter\.[^/]+\/pic\//,'https://pbs.twimg.com/').replace(/nitter\.[^/]+\/pic\/enc\/([^"]+)/,function(m,p){try{return decodeURIComponent(p)}catch(e){return m}});
 var cleanText=(item.title||'').replace(/<[^>]+>/g,'');
 var desc=(item.description||'').replace(/<[^>]+>/g,'').trim();
 if(desc.length>cleanText.length)cleanText=desc;
 var author=item.author||('@'+acct);
 var screenName=author.replace(/^@/,'');
-var tweetLink=(item.link||'').replace('nitter.net','x.com');
+var tweetLink=(item.link||'').replace(/nitter\.[^/]+/,'x.com');
 _mapFeedAllItems.push({
 text:cleanText,
 created_at:item.pubDate||'',
@@ -2028,7 +2030,9 @@ var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCa
 var accounts=_osintAccounts.map(function(a){return a.handle});
 var allTweets=[];
 var fetches=accounts.map(function(acct){
-return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://nitter.net/'+acct+'/rss'))
+var _nitterBase2='https://nitter.perennialte.ch/';
+var _cacheBust2='&_t='+Math.floor(Date.now()/60000);
+return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(_nitterBase2+acct+'/rss')+_cacheBust2)
 .then(function(r){return r.json()})
 .then(function(d){
 if(d.status==='ok'&&d.items){
@@ -2039,13 +2043,13 @@ var mediaUrl='';
 if(item.enclosure&&item.enclosure.link)mediaUrl=item.enclosure.link;
 else if(item.thumbnail)mediaUrl=item.thumbnail;
 else{var imgMatch=item.description&&item.description.match(/<img[^>]+src="([^"]+)"/);if(imgMatch)mediaUrl=imgMatch[1]}
-if(mediaUrl)mediaUrl=mediaUrl.replace(/nitter\.net\/pic\//,'https://pbs.twimg.com/').replace(/nitter\.net\/pic\/enc\/([^"]+)/,function(m,p){try{return decodeURIComponent(p)}catch(e){return m}});
+if(mediaUrl)mediaUrl=mediaUrl.replace(/nitter\.[^/]+\/pic\//,'https://pbs.twimg.com/').replace(/nitter\.[^/]+\/pic\/enc\/([^"]+)/,function(m,p){try{return decodeURIComponent(p)}catch(e){return m}});
 var cleanText=(item.title||'').replace(/<[^>]+>/g,'');
 var desc=(item.description||'').replace(/<[^>]+>/g,'').trim();
 if(desc.length>cleanText.length)cleanText=desc;
 var author=item.author||('@'+acct);
 var screenName=author.replace(/^@/,'');
-var tweetLink=(item.link||'').replace('nitter.net','x.com');
+var tweetLink=(item.link||'').replace(/nitter\.[^/]+/,'x.com');
 allTweets.push({
 text:cleanText,
 created_at:item.pubDate||'',
