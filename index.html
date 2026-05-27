@@ -1820,7 +1820,6 @@ var _osintAccounts=[
 {handle:'DailyPostNGR',region:'africa',type:'news'},
 {handle:'THISDAYLIVE',region:'africa',type:'news'},
 {handle:'GuardianNigeria',region:'africa',type:'news'},
-{handle:'WagnerAmb1W9',region:'aes',type:'osint'},
 {handle:'Spearhead_Af',region:'aes',type:'osint'}
 ];
 var _mapFeedTab='global',_mapFeedAllItems=[];
@@ -1942,8 +1941,8 @@ var items=_mapFeedAllItems;
 if(_mapFeedTab==='global')items=items.filter(function(t){return true});
 else if(_mapFeedTab==='africa')items=items.filter(function(t){return t._region==='africa'||t._region==='aes'});
 else if(_mapFeedTab==='aes')items=items.filter(function(t){return t._region==='aes'||/\b(sahel|mali|burkina faso|niger|niamey|bamako|ouagadougou|wagner|africa corps|jnim|al qaeda|tuareg|azawad|fama|ecowas|coup|junta|traore|goita|tiani|mnla|aqim)\b/i.test(t.text)});
-else if(_mapFeedTab==='iran')items=items.filter(function(t){return /\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi)\b/i.test(t.text)});
-if(!items.length){content.innerHTML='<div style="text-align:center;color:#ff4444;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">No items for this filter</div>';return}
+else if(_mapFeedTab==='iran')items=items.filter(function(t){return t._region==='iran'||/\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi|proxy|missile)\b/i.test(t.text)});
+if(!items.length){content.innerHTML='<div style="text-align:center;color:#ffaa00;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">No recent items matching this filter</div>';return}
 content.innerHTML=items.map(function(t){
 var dateStr='';try{var dd=new Date(t.created_at);if(!isNaN(dd)){var now=new Date();var diff=now-dd;var mins=Math.floor(diff/60000);var hrs=Math.floor(diff/3600000);if(mins<60)dateStr=mins+'m ago';else if(hrs<24)dateStr=hrs+'h ago';else dateStr=dd.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}}catch(e){}
 var avatarHtml=t.user&&t.user.profile_image_url?'<img src="'+esc(t.user.profile_image_url)+'" style="width:32px;height:32px;border-radius:50%;border:1px solid #00ffee44;flex-shrink:0" onerror="this.style.display=\'none\'">':'';
@@ -2101,8 +2100,8 @@ var filtered=allTweets;
 if(_liveFeedRegion==='africa')filtered=allTweets.filter(function(t){return t._region==='africa'||t._region==='aes'});
 else if(_liveFeedRegion==='global')filtered=allTweets;
 else if(_liveFeedRegion==='aes')filtered=allTweets.filter(function(t){return t._region==='aes'||/\b(sahel|mali|burkina faso|niger|niamey|bamako|ouagadougou|wagner|africa corps|jnim|al qaeda|tuareg|azawad|fama|ecowas|coup|junta|traore|goita|tiani|mnla|aqim)\b/i.test(t.text)});
-else if(_liveFeedRegion==='iran')filtered=allTweets.filter(function(t){return /\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi)\b/i.test(t.text)});
-if(!filtered.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">No tweets for this filter.</div>';return}
+else if(_liveFeedRegion==='iran')filtered=allTweets.filter(function(t){return t._region==='iran'||/\b(iran|iranian|tehran|irgc|persian gulf|khamenei|rouhani|pezeshkian|strait of hormuz|bandar abbas|isfahan|quds force|hezbollah|houthi|proxy|missile)\b/i.test(t.text)});
+if(!filtered.length){vp.innerHTML='<div style="text-align:center;color:#ffaa00;padding:40px;font-family:Share Tech Mono,monospace">No recent items matching this filter</div>';return}
 vp.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">'+filtered.map(function(t){
 var imgHtml=t.media&&t.media[0]?'<img src="'+esc(t.media[0])+'" style="width:100%;max-height:240px;object-fit:cover;border-radius:6px;border:1px solid #00ffee22;margin-bottom:8px" onerror="this.style.display=\'none\'">':'';
 var avatarHtml=t.user&&t.user.profile_image_url?'<img src="'+esc(t.user.profile_image_url)+'" style="width:36px;height:36px;border-radius:50%;border:1px solid #00ffee44;flex-shrink:0" onerror="this.style.display=\'none\'">':'';
