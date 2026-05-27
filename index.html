@@ -1788,6 +1788,7 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 
 loadTicker();loadHeadlines();
 
+var _rssProxyBase='https://situation-monitor.vercel.app/api/rss-proxy';
 var _nitterInstances=['https://nitter.perennialte.ch/','https://nitter.net/','https://nitter.privacydev.net/'];
 function _fetchNitterRSS(acct){
 var cb='&_t='+Math.floor(Date.now()/60000);
@@ -1799,6 +1800,11 @@ return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(
 .catch(function(){return tryInstance(idx+1)});
 }
 return tryInstance(0);
+}
+function _fetchAllViaProxy(accountList){
+return fetch(_rssProxyBase+'?users='+accountList.join(',')+'&_t='+Math.floor(Date.now()/60000))
+.then(function(r){if(!r.ok)throw new Error('proxy error');return r.json()})
+.catch(function(){return null});
 }
 var _osintAccounts=[
 {handle:'Conflict_Radar',region:'global',type:'osint'},
@@ -1985,10 +1991,8 @@ content.innerHTML='<div style="text-align:center;color:#00ffee;font-family:Share
 var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCase()]=a.region});
 var accounts=_osintAccounts.filter(function(a){return a.type==='osint'}).map(function(a){return a.handle});
 _mapFeedAllItems=[];
-var fetches=accounts.map(function(acct){
-return _fetchNitterRSS(acct)
-.then(function(d){
-if(d&&d.status==='ok'&&d.items){
+function _processRssData(d,acct){
+if(!d||d.status!=='ok'||!d.items)return;
 var feedName=(d.feed&&d.feed.title)||acct;
 var feedImg=(d.feed&&d.feed.image)||'';
 d.items.forEach(function(item){
@@ -2011,9 +2015,11 @@ media:mediaUrl?[mediaUrl]:[],
 link:tweetLink,
 _region:regionMap[screenName.toLowerCase()]||regionMap[acct.toLowerCase()]||'global'
 })})}
-}).catch(function(e){console.warn('Map feed RSS failed for '+acct+':',e)})
-});
-await Promise.all(fetches);
+var proxyData=await _fetchAllViaProxy(accounts);
+var missingAccounts=[];
+if(proxyData){accounts.forEach(function(acct){var d=proxyData[acct];if(d&&d.items&&d.items.length>0){_processRssData(d,acct)}else{missingAccounts.push(acct)}})}
+else{missingAccounts=accounts}
+if(missingAccounts.length>0){var fallbacks=missingAccounts.map(function(acct){return _fetchNitterRSS(acct).then(function(d){_processRssData(d,acct)}).catch(function(){})});await Promise.all(fallbacks)}
 _mapFeedAllItems.sort(function(a,b){try{return new Date(b.created_at).getTime()-new Date(a.created_at).getTime()}catch(e){return 0}});
 if(!_mapFeedAllItems.length){content.innerHTML='<div style="text-align:center;color:#ff4444;padding:30px;font-family:Share Tech Mono,monospace;font-size:11px">Feed unavailable</div>';return}
 _renderMapFeedItems();
@@ -2057,10 +2063,8 @@ async function _fetchOsintTweets(vp){
 var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCase()]=a.region});
 var accounts=_osintAccounts.map(function(a){return a.handle});
 var allTweets=[];
-var fetches=accounts.map(function(acct){
-return _fetchNitterRSS(acct)
-.then(function(d){
-if(d&&d.status==='ok'&&d.items){
+function _processLiveFeedData(d,acct){
+if(!d||d.status!=='ok'||!d.items)return;
 var feedName=(d.feed&&d.feed.title)||acct;
 var feedImg=(d.feed&&d.feed.image)||'';
 d.items.forEach(function(item){
@@ -2086,33 +2090,11 @@ reply_count:0,
 link:tweetLink,
 _region:regionMap[screenName.toLowerCase()]||regionMap[acct.toLowerCase()]||'global'
 })})}
-}).catch(function(e){console.warn('Nitter RSS failed for '+acct+':',e)})
-});
-await Promise.all(fetches);
-if(!allTweets.length){
-var apiBaseUrls=['https://situation-monitor.vercel.app','https://situation-monitor-one.vercel.app','https://situation-monitor-two.vercel.app'];
-for(var b=0;b<apiBaseUrls.length;b++){
-try{
-var apiUrl=apiBaseUrls[b]+'/api/nitter?users='+accounts.join(',');
-var r=await fetch(apiUrl);
-if(r.ok){
-var d=await r.json();
-var tweets=d.data||[];
-if(tweets.length>0){
-tweets.forEach(function(t){
-var sn=(t.user&&t.user.screen_name)||'';
-allTweets.push({
-text:t.full_text||'',
-created_at:t.created_at||'',
-user:{name:(t.user&&t.user.name)||'',screen_name:sn,profile_image_url:(t.user&&t.user.profile_image_url)||''},
-media:[],
-retweet_count:0,
-favorite_count:0,
-reply_count:0,
-_region:regionMap[sn.toLowerCase()]||'global'
-})});
-break}}
-}catch(e){console.warn('Situation monitor API failed:',e)}}}
+var proxyData=await _fetchAllViaProxy(accounts);
+var missingAccounts=[];
+if(proxyData){accounts.forEach(function(acct){var d=proxyData[acct];if(d&&d.items&&d.items.length>0){_processLiveFeedData(d,acct)}else{missingAccounts.push(acct)}})}
+else{missingAccounts=accounts}
+if(missingAccounts.length>0){var fallbacks=missingAccounts.map(function(acct){return _fetchNitterRSS(acct).then(function(d){_processLiveFeedData(d,acct)}).catch(function(){})});await Promise.all(fallbacks)}
 allTweets.sort(function(a,b){
 try{return new Date(b.created_at).getTime()-new Date(a.created_at).getTime()}catch(e){return 0}});
 if(!allTweets.length){vp.innerHTML='<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">Unable to load tweets. The feed may be temporarily unavailable.</div>';return}
