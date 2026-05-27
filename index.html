@@ -1788,6 +1788,18 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 
 loadTicker();loadHeadlines();
 
+var _nitterInstances=['https://nitter.perennialte.ch/','https://nitter.net/','https://nitter.privacydev.net/'];
+function _fetchNitterRSS(acct){
+var cb='&_t='+Math.floor(Date.now()/60000);
+function tryInstance(idx){
+if(idx>=_nitterInstances.length)return Promise.resolve(null);
+return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(_nitterInstances[idx]+acct+'/rss')+cb)
+.then(function(r){return r.json()})
+.then(function(d){if(d.status==='ok'&&d.items&&d.items.length>0)return d;return tryInstance(idx+1)})
+.catch(function(){return tryInstance(idx+1)});
+}
+return tryInstance(0);
+}
 var _osintAccounts=[
 {handle:'Conflict_Radar',region:'global',type:'osint'},
 {handle:'sentdefender',region:'global',type:'osint'},
@@ -1955,12 +1967,9 @@ var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCa
 var accounts=_osintAccounts.filter(function(a){return a.type==='osint'}).map(function(a){return a.handle});
 _mapFeedAllItems=[];
 var fetches=accounts.map(function(acct){
-var _nitterBase='https://nitter.perennialte.ch/';
-var _cacheBust='&_t='+Math.floor(Date.now()/60000);
-return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(_nitterBase+acct+'/rss')+_cacheBust)
-.then(function(r){return r.json()})
+return _fetchNitterRSS(acct)
 .then(function(d){
-if(d.status==='ok'&&d.items){
+if(d&&d.status==='ok'&&d.items){
 var feedName=(d.feed&&d.feed.title)||acct;
 var feedImg=(d.feed&&d.feed.image)||'';
 d.items.forEach(function(item){
@@ -2030,12 +2039,9 @@ var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCa
 var accounts=_osintAccounts.map(function(a){return a.handle});
 var allTweets=[];
 var fetches=accounts.map(function(acct){
-var _nitterBase2='https://nitter.perennialte.ch/';
-var _cacheBust2='&_t='+Math.floor(Date.now()/60000);
-return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(_nitterBase2+acct+'/rss')+_cacheBust2)
-.then(function(r){return r.json()})
+return _fetchNitterRSS(acct)
 .then(function(d){
-if(d.status==='ok'&&d.items){
+if(d&&d.status==='ok'&&d.items){
 var feedName=(d.feed&&d.feed.title)||acct;
 var feedImg=(d.feed&&d.feed.image)||'';
 d.items.forEach(function(item){
