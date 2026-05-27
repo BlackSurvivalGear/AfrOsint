@@ -1789,27 +1789,27 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 loadTicker();loadHeadlines();
 
 var _osintAccounts=[
-{handle:'Conflict_Radar',region:'global'},
-{handle:'sentdefender',region:'global'},
-{handle:'Osint613',region:'global'},
-{handle:'MenchOsint',region:'global'},
-{handle:'AfriMEOSINT',region:'africa'},
-{handle:'AfriOSINT1',region:'africa'},
-{handle:'war_noir',region:'global'},
-{handle:'PopularFront_',region:'global'},
-{handle:'TheAfricaCorps',region:'africa'},
-{handle:'AJEnglish',region:'global'},
-{handle:'ReutersWorld',region:'global'},
-{handle:'ReutersAfrica',region:'africa'},
-{handle:'allafrica',region:'africa'},
-{handle:'DefenseNigeria',region:'africa'},
-{handle:'SaharaWire',region:'africa'},
-{handle:'Africa_In_EN',region:'africa'},
-{handle:'DailyPostNGR',region:'africa'},
-{handle:'THISDAYLIVE',region:'africa'},
-{handle:'GuardianNigeria',region:'africa'},
-{handle:'WagnerAmb1W9',region:'aes'},
-{handle:'Spearhead_Af',region:'aes'}
+{handle:'Conflict_Radar',region:'global',type:'osint'},
+{handle:'sentdefender',region:'global',type:'osint'},
+{handle:'Osint613',region:'global',type:'osint'},
+{handle:'MenchOsint',region:'global',type:'osint'},
+{handle:'AfriMEOSINT',region:'africa',type:'osint'},
+{handle:'AfriOSINT1',region:'africa',type:'osint'},
+{handle:'war_noir',region:'global',type:'osint'},
+{handle:'PopularFront_',region:'global',type:'osint'},
+{handle:'TheAfricaCorps',region:'africa',type:'osint'},
+{handle:'AJEnglish',region:'global',type:'news'},
+{handle:'ReutersWorld',region:'global',type:'news'},
+{handle:'ReutersAfrica',region:'africa',type:'news'},
+{handle:'allafrica',region:'africa',type:'news'},
+{handle:'DefenseNigeria',region:'africa',type:'osint'},
+{handle:'SaharaWire',region:'africa',type:'osint'},
+{handle:'Africa_In_EN',region:'africa',type:'news'},
+{handle:'DailyPostNGR',region:'africa',type:'news'},
+{handle:'THISDAYLIVE',region:'africa',type:'news'},
+{handle:'GuardianNigeria',region:'africa',type:'news'},
+{handle:'WagnerAmb1W9',region:'aes',type:'osint'},
+{handle:'Spearhead_Af',region:'aes',type:'osint'}
 ];
 var _mapFeedTab='global',_mapFeedAllItems=[];
 var _mapFeedVisible=true,_mapFeedCollapsed=false,_mapFeedScrollInit=false;
@@ -1952,7 +1952,7 @@ var content=document.getElementById('mapFeedContent');
 if(!content)return;
 content.innerHTML='<div style="text-align:center;color:#00ffee;font-family:Share Tech Mono,monospace;padding:30px;letter-spacing:2px;font-size:11px">LOADING FEED...</div>';
 var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCase()]=a.region});
-var accounts=_osintAccounts.map(function(a){return a.handle});
+var accounts=_osintAccounts.filter(function(a){return a.type==='osint'}).map(function(a){return a.handle});
 _mapFeedAllItems=[];
 var fetches=accounts.map(function(acct){
 return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://nitter.net/'+acct+'/rss'))
