@@ -1230,6 +1230,20 @@ async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa
 
 loadTicker();loadHeadlines();
 
+(function(){
+var tw=document.querySelector('.ticker-window');
+var tt=document.getElementById('newsTicker');
+if(!tw||!tt)return;
+var dragging=false,startX=0,scrollLeft=0;
+function getTranslateX(){var s=getComputedStyle(tt).transform;if(!s||s==='none')return 0;var m=s.match(/matrix\(([^)]+)\)/);return m?parseFloat(m[1].split(',')[4]):0}
+tw.addEventListener('mousedown',function(e){e.preventDefault();dragging=true;startX=e.pageX;scrollLeft=getTranslateX();tt.classList.add('dragging');tw.classList.add('dragging');tt.style.animation='none';tt.style.transform='translateX('+scrollLeft+'px)'});
+document.addEventListener('mousemove',function(e){if(!dragging)return;var dx=e.pageX-startX;tt.style.transform='translateX('+(scrollLeft+dx)+'px)'});
+document.addEventListener('mouseup',function(){if(!dragging)return;dragging=false;tt.classList.remove('dragging');tw.classList.remove('dragging');tt.style.animation='';tt.style.transform=''});
+tw.addEventListener('touchstart',function(e){dragging=true;startX=e.touches[0].pageX;scrollLeft=getTranslateX();tt.classList.add('dragging');tw.classList.add('dragging');tt.style.animation='none';tt.style.transform='translateX('+scrollLeft+'px)'},{passive:true});
+document.addEventListener('touchmove',function(e){if(!dragging)return;var dx=e.touches[0].pageX-startX;tt.style.transform='translateX('+(scrollLeft+dx)+'px)'},{passive:true});
+document.addEventListener('touchend',function(){if(!dragging)return;dragging=false;tt.classList.remove('dragging');tw.classList.remove('dragging');tt.style.animation='';tt.style.transform=''});
+})();
+
 var _nitterBase='https://nitter.net/';
 function _fetchNitterRSS(acct){
 return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(_nitterBase+acct+'/rss'))
