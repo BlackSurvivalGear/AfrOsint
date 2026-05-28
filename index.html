@@ -571,21 +571,21 @@ const escapedName=name.replace(/'/g,"\\'");
 w.innerHTML=`<div style='padding:12px'>
 <button class='atw-small-button' onclick='atwRestoreWidget()' style='margin-bottom:16px'>⬅ BACK</button>
 <div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name}</h2><div style='color:#7fd6df;font-size:13px'>${region} — ${subregion}</div></div></div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-family:Rajdhani,sans-serif;font-size:13px;margin-bottom:10px'>
+<div><span style='color:#7fd6df'>Capital:</span> <span style='color:#d7ffff'>${capital}</span></div>
+<div><span style='color:#7fd6df'>Population:</span> <span style='color:#d7ffff'>${pop}</span></div>
+<div><span style='color:#7fd6df'>Currency:</span> <span style='color:#d7ffff'>${currName} (${currTicker})</span></div>
+<div><span style='color:#7fd6df'>Area:</span> <span style='color:#d7ffff'>${area}</span></div>
+<div><span style='color:#7fd6df'>FX Rate (USD):</span> <span style='color:#d7ffff'>${exRate}</span></div>
+<div><span style='color:#7fd6df'>Calling Code:</span> <span style='color:#d7ffff'>${code}</span></div>
+<div><span style='color:#7fd6df'>Black Pop.:</span> <span style='color:#ffcc00'>${bpopStr}</span></div>
+<div><span style='color:#7fd6df'>Language:</span> <span style='color:#d7ffff'>${lang}</span></div>
+<div><a href='${gmap}' target='_blank' style='color:#00ffee;text-decoration:none'>📍 Google Maps</a></div>
+<div><a href='${passIdx}' target='_blank' style='color:#00ffee;text-decoration:none'>🛃 Passport Index</a></div>
+</div>
 <div style='display:flex;justify-content:flex-end;margin-bottom:8px'><div id='cpApiKeyWrap' style='display:flex;align-items:center;gap:4px'></div></div>
 <div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px;flex-wrap:wrap'><button class='atw-small-button' onclick="showBugoutSlidePanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>✈️ TRAVEL</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button><button class='atw-small-button' onclick="showLiveNewsPanel('${escapedName}')" style='background:#0c2430;border-color:#44ff88;color:#44ff88;text-shadow:0 0 6px #44ff8888'>📺 LIVE NEWS</button><button class='atw-small-button' onclick="aiCountrySitrepMaster('${escapedName}');document.getElementById('africaTimePanel').classList.remove('open');africaTimePanelOpen=false" style='background:#0c2430;border-color:#ff4444;color:#ff4444;text-shadow:0 0 6px #ff444488'>📋 SitRep</button><button class='atw-small-button' onclick="aiStrategicRelocation('${escapedName}');document.getElementById('africaTimePanel').classList.remove('open');africaTimePanelOpen=false" style='background:#0c2430;border-color:#cc44ff;color:#cc44ff;text-shadow:0 0 6px #cc44ff88'>🏠 STRATEGIC RELOCATION</button></div>
 <div style='position:relative;overflow:hidden'><div id='countryDataMain'>
-<div style='display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;font-family:Rajdhani,sans-serif;font-size:13px;scrollbar-width:thin;scrollbar-color:#00ffee44 transparent'>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Capital</div><div style='color:#d7ffff'>${capital}</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Population</div><div style='color:#d7ffff'>${pop}</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Currency</div><div style='color:#d7ffff'>${currName} (${currTicker})</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Area</div><div style='color:#d7ffff'>${area}</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>FX Rate (USD)</div><div style='color:#d7ffff'>${exRate}</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Calling Code</div><div style='color:#d7ffff'>${code}</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Black Pop.</div><div style='color:#ffcc00'>${bpopStr}</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Language</div><div style='color:#d7ffff'>${lang}</div></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><a href='${gmap}' target='_blank' style='color:#00ffee;text-decoration:none;font-size:12px'>📍 Maps</a></div>
-<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><a href='${passIdx}' target='_blank' style='color:#00ffee;text-decoration:none;font-size:12px'>🛃 Passport</a></div>
-</div>
 <div id="ucpBar" class="ucp-bar">
 ${localBtns}
 <button class="ucp-btn map-btn active" onclick="ucpSwitch(this,'${liveMapUrl}')" style="margin-left:auto">🗺 CONFLICT MAP</button>
@@ -652,17 +652,21 @@ var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;
 var d=bugoutData[name];
 if(!d){panel.innerHTML="<button class='atw-small-button' onclick='hideBugoutSlidePanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>No bugout data for "+name+".</div>";panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);return}
 panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10);
-function ml(item){if(!item||!item.url)return '<span style="display:inline-block;padding:6px 12px;background:#081821;border:1px solid #ff880033;border-radius:6px;color:#7fd6df;font-size:12px;font-family:Share Tech Mono,monospace">'+(item?item.name:'')+'</span>';return '<a href="'+item.url+'" target="_blank" style="display:inline-block;padding:6px 12px;background:#081821;border:1px solid #ff880044;border-radius:6px;color:#00ffee;text-decoration:none;font-size:12px;font-family:Share Tech Mono,monospace;transition:background 0.15s,box-shadow 0.15s" onmouseover="this.style.background=\'#0c2430\';this.style.boxShadow=\'0 0 12px #ff880044\'" onmouseout="this.style.background=\'#081821\';this.style.boxShadow=\'none\'">'+item.name+'</a>'}
-function ms(icon,title,links){return '<div style="margin-bottom:14px"><div style="color:#ff8800;font-family:Share Tech Mono,monospace;font-size:12px;margin-bottom:6px;text-shadow:0 0 6px #ff880066">'+icon+' '+title+'</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+links+'</div></div>'}
+function ml(item){if(!item||!item.url)return '<div style="color:#7fd6df;font-size:11px;padding:2px 0">'+(item?item.name:'')+'</div>';return '<div style="padding:2px 0"><a href="'+item.url+'" target="_blank" style="color:#00ffee;text-decoration:none;font-size:11px;font-family:Share Tech Mono,monospace">'+item.name+'</a></div>'}
+function card(icon,title,links){return '<div style="flex:1 1 calc(33.3% - 8px);min-width:140px;padding:10px;background:#081821;border:1px solid #ff880033;border-radius:6px"><div style="color:#ff8800;font-family:Share Tech Mono,monospace;font-size:11px;margin-bottom:6px;text-shadow:0 0 6px #ff880066">'+icon+' '+title+'</div>'+links+'</div>'}
 var h="<button class='atw-small-button' onclick='hideBugoutSlidePanel()' style='margin-bottom:12px'>\u2B05 BACK</button>";
 h+="<h3 style='color:#ff8800;font-family:Share Tech Mono,monospace;margin-bottom:12px;text-shadow:0 0 8px #ff880066'>\u2708\uFE0F TRAVEL \u2014 "+name+"</h3>";
-var tl=d.travel.map(ml).join('');h+=ms('\uD83D\uDEC2','TRAVEL DOCUMENTS',tl);
-var al='';if(d.air.national)al+=ml({name:d.air.national+' (National)',url:d.air.nationalUrl});al+=d.air.regional.map(ml).join('');al+=ml(d.air.search);h+=ms('\u2708\uFE0F','AIR MOBILITY',al);
-h+=ms('\uD83D\uDE95','GROUND TRANSPORT',d.ground.map(ml).join(''));
-h+=ms('\uD83C\uDFE8','ACCOMMODATION',d.accommodation.map(ml).join(''));
-h+=ms('\uD83D\uDCE1','COMMUNICATIONS',d.comms.map(ml).join(''));
-h+=ms('\uD83D\uDCB0','FINANCIAL',d.financial.map(ml).join(''));
-if(d.visaFree&&d.visaFree.length){h+=ms('\uD83C\uDF10','VISA-FREE DESTINATIONS ('+d.visaFree.length+')',d.visaFree.map(function(v){var label=v.name+(v.days?' ('+v.days+' days)':'');var nameEsc=v.name.replace(/'/g,"\\'");return '<span onclick="navigateToVisaFreeCountry(\''+nameEsc+'\')" style="display:inline-block;padding:6px 12px;background:#081821;border:1px solid #ff880033;border-radius:6px;color:#7fd6df;font-size:12px;font-family:Share Tech Mono,monospace;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background=\'#0c2430\'" onmouseout="this.style.background=\'#081821\'">'+label+'</span>'}).join(''))}
+var tl=d.travel.map(ml).join('');
+var al='';if(d.air.national)al+=ml({name:d.air.national+' (National)',url:d.air.nationalUrl});al+=d.air.regional.map(ml).join('');al+=ml(d.air.search);
+h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+h+=card('\uD83D\uDEC2','TRAVEL DOCUMENTS',tl);
+h+=card('\u2708\uFE0F','AIR MOBILITY',al);
+h+=card('\uD83D\uDE95','GROUND TRANSPORT',d.ground.map(ml).join(''));
+h+=card('\uD83C\uDFE8','ACCOMMODATION',d.accommodation.map(ml).join(''));
+h+=card('\uD83D\uDCE1','COMMUNICATIONS',d.comms.map(ml).join(''));
+h+=card('\uD83D\uDCB0','FINANCIAL',d.financial.map(ml).join(''));
+h+='</div>';
+if(d.visaFree&&d.visaFree.length){h+='<div style="margin-bottom:12px"><div style="color:#ff8800;font-family:Share Tech Mono,monospace;font-size:11px;margin-bottom:6px;text-shadow:0 0 6px #ff880066">\uD83C\uDF10 VISA-FREE DESTINATIONS ('+d.visaFree.length+')</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+d.visaFree.map(function(v){var label=v.name+(v.days?' ('+v.days+' days)':'');var nameEsc=v.name.replace(/'/g,"\\'");return '<span onclick="navigateToVisaFreeCountry(\''+nameEsc+'\')" style="display:inline-block;padding:4px 8px;background:#081821;border:1px solid #ff880033;border-radius:4px;color:#7fd6df;font-size:11px;font-family:Share Tech Mono,monospace;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background=\'#0c2430\'" onmouseout="this.style.background=\'#081821\'">'+label+'</span>'}).join('')+'</div></div>'}
 panel.innerHTML=h}
 function hideBugoutSlidePanel(){_hideAllCountryPanels()}
 function showPopupFxRates(){_autoShowFx=true;popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()}
