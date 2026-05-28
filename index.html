@@ -411,7 +411,7 @@ function bugoutSection(icon,title,content){return `<div style='margin-bottom:16p
 async function renderBugoutPanel(name,iso){
 const p=document.getElementById('africaTimePanel');p.onmouseleave=null;clearAfricaTimeHide();p.scrollTop=0;
 const w=document.getElementById('africaTimeWidget');
-w.innerHTML=`<div style='text-align:center;padding:40px;color:#ff8800;font-family:Share Tech Mono,monospace'>Loading ${name} Bugout Panel...</div>`;
+w.innerHTML=`<div style='text-align:center;padding:40px;color:#ff8800;font-family:Share Tech Mono,monospace'>Loading ${name} Travel Panel...</div>`;
 const d=bugoutData[name];
 if(!d){w.innerHTML=`<div style='padding:12px'><button class='atw-small-button' onclick="atwViewCountry('${name.replace(/'/g,"\\'")}','${iso}')">⬅ BACK</button><div style='text-align:center;color:#ff4444;padding:20px'>No bugout data available for ${name}.</div></div>`;return}
 const flag=`https://flagcdn.com/w80/${iso}.png`;
@@ -438,7 +438,7 @@ let panHtml='';
 if(panNews.length){panHtml=bugoutSection('🌍','PAN-AFRICAN / DIASPORA',panNews.map(s=>bugoutLink({name:s[0],url:s[1]})).join(''))}
 w.innerHTML=`<div style='padding:12px'>
 <button class='atw-small-button' onclick="atwViewCountry('${name.replace(/'/g,"\\'")}','${iso}')" style='margin-bottom:16px'>⬅ BACK</button>
-<div style='display:flex;align-items:center;gap:12px;margin-bottom:16px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#ff8800;font-family:Share Tech Mono,monospace'>${name} — BUGOUT PANEL</h2><div style='color:#7fd6df;font-size:13px'>Mobility / Resilience</div></div></div>
+<div style='display:flex;align-items:center;gap:12px;margin-bottom:16px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#ff8800;font-family:Share Tech Mono,monospace'>${name} — TRAVEL PANEL</h2><div style='color:#7fd6df;font-size:13px'>Mobility / Resilience</div></div></div>
 ${bugoutSection('🛂','TRAVEL DOCUMENTS',travelHtml)}
 ${bugoutSection('✈️','AIR MOBILITY',airHtml)}
 ${bugoutSection('🚕','GROUND TRANSPORT',groundHtml)}
@@ -520,7 +520,7 @@ if(!w)return;
 if(aiDSApiKey){
 w.innerHTML='<span style="color:#44ff8888;font-size:9px;font-family:Share Tech Mono,monospace">🔑</span><span style="color:#44ff88;font-size:10px;font-family:Share Tech Mono,monospace">sk-•••••••</span><button onclick="_cpApiKeyReset()" style="padding:2px 6px;background:#081821;border:1px solid #ff444444;color:#ff4444;font-size:9px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;margin-left:2px">RESET</button>';
 }else{
-w.innerHTML='<span style="color:#44ff8888;font-size:9px;font-family:Share Tech Mono,monospace">🔑</span><input id="countryPanelApiKey" type="password" placeholder="OpenAI API key (sk-...)" style="width:160px;padding:4px 6px;background:#081821;border:1px solid #44ff8833;color:#d7ffff;font-size:10px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box" /><button onclick="_cpApiKeySet()" style="padding:2px 6px;background:#081821;border:1px solid #44ff8844;color:#44ff88;font-size:9px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;margin-left:2px">SET</button>';
+w.innerHTML='<span style="color:#44ff8888;font-size:9px;font-family:Share Tech Mono,monospace">🔑</span><input id="countryPanelApiKey" type="password" placeholder="OpenAI API key (sk-...)" style="width:160px;padding:4px 6px;background:#081821;border:1px solid #44ff8833;color:#d7ffff;font-size:10px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box" /><button onclick="_cpApiKeySet()" style="padding:4px 6px;background:#081821;border:1px solid #44ff8844;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;margin-left:2px">SET</button>';
 }
 }
 function _cpApiKeySet(){
@@ -574,17 +574,17 @@ w.innerHTML=`<div style='padding:12px'>
 <div style='display:flex;justify-content:flex-end;margin-bottom:8px'><div id='cpApiKeyWrap' style='display:flex;align-items:center;gap:4px'></div></div>
 <div style='display:flex;justify-content:center;gap:10px;margin-bottom:12px;flex-wrap:wrap'><button class='atw-small-button' onclick="showBugoutSlidePanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>✈️ TRAVEL</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button><button class='atw-small-button' onclick="showLiveNewsPanel('${escapedName}')" style='background:#0c2430;border-color:#44ff88;color:#44ff88;text-shadow:0 0 6px #44ff8888'>📺 LIVE NEWS</button><button class='atw-small-button' onclick="aiCountrySitrepMaster('${escapedName}');document.getElementById('africaTimePanel').classList.remove('open');africaTimePanelOpen=false" style='background:#0c2430;border-color:#ff4444;color:#ff4444;text-shadow:0 0 6px #ff444488'>📋 SitRep</button><button class='atw-small-button' onclick="aiStrategicRelocation('${escapedName}');document.getElementById('africaTimePanel').classList.remove('open');africaTimePanelOpen=false" style='background:#0c2430;border-color:#cc44ff;color:#cc44ff;text-shadow:0 0 6px #cc44ff88'>🏠 STRATEGIC RELOCATION</button></div>
 <div style='position:relative;overflow:hidden'><div id='countryDataMain'>
-<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:Rajdhani,sans-serif;font-size:14px'>
-<div><span style='color:#7fd6df'>Capital:</span> ${capital}</div>
-<div><span style='color:#7fd6df'>Population:</span> ${pop}</div>
-<div><span style='color:#7fd6df'>Currency:</span> ${currName} (${currTicker})</div>
-<div><span style='color:#7fd6df'>Area:</span> ${area}</div>
-<div><span style='color:#7fd6df'>Exchange Rate (USD):</span> ${exRate}</div>
-<div><span style='color:#7fd6df'>Calling Code:</span> ${code}</div>
-<div><span style='color:#7fd6df'>Black Population:</span> <span style='color:#ffcc00'>${bpopStr}</span></div>
-<div><span style='color:#7fd6df'>Language:</span> ${lang}</div>
-<div><a href='${gmap}' target='_blank' style='color:#00ffee;text-decoration:none'>📍 Google Maps</a></div>
-<div><a href='${passIdx}' target='_blank' style='color:#00ffee;text-decoration:none'>🛃 Passport Index</a></div>
+<div style='display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;font-family:Rajdhani,sans-serif;font-size:13px;scrollbar-width:thin;scrollbar-color:#00ffee44 transparent'>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Capital</div><div style='color:#d7ffff'>${capital}</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Population</div><div style='color:#d7ffff'>${pop}</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Currency</div><div style='color:#d7ffff'>${currName} (${currTicker})</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Area</div><div style='color:#d7ffff'>${area}</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>FX Rate (USD)</div><div style='color:#d7ffff'>${exRate}</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Calling Code</div><div style='color:#d7ffff'>${code}</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Black Pop.</div><div style='color:#ffcc00'>${bpopStr}</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><div style='color:#7fd6df;font-size:10px;margin-bottom:2px'>Language</div><div style='color:#d7ffff'>${lang}</div></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><a href='${gmap}' target='_blank' style='color:#00ffee;text-decoration:none;font-size:12px'>📍 Maps</a></div>
+<div style='flex:0 0 auto;padding:8px 12px;background:#081821;border:1px solid #00ffee22;border-radius:6px;min-width:100px;text-align:center'><a href='${passIdx}' target='_blank' style='color:#00ffee;text-decoration:none;font-size:12px'>🛃 Passport</a></div>
 </div>
 <div id="ucpBar" class="ucp-bar">
 ${localBtns}
@@ -655,7 +655,7 @@ panel.style.display='block';setTimeout(function(){panel.style.transform='transla
 function ml(item){if(!item||!item.url)return '<div style="padding:2px 0"><span style="color:#7fd6df;font-size:13px">'+(item?item.name:'')+'</span></div>';return '<div style="padding:2px 0"><a href="'+item.url+'" target="_blank" style="color:#00ffee;text-decoration:none;font-size:13px;font-family:Rajdhani,sans-serif">'+item.name+'</a></div>'}
 function ms(icon,title,links){return '<div style="margin-bottom:14px"><div style="color:#ff8800;font-family:Share Tech Mono,monospace;font-size:12px;margin-bottom:4px;text-shadow:0 0 6px #ff880066">'+icon+' '+title+'</div><div style="padding-left:8px">'+links+'</div></div>'}
 var h="<button class='atw-small-button' onclick='hideBugoutSlidePanel()' style='margin-bottom:12px'>\u2B05 BACK</button>";
-h+="<h3 style='color:#ff8800;font-family:Share Tech Mono,monospace;margin-bottom:12px;text-shadow:0 0 8px #ff880066'>\uD83D\uDE81 BUGOUT \u2014 "+name+"</h3>";
+h+="<h3 style='color:#ff8800;font-family:Share Tech Mono,monospace;margin-bottom:12px;text-shadow:0 0 8px #ff880066'>\u2708\uFE0F TRAVEL \u2014 "+name+"</h3>";
 var tl=d.travel.map(ml).join('');h+=ms('\uD83D\uDEC2','TRAVEL DOCUMENTS',tl);
 var al='';if(d.air.national)al+=ml({name:d.air.national+' (National)',url:d.air.nationalUrl});al+=d.air.regional.map(ml).join('');al+=ml(d.air.search);h+=ms('\u2708\uFE0F','AIR MOBILITY',al);
 h+=ms('\uD83D\uDE95','GROUND TRANSPORT',d.ground.map(ml).join(''));
@@ -1696,7 +1696,7 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Black Population</td><td style="color:#ffcc00">'+(blackPopPct[info.name]!==undefined?blackPopPct[info.name]+'%':'N/A')+'</td></tr>'+
 '<tr><td style="color:#00ffee;padding:2px 8px 2px 0;white-space:nowrap">Timezone</td><td style="color:#d7ffff">'+info.timezone+'</td></tr>'+
 '</table>'+
-'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupHeadlineSlide()" style="border-color:#d7a0ff55;color:#d7a0ff">📋 HEADLINES</button><button class="popup-action-btn" onclick="showPopupNewsSlide()" style="border-color:#44ff8855;color:#44ff88">📰 LIVE NEWS</button><button class="popup-action-btn" onclick="showPopupFxSlide()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugoutSlide()" style="border-color:#ff880055;color:#ff8800">🚁 TRAVEL</button><button class="popup-action-btn" onclick="aiSitRep(_lastPopupInfo.name);afrMapInstance.closePopup()" style="border-color:#44ff8855;color:#44ff88">📋 SITREP</button><button class="popup-action-btn" onclick="aiBugoutPlan(_lastPopupInfo.name);afrMapInstance.closePopup()" style="border-color:#ff880055;color:#ff8800">🚁 AI BUGOUT</button><button class="popup-action-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()" style="border-color:#00ffee55;color:#00ffee">🏠 HOME</button></div>'+
+'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid #00ffee33;padding-top:8px"><button class="popup-action-btn set-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()">SET</button><button class="popup-action-btn" onclick="showPopupHeadlineSlide()" style="border-color:#d7a0ff55;color:#d7a0ff">📋 HEADLINES</button><button class="popup-action-btn" onclick="showPopupNewsSlide()" style="border-color:#44ff8855;color:#44ff88">📰 LIVE NEWS</button><button class="popup-action-btn" onclick="showPopupFxSlide()" style="border-color:#ffcc0055;color:#ffcc00">💱 FX RATES</button><button class="popup-action-btn" onclick="showPopupBugoutSlide()" style="border-color:#ff880055;color:#ff8800">🚁 TRAVEL</button><button class="popup-action-btn" onclick="popupSetCountry(_lastPopupInfo.name);afrMapInstance.closePopup()" style="border-color:#00ffee55;color:#00ffee">🏠 HOME</button></div>'+
 '</div>'+
 '<div id="popupFxSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
 '<div id="popupBugoutSlide" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#0a1a24;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding:8px;box-sizing:border-box;display:none"></div>'+
