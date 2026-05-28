@@ -223,9 +223,9 @@ function _renderCpApiKey(){
 var w=document.getElementById('cpApiKeyWrap');
 if(!w)return;
 if(aiDSApiKey){
-w.innerHTML='<span style="color:#44ff8888;font-size:9px;font-family:Share Tech Mono,monospace">🔑</span><span style="color:#44ff88;font-size:10px;font-family:Share Tech Mono,monospace">sk-•••••••</span><button onclick="_cpApiKeyReset()" style="padding:2px 6px;background:#081821;border:1px solid #ff444444;color:#ff4444;font-size:9px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;margin-left:2px">RESET</button>';
+w.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;width:100%"><span style="color:#44ff88;font-size:10px;font-family:Share Tech Mono,monospace">🔑 AI modules enabled</span><span onclick="_cpApiKeyReset()" style="color:#ff444488;font-size:9px;cursor:pointer;font-family:Share Tech Mono,monospace;text-decoration:underline">reset</span></div>';
 }else{
-w.innerHTML='<div style="display:flex;align-items:stretch;gap:0;width:100%"><input id="countryPanelApiKey" type="password" placeholder="Integrate your API key..." style="flex:1;min-width:0;padding:4px 6px;background:#081821;border:1px solid #44ff8833;border-right:none;color:#d7ffff;font-size:10px;border-radius:3px 0 0 3px;font-family:Share Tech Mono,monospace;box-sizing:border-box" /><button onclick="_cpApiKeySet()" style="padding:4px 8px;background:#0c2430;border:1px solid #44ff8866;color:#44ff88;font-size:9px;cursor:pointer;border-radius:0 3px 3px 0;font-family:Share Tech Mono,monospace;white-space:nowrap;text-shadow:0 0 6px #44ff8866;letter-spacing:1px">Enable AI</button></div>';
+w.innerHTML='<div style="display:flex;align-items:center;gap:6px;width:100%"><input id="countryPanelApiKey" type="password" placeholder="Integrate your API key..." style="flex:1;min-width:0;padding:4px 6px;background:#081821;border:1px solid #44ff8833;color:#d7ffff;font-size:10px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box" /><span onclick="_cpApiKeySet()" style="color:#44ff88;font-size:10px;cursor:pointer;font-family:Share Tech Mono,monospace;white-space:nowrap;text-decoration:underline">Enable AI</span></div>';
 }
 }
 function _cpApiKeySet(){
@@ -235,6 +235,7 @@ var k=inp.value.trim();
 if(!k){alert('Enter an API key');return}
 aiDSApiKey=k.replace(/[^\x20-\x7E]/g,'');
 _renderCpApiKey();
+var b=document.getElementById('aiCardBody');if(b)b.style.display='block';var a=document.getElementById('aiCardCollapseArrow');if(a)a.textContent='\u25bc';
 }
 function _cpApiKeyReset(){
 aiDSApiKey='';
