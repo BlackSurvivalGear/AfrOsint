@@ -111,7 +111,7 @@ a{color:#00ffee;text-decoration:none}
 .ucp-btn.map-btn:hover{box-shadow:0 0 12px #ff880066;text-shadow:0 0 8px #ff8800;background:#1a1200}
 .ucp-btn.map-btn.active{background:#1a1200;border-color:#ff8800;box-shadow:0 0 12px #ff880044;text-shadow:0 0 8px #ff8800;font-weight:700}
 #ucpFrame{transition:opacity 0.3s ease}
-#splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;background-image:url('../assets/images/AFROSINT LOGO.png');background-size:40%;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease}
+#splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;background-image:url('../assets/images/AFROSINT LOGO.png');background-size:40%;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease;cursor:pointer}
 #splashScreen.fade-out{opacity:0}
 
 #splashScreen .splash-title{margin-top:20px;font-size:28px;font-weight:700;letter-spacing:3px;color:#06161c;text-shadow:0 0 30px #00ffee,0 0 60px #00ffee,0 0 100px #00ffee88}
