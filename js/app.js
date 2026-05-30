@@ -981,7 +981,7 @@ function loadAfrMap(){afrRegionIdx=0;active('afrMapBtn');renderOps(`
 var container=document.getElementById('afrMapContainer');
 var globeDiv=document.createElement('div');globeDiv.id='globeMount';globeDiv.style.cssText='width:100%;height:100%;position:absolute;top:0;left:0;z-index:1;background:#000';
 container.insertBefore(globeDiv,container.firstChild);
-afrMapInstance=Globe()
+try{if(typeof Globe==='undefined')throw new Error('Globe library not loaded');afrMapInstance=Globe()
 .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
 .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
@@ -1000,7 +1000,7 @@ afrMapInstance.pointOfView({lat:5,lng:20,altitude:2.2},0);
 afrMapInstance.controls().autoRotate=true;afrMapInstance.controls().autoRotateSpeed=0.3;
 afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='SATELLITE';
 initCountryBorders();
-_globeRefreshLayers();
+_globeRefreshLayers();}catch(e){console.error('Globe init error:',e);globeDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ff4444;font-family:Share Tech Mono,monospace;font-size:14px;text-align:center;padding:20px">⚠ 3D Globe requires WebGL.<br>Please enable hardware acceleration in your browser settings.</div>'}
 afrNewsBoxCount=0;document.getElementById('afrNewsBoxes').innerHTML='';afrAddNewsBox();showLayerPanels();_showMapFeedOnLoad();_webcamScrollInit=false;_webcamVisible=false;_webcamCollapsed=false;_webcamTab='all'},100)}
 function _globeRefreshLayers(){if(!afrMapInstance)return;
 var pts=[];
