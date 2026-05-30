@@ -22,30 +22,11 @@ var aiDSCountryRisk=[
 {name:'Morocco',lat:31.8,lng:-7.1,risk:'LOW',score:2.8,travel:'NORMAL PRECAUTIONS',color:'#44cc44',threats:['Western Sahara tensions','Terrorism (low probability)','Migration pressure'],stability:'Stable monarchy; strong security apparatus; economic development focused',humanitarian:'Earthquake recovery (2023); drought stress',forecast:'Stable-positive — World Cup 2030 driving infrastructure investment'}
 ];
 
-var aiDSLayer=null;var aiDSVisible=false;
-function initAiDecisionSupport(){
-if(!afrMapInstance.getPane('aiDSPane')){var p=afrMapInstance.createPane('aiDSPane');p.style.zIndex=650}
-aiDSLayer=L.layerGroup();
-aiDSCountryRisk.forEach(function(c){
-var riskColor=c.color;
-var marker=L.circleMarker([c.lat,c.lng],{radius:c.score*1.8,color:riskColor,fillColor:riskColor,fillOpacity:0.25,weight:2,opacity:0.8,pane:'aiDSPane'});
-marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:11px;max-width:320px;line-height:1.5;color:#d7ffff">'+
-'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #44ff8833"><strong style="color:'+riskColor+';font-size:14px;text-shadow:0 0 8px '+riskColor+'66">'+c.name+'</strong><span style="background:'+riskColor+';color:#000;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:bold;letter-spacing:1px">'+c.risk+'</span></div>'+
-'<div style="margin-bottom:8px;color:#7fd6df;font-size:12px">RISK SCORE: <span style="color:'+riskColor+';font-weight:bold;text-shadow:0 0 6px '+riskColor+'44">'+c.score+'/10</span> — Travel: <span style="color:#ffcc00">'+c.travel+'</span></div>'+
-'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,100,100,0.08);border-left:2px solid #ff6666;border-radius:0 4px 4px 0"><span style="color:#ff6666;font-weight:bold">⚠ THREATS:</span><br><span style="color:#e0e8ef">'+c.threats.map(function(t){return'• '+t}).join('<br>')+'</span></div>'+
-'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,170,0,0.08);border-left:2px solid #ffaa00;border-radius:0 4px 4px 0"><span style="color:#ffaa00;font-weight:bold">⊕ STABILITY:</span><br><span style="color:#e0e8ef">'+c.stability+'</span></div>'+
-'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(102,204,255,0.08);border-left:2px solid #66ccff;border-radius:0 4px 4px 0"><span style="color:#66ccff;font-weight:bold">♜ HUMANITARIAN:</span><br><span style="color:#e0e8ef">'+c.humanitarian+'</span></div>'+
-'<div style="padding:6px 8px;background:rgba(68,255,136,0.08);border-left:2px solid #44ff88;border-radius:0 4px 4px 0"><span style="color:#44ff88;font-weight:bold">⟳ AI FORECAST:</span><br><span style="color:#e0e8ef">'+c.forecast+'</span></div>'+
-'<div style="margin-top:10px;border-top:1px solid #44ff8833;padding-top:8px"><button onclick="aiDeepDive(\''+c.name.replace(/'/g,"\\'")+'\')" style="width:100%;padding:7px;background:#0a2a1a;border:1px solid #44ff88;color:#44ff88;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px">🔬 AI DEEP DIVE</button></div>'+
-'</div>',{maxWidth:360,className:'ai-ds-popup'});
-marker.addTo(aiDSLayer);
-});
-aiDSVisible=false;
-}
+var aiDSLayer=true;var aiDSVisible=false;
+function initAiDecisionSupport(){}
 function toggleAiDSLayer(){
-if(!aiDSLayer)initAiDecisionSupport();
-if(aiDSVisible){afrMapInstance.removeLayer(aiDSLayer);aiDSVisible=false}
-else{aiDSLayer.addTo(afrMapInstance);aiDSVisible=true}
+aiDSVisible=!aiDSVisible;
+if(typeof _globeRefreshLayers==='function')_globeRefreshLayers();
 var leg=document.getElementById('aiDSLegend');if(leg)leg.style.display=aiDSVisible?'block':'none';
 var cb=document.getElementById('aiDSRiskToggle');if(cb)cb.checked=aiDSVisible;
 var btn=document.getElementById('aiDSToggleBtn');if(btn){btn.style.borderColor=aiDSVisible?'#44ff88':'#00ffee44';btn.style.color=aiDSVisible?'#44ff88':'#00ffee'}
@@ -82,8 +63,7 @@ var newData=JSON.parse(content);
 if(!Array.isArray(newData)||newData.length===0)throw new Error('Invalid response format');
 aiDSCountryRisk.length=0;
 newData.forEach(function(c){aiDSCountryRisk.push(c)});
-if(aiDSVisible){afrMapInstance.removeLayer(aiDSLayer);aiDSLayer=null;initAiDecisionSupport();aiDSLayer.addTo(afrMapInstance)}
-else{aiDSLayer=null;initAiDecisionSupport()}
+if(typeof _globeRefreshLayers==='function')_globeRefreshLayers();
 statusEl.innerHTML='<span style="color:#44ff88">✓ Intel updated — '+newData.length+' countries refreshed</span>';
 setTimeout(function(){statusEl.style.display='none'},5000);
 }).catch(function(err){
