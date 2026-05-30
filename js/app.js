@@ -1287,9 +1287,10 @@ document.removeEventListener('mousemove',doPanelDrag);
 document.removeEventListener('mouseup',stopPanelDrag);
 document.removeEventListener('touchmove',doPanelDrag);
 document.removeEventListener('touchend',stopPanelDrag);
-if(!panelDragActive&&panelDragEl){
-var handle=panelDragEl.querySelector('[id$="DragHandle"]');
-if(handle)handle.click()}
+if(panelDragActive){
+var cb=function(ev){ev.stopPropagation();ev.preventDefault();document.removeEventListener('click',cb,true)};
+document.addEventListener('click',cb,true);
+setTimeout(function(){document.removeEventListener('click',cb,true)},100)}
 panelDragEl=null;panelDragActive=false}
 function showLayerPanels(){var t=document.getElementById('tacticalLayerPanel');var s=document.getElementById('survivalLayerPanel');var ai=document.getElementById('aiDecisionPanel');if(t)t.style.display='block';if(s)s.style.display='block';if(ai)ai.style.display='block'}
 function hideLayerPanels(){var t=document.getElementById('tacticalLayerPanel');var s=document.getElementById('survivalLayerPanel');var ai=document.getElementById('aiDecisionPanel');if(t)t.style.display='none';if(s)s.style.display='none';if(ai)ai.style.display='none'}
