@@ -1023,6 +1023,18 @@ if(afrRiskyVisible&&typeof riskyZones!=='undefined'){riskyZones.forEach(function
 afrMapInstance.pointsData(pts).pointLat('lat').pointLng('lng').pointAltitude(0.01).pointRadius('size').pointColor('color').pointLabel(function(d){return '<div style="font-family:Share Tech Mono,monospace;font-size:12px;background:rgba(6,16,24,0.95);border:1px solid #00ffee44;padding:8px 12px;border-radius:4px;color:#d7ffff"><strong style="color:'+d.color+'">'+d.name+'</strong><br>'+d.info+'</div>'});
 afrMapInstance.ringsData(rings).ringLat('lat').ringLng('lng').ringMaxRadius('maxR').ringPropagationSpeed('propagationSpeed').ringRepeatPeriod('repeatPeriod').ringColor(function(d){return[d.color]});
 afrMapInstance.arcsData(arcs).arcStartLat('startLat').arcStartLng('startLng').arcEndLat('endLat').arcEndLng('endLng').arcColor(function(d){return[d.color,d.color]}).arcStroke(0.5).arcDashLength(0.4).arcDashGap(0.2).arcDashAnimateTime(1500);
+
+if(typeof globeLabels !== 'undefined'){
+  afrMapInstance.labelsData(globeLabels)
+    .labelLat('lat').labelLng('lng')
+    .labelText('name')
+    .labelSize(0.6)
+    .labelDotRadius(0.1)
+    .labelColor(() => '#00ffee')
+    .labelAltitude(0.015)
+    .labelFont(() => 'Share Tech Mono')
+    .labelSize(0.8);
+}
 }
 function _globeShowPopup(html,screenX,screenY){_globeClosePopup();var el=document.createElement('div');el.id='globePopupOverlay';el.style.cssText='position:absolute;z-index:2000;background:rgba(6,16,24,0.97);border:1px solid #00ffee44;border-radius:6px;padding:0;max-width:340px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 24px rgba(0,255,238,0.15);pointer-events:auto';el.innerHTML=html;var container=document.getElementById('afrMapContainer');if(!container)return;container.appendChild(el);var cw=container.offsetWidth,ch2=container.offsetHeight;var ew=Math.min(340,cw-20),eh=el.offsetHeight;var left=Math.min(Math.max(10,screenX-ew/2),cw-ew-10);var top=Math.min(Math.max(10,screenY-eh-20),ch2-eh-10);el.style.left=left+'px';el.style.top=top+'px';_globePopupEl=el}
 function _globeClosePopup(){var el=document.getElementById('globePopupOverlay');if(el)el.remove();_globePopupEl=null}
