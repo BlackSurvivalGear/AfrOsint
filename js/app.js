@@ -1034,6 +1034,13 @@ if(!afrMapInstance||_globeCountryFeatures)return;
 fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
 .then(r=>r.json()).then(data=>{
 _globeCountryFeatures=data.features;
+const countryLabels=_globeCountryFeatures.map(f=>{
+const name=f.properties.ADMIN||f.properties.name||'';
+let lat=0,lng=0,count=0;
+if(f.geometry.type==='Polygon'){f.geometry.coordinates[0].forEach(p=>{lng+=p[0];lat+=p[1];count++})}
+else if(f.geometry.type==='MultiPolygon'){f.geometry.coordinates.forEach(poly=>{poly[0].forEach(p=>{lng+=p[0];lat+=p[1];count++})})}
+return {name:name,lat:lat/count,lng:lng/count}});
+afrMapInstance.labelsData(countryLabels).labelLat(d=>d.lat).labelLng(d=>d.lng).labelText(d=>d.name).labelSize(0.6).labelDotRadius(0.2).labelColor(()=>'rgba(0,255,238,0.8)').labelResolution(2);
 afrMapInstance.polygonsData(_globeCountryFeatures)
 .polygonCapColor(function(d){
 var name=d.properties.ADMIN||d.properties.name||'';
@@ -1889,10 +1896,25 @@ const donateWallets={btc:{addr:'bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6',qr:'
 let donateCategory='crypto';
 function switchDonateCategory(cat){donateCategory=cat;document.getElementById('donateCategoryBtnCrypto').classList.toggle('active',cat==='crypto');document.getElementById('donateCategoryBtnFiat').classList.toggle('active',cat==='fiat');document.getElementById('donateCryptoCategory').style.display=cat==='crypto'?'block':'none';document.getElementById('donateFiatCategory').style.display=cat==='fiat'?'block':'none'}
 let donateNetwork='btc';
-function toggleDonatePanel(){document.getElementById('donatePanel').classList.toggle('open')}
+function toggleDonatePanel(){document.getElementById('donatePanel').classList.toggle('open');document.getElementById('sharePanel').classList.remove('open')}
+function toggleSharePanel(){
+const p=document.getElementById('sharePanel');p.classList.toggle('open');document.getElementById('donatePanel').classList.remove('open');
+if(p.classList.contains('open')){
+const url=encodeURIComponent(window.location.href);const txt=encodeURIComponent('Check out AfrOSINT — Pan-African OSINT platform');
+document.getElementById('shareX').href=`https://twitter.com/intent/tweet?text=${txt}&url=${url}`;
+document.getElementById('shareFB').href=`https://www.facebook.com/sharer/sharer.php?u=${url}`;
+document.getElementById('shareLI').href=`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${txt}`;
+document.getElementById('shareWA').href=`https://api.whatsapp.com/send?text=${txt}%20${url}`;
+}}
+function copyShareLink(){const url=window.location.href;navigator.clipboard.writeText(url).then(()=>{const btn=document.getElementById('shareCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY LINK'},2000)}).catch(()=>{const t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);const btn=document.getElementById('shareCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY LINK'},2000)})}
 function switchDonateNetwork(net){donateNetwork=net;const w=donateWallets[net];document.getElementById('donateBtcBtn').classList.toggle('active',net==='btc');document.getElementById('donateUsdtBtn').classList.toggle('active',net==='usdt');document.getElementById('donateAddr').textContent=w.addr;document.getElementById('donateQrImg').src=w.qr;document.getElementById('donateCopyBtn').textContent='COPY'}
 function copyDonateAddr(){if(!donateWallets[donateNetwork])return;const addr=donateWallets[donateNetwork].addr;navigator.clipboard.writeText(addr).then(()=>{const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)}).catch(()=>{const t=document.createElement('textarea');t.value=addr;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)})}
-document.addEventListener('click',function(e){const panel=document.getElementById('donatePanel');const btn=document.querySelector('.donate-btn');if(panel.classList.contains('open')&&!panel.contains(e.target)&&!btn.contains(e.target)){panel.classList.remove('open')}});
+document.addEventListener('click',function(e){
+const dPanel=document.getElementById('donatePanel');const dBtn=document.querySelector('.donate-btn');
+if(dPanel.classList.contains('open')&&!dPanel.contains(e.target)&&!dBtn.contains(e.target))dPanel.classList.remove('open');
+const sPanel=document.getElementById('sharePanel');const sBtn=document.querySelector('.share-btn');
+if(sPanel.classList.contains('open')&&!sPanel.contains(e.target)&&!sBtn.contains(e.target))sPanel.classList.remove('open');
+});
 loadAfrMap();
 
 // Mobile nav: close menu when a nav button is clicked
