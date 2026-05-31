@@ -1947,3 +1947,20 @@ var hc=document.querySelector('.header-center');
 var mb=document.getElementById('mobileMenuBtn');
 if(hc&&hc.classList.contains('mobile-open')){hc.classList.remove('mobile-open');if(mb)mb.textContent='☰'}
 })});
+
+// Proverb banner cycling
+(function(){
+if(typeof africanProverbs==='undefined'||!africanProverbs.length)return;
+var el=document.getElementById('proverbText');
+if(!el)return;
+var idx=Math.floor(Math.random()*africanProverbs.length);
+function show(){
+var p=africanProverbs[idx];
+el.textContent=p.flag+' '+p.text+' — '+p.nation;
+el.classList.add('visible');
+setTimeout(function(){
+el.classList.remove('visible');
+setTimeout(function(){
+idx=(idx+1)%africanProverbs.length;
+show()},1200)},8000)}
+show()})();

@@ -2,6 +2,11 @@
 *{margin:0;padding:0;box-sizing:border-box}
 #opsViewport,#panAfricaViewport,#channelHubViewport,#headlinesFrame,.ai-grid{scrollbar-width:none}#opsViewport::-webkit-scrollbar,#panAfricaViewport::-webkit-scrollbar,#channelHubViewport::-webkit-scrollbar,#headlinesFrame::-webkit-scrollbar,.ai-grid::-webkit-scrollbar{display:none}
 body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:hidden}
+#proverbBanner{width:100%;text-align:center;padding:8px 16px;background:linear-gradient(90deg,transparent,rgba(0,255,238,0.06),transparent);border-bottom:1px solid #00ffee22;min-height:36px;display:flex;align-items:center;justify-content:center}
+#proverbText{font-family:'Share Tech Mono',monospace;font-size:13px;color:#7fd6df;letter-spacing:1px;opacity:0;transition:opacity 1.2s ease;text-shadow:0 0 8px #00ffee44}
+#proverbText.visible{opacity:1}
+@media(max-width:1024px){#proverbBanner{padding:6px 12px;min-height:30px}#proverbText{font-size:11px;letter-spacing:0.5px}}
+@media(max-width:480px){#proverbBanner{padding:4px 8px;min-height:26px}#proverbText{font-size:10px}}
 #commandHeader{position:relative;display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;padding:18px 24px;background:linear-gradient(180deg,#07141c,#050b12);background-image:linear-gradient(180deg,rgba(7,20,28,0.88),rgba(5,11,18,0.92)),url('../assets/images/AFROSINT LOGO.png');background-size:cover;background-position:center;border-bottom:2px solid #00ffee55}
 .brand-wrap{display:flex;align-items:center;gap:15px}
 .radar-logo,.footer-radar{width:96px;height:96px;border-radius:50%;border:1px solid #00ffee88;box-shadow:0 0 16px #00ffee55;animation:radarPulse 4s infinite;transition:box-shadow 0.3s ease;object-fit:cover;overflow:hidden}
