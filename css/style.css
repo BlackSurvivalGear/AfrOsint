@@ -111,15 +111,7 @@ a{color:#00ffee;text-decoration:none}
 .ucp-btn.map-btn:hover{box-shadow:0 0 12px #ff880066;text-shadow:0 0 8px #ff8800;background:#1a1200}
 .ucp-btn.map-btn.active{background:#1a1200;border-color:#ff8800;box-shadow:0 0 12px #ff880044;text-shadow:0 0 8px #ff8800;font-weight:700}
 #ucpFrame{transition:opacity 0.3s ease}
-#splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#02070d;background-image:url('../assets/images/AFROSINT LOGO.png');background-size:40%;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease;cursor:pointer}
-#splashScreen.fade-out{opacity:0}
-
-#splashScreen .splash-title{margin-top:20px;font-size:28px;font-weight:700;letter-spacing:3px;color:#06161c;text-shadow:0 0 30px #00ffee,0 0 60px #00ffee,0 0 100px #00ffee88}
-#splashScreen .splash-sub{font-size:13px;letter-spacing:6px;color:#00ffee;margin-top:6px;font-family:'Share Tech Mono'}
 .ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;padding:0 28px 28px}.ai-tile{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#081821;border:1px solid #00ffee33;border-radius:8px;color:#d7ffff;text-decoration:none;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s,transform 0.15s}.ai-tile:hover{border-color:#00ffee;box-shadow:0 0 18px #00ffee44,0 0 36px #00ffee22;background:#0c2430;transform:translateY(-2px);color:#00ffee;text-shadow:0 0 6px #00ffee88}.ai-tile-icon{font-size:22px;flex-shrink:0;width:30px;text-align:center}.ai-section-hdr{color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;padding:20px 28px 6px;margin:0;border-bottom:1px solid #00ffee22;text-shadow:0 0 8px #00ffee66}
-.loader-wrap{margin-top:32px;width:260px;height:3px;background:#0a1a22;border-radius:2px;overflow:hidden}
-.loader-bar{width:0;height:100%;background:linear-gradient(90deg,#00ffee,#00ffeedd);border-radius:2px;animation:loadBar 5s ease-in-out forwards}
-@keyframes loadBar{0%{width:0}100%{width:100%}}
 /* Mobile hamburger button - hidden on desktop */
 #mobileMenuBtn{display:none;background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:22px;padding:6px 10px;cursor:pointer;border-radius:4px;font-family:'Share Tech Mono';line-height:1}
 #mobileMenuBtn:hover{background:#0c2430;box-shadow:0 0 12px #00ffee66}
