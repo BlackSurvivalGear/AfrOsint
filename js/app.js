@@ -1039,7 +1039,9 @@ var out=[coords[0]];
 for(var i=1;i<coords.length-1;i++){
 var dx=coords[i][0]-out[out.length-1][0],dy=coords[i][1]-out[out.length-1][1];
 if(dx*dx+dy*dy>=tolerance*tolerance)out.push(coords[i])}
-out.push(coords[coords.length-1]);return out}
+out.push(coords[coords.length-1]);
+if(out.length<4)return coords;
+return out}
 function _simplifyFeature(f,tolerance){
 var g=f.geometry;if(!g)return f;
 var newCoords;
