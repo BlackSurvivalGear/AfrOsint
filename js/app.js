@@ -1,5 +1,7 @@
 let headerTz=null,headerTzLabel='',headerTzIso='';
+let globalMaxZIndex=2000;
 function _getEvPos(e){if(e.touches&&e.touches.length>0)return{clientX:e.touches[0].clientX,clientY:e.touches[0].clientY};if(e.changedTouches&&e.changedTouches.length>0)return{clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY};return{clientX:e.clientX,clientY:e.clientY}}
+function bringToFront(el){if(!el)return;globalMaxZIndex++;el.style.zIndex=globalMaxZIndex}
 function updateClock(){const now=new Date();const flagEl=document.getElementById('gmtClockFlag');if(headerTz){const time=new Intl.DateTimeFormat('en-GB',{timeZone:headerTz,weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);gmtClock.textContent=time+' | '+headerTzLabel;if(flagEl){flagEl.innerHTML=`<img src='https://flagcdn.com/w80/${headerTzIso}.png' alt='${headerTzLabel.replace(/'/g,"&#39;")}' style='width:36px;height:auto;border-radius:3px'>`;flagEl.style.display='block'}}else{const utc=new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);gmtClock.textContent=utc+' GMT / ZULU';if(flagEl){flagEl.innerHTML='';flagEl.style.display='none'}}}setInterval(updateClock,1000);updateClock();
 function setHeaderTime(tz,label,iso){headerTz=tz;headerTzLabel=label;headerTzIso=iso||'';const setBtn=document.getElementById('setCountryBtn');if(setBtn){setBtn.style.display=tz?'none':'block'}updateClock();atwRender();atwUpdateTimes()}
 
@@ -1147,6 +1149,7 @@ var pos=_getEvPos(e);
 afrSvStartX=pos.clientX;afrSvStartY=pos.clientY;
 afrSvMoved=false;
 afrSvDragEl=document.getElementById('afrStreetViewPanel');
+bringToFront(afrSvDragEl);
 var rect=afrSvDragEl.getBoundingClientRect();
 var parent=afrSvDragEl.parentElement.getBoundingClientRect();
 afrSvDragOX=pos.clientX-rect.left;afrSvDragOY=pos.clientY-rect.top;
@@ -1161,7 +1164,7 @@ function afrSvDoDrag(e){
 if(!afrSvDragEl)return;
 var pos=_getEvPos(e);
 var dx=pos.clientX-afrSvStartX,dy=pos.clientY-afrSvStartY;
-if(!afrSvMoved&&Math.abs(dx)<5&&Math.abs(dy)<5)return;
+if(!afrSvMoved&&Math.abs(dx)<10&&Math.abs(dy)<10)return;
 if(!afrSvMoved)afrSvMoved=true;
 if(e.cancelable)e.preventDefault();
 var parent=afrSvDragEl.parentElement.getBoundingClientRect();
@@ -1187,6 +1190,7 @@ var pos=_getEvPos(e);
 afrNewsStartX=pos.clientX;afrNewsStartY=pos.clientY;
 afrNewsMoved=false;
 afrNewsDragEl=document.getElementById('afrNewsBox'+id);
+bringToFront(afrNewsDragEl);
 var rect=afrNewsDragEl.getBoundingClientRect();
 afrNewsDragOX=pos.clientX-rect.left;afrNewsDragOY=pos.clientY-rect.top;
 var parent=afrNewsDragEl.parentElement.getBoundingClientRect();
@@ -1200,7 +1204,7 @@ function afrNewsDoDrag(e){
 if(!afrNewsDragEl)return;
 var pos=_getEvPos(e);
 var dx=pos.clientX-afrNewsStartX,dy=pos.clientY-afrNewsStartY;
-if(!afrNewsMoved&&Math.abs(dx)<5&&Math.abs(dy)<5)return;
+if(!afrNewsMoved&&Math.abs(dx)<10&&Math.abs(dy)<10)return;
 if(!afrNewsMoved){afrNewsMoved=true}
 if(e.cancelable)e.preventDefault();
 var parent=afrNewsDragEl.parentElement.getBoundingClientRect();
@@ -1221,6 +1225,7 @@ var pos=_getEvPos(e);
 afrDragStartX=pos.clientX;afrDragStartY=pos.clientY;
 afrDragMoved=false;
 afrDragEl=document.getElementById('afrGoogleDirections');
+bringToFront(afrDragEl);
 var rect=afrDragEl.getBoundingClientRect();
 afrDragOX=pos.clientX-rect.left;
 afrDragOY=pos.clientY-rect.top;
@@ -1236,7 +1241,7 @@ function afrDoDrag(e){
 if(!afrDragEl)return;
 var pos=_getEvPos(e);
 var dx=pos.clientX-afrDragStartX,dy=pos.clientY-afrDragStartY;
-if(!afrDragMoved&&Math.abs(dx)<5&&Math.abs(dy)<5)return;
+if(!afrDragMoved&&Math.abs(dx)<10&&Math.abs(dy)<10)return;
 if(!afrDragMoved)afrDragMoved=true;
 if(e.cancelable)e.preventDefault();
 var parent=afrDragEl.parentElement.getBoundingClientRect();
@@ -1255,6 +1260,7 @@ var panelDragEl=null,panelDragOX=0,panelDragOY=0,panelDragStartX=0,panelDragStar
 function startPanelDrag(e,panelId){
 var pos=_getEvPos(e);
 panelDragEl=document.getElementById(panelId);
+bringToFront(panelDragEl);
 panelDragStartX=pos.clientX;panelDragStartY=pos.clientY;
 var rect=panelDragEl.getBoundingClientRect();
 var section=panelDragEl.parentElement.getBoundingClientRect();
@@ -1268,7 +1274,7 @@ function doPanelDrag(e){
 if(!panelDragEl)return;
 var pos=_getEvPos(e);
 var dx=pos.clientX-panelDragStartX,dy=pos.clientY-panelDragStartY;
-if(!panelDragActive&&Math.abs(dx)<5&&Math.abs(dy)<5)return;
+if(!panelDragActive&&Math.abs(dx)<10&&Math.abs(dy)<10)return;
 if(!panelDragActive){
 panelDragActive=true;
 var rect=panelDragEl.getBoundingClientRect();
@@ -1497,6 +1503,7 @@ var pos=_getEvPos(e);
 _mfDragStartX=pos.clientX;_mfDragStartY=pos.clientY;
 _mfDragMoved=false;
 _mfDragEl=document.getElementById('mapFeedPanel');
+bringToFront(_mfDragEl);
 if(!_mfDragEl)return;
 var r=_mfDragEl.getBoundingClientRect();
 var p=_mfDragEl.parentElement.getBoundingClientRect();
@@ -1513,7 +1520,7 @@ function _mfDragMove(e){
 if(!_mfDragEl)return;
 var pos=_getEvPos(e);
 var dx=pos.clientX-_mfDragStartX,dy=pos.clientY-_mfDragStartY;
-if(!_mfDragMoved&&Math.abs(dx)<5&&Math.abs(dy)<5)return;
+if(!_mfDragMoved&&Math.abs(dx)<10&&Math.abs(dy)<10)return;
 if(!_mfDragMoved)_mfDragMoved=true;
 if(e.cancelable)e.preventDefault();
 var p=_mfDragEl.parentElement.getBoundingClientRect();
@@ -1697,8 +1704,8 @@ var _webcamFeeds=[
 ];
 var _wcDragEl=null,_wcDragOX=0,_wcDragOY=0;
 var _wcDragStartX=0,_wcDragStartY=0,_wcDragMoved=false;
-function _wcDragStart(e){if(e.target.tagName==='BUTTON')return;var pos=_getEvPos(e);_wcDragStartX=pos.clientX;_wcDragStartY=pos.clientY;_wcDragMoved=false;_wcDragEl=document.getElementById('webcamPanel');if(!_wcDragEl)return;var r=_wcDragEl.getBoundingClientRect();var p=_wcDragEl.parentElement.getBoundingClientRect();_wcDragOX=pos.clientX-r.left;_wcDragOY=pos.clientY-r.top;_wcDragEl.style.right='auto';_wcDragEl.style.left=(r.left-p.left)+'px';_wcDragEl.style.top=(r.top-p.top)+'px';document.addEventListener('mousemove',_wcDragMove);document.addEventListener('mouseup',_wcDragEnd);document.addEventListener('touchmove',_wcDragMove,{passive:false});document.addEventListener('touchend',_wcDragEnd)}
-function _wcDragMove(e){if(!_wcDragEl)return;var pos=_getEvPos(e);var dx=pos.clientX-_wcDragStartX,dy=pos.clientY-_wcDragStartY;if(!_wcDragMoved&&Math.abs(dx)<5&&Math.abs(dy)<5)return;if(!_wcDragMoved)_wcDragMoved=true;if(e.cancelable)e.preventDefault();var p=_wcDragEl.parentElement.getBoundingClientRect();_wcDragEl.style.left=Math.max(0,pos.clientX-_wcDragOX-p.left)+'px';_wcDragEl.style.top=Math.max(0,pos.clientY-_wcDragOY-p.top)+'px'}
+function _wcDragStart(e){if(e.target.tagName==='BUTTON')return;var pos=_getEvPos(e);_wcDragStartX=pos.clientX;_wcDragStartY=pos.clientY;_wcDragMoved=false;_wcDragEl=document.getElementById('webcamPanel');if(!_wcDragEl)return;bringToFront(_wcDragEl);var r=_wcDragEl.getBoundingClientRect();var p=_wcDragEl.parentElement.getBoundingClientRect();_wcDragOX=pos.clientX-r.left;_wcDragOY=pos.clientY-r.top;_wcDragEl.style.right='auto';_wcDragEl.style.left=(r.left-p.left)+'px';_wcDragEl.style.top=(r.top-p.top)+'px';document.addEventListener('mousemove',_wcDragMove);document.addEventListener('mouseup',_wcDragEnd);document.addEventListener('touchmove',_wcDragMove,{passive:false});document.addEventListener('touchend',_wcDragEnd)}
+function _wcDragMove(e){if(!_wcDragEl)return;var pos=_getEvPos(e);var dx=pos.clientX-_wcDragStartX,dy=pos.clientY-_wcDragStartY;if(!_wcDragMoved&&Math.abs(dx)<10&&Math.abs(dy)<10)return;if(!_wcDragMoved)_wcDragMoved=true;if(e.cancelable)e.preventDefault();var p=_wcDragEl.parentElement.getBoundingClientRect();_wcDragEl.style.left=Math.max(0,pos.clientX-_wcDragOX-p.left)+'px';_wcDragEl.style.top=Math.max(0,pos.clientY-_wcDragOY-p.top)+'px'}
 function _wcDragEnd(){document.removeEventListener('mousemove',_wcDragMove);document.removeEventListener('mouseup',_wcDragEnd);document.removeEventListener('touchmove',_wcDragMove);document.removeEventListener('touchend',_wcDragEnd);_wcDragEl=null}
 function toggleWebcamPanel(){
 var panel=document.getElementById('webcamPanel');if(!panel)return;

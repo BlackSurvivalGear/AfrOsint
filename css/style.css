@@ -111,58 +111,91 @@ a{color:#00ffee;text-decoration:none}
 .ucp-btn.map-btn:hover{box-shadow:0 0 12px #ff880066;text-shadow:0 0 8px #ff8800;background:#1a1200}
 .ucp-btn.map-btn.active{background:#1a1200;border-color:#ff8800;box-shadow:0 0 12px #ff880044;text-shadow:0 0 8px #ff8800;font-weight:700}
 #ucpFrame{transition:opacity 0.3s ease}
+
+.layer-panel{
+    position:absolute;
+    z-index:1200;
+    background:rgba(6,16,24,0.95);
+    border:1px solid #00ffee44;
+    border-radius:6px;
+    padding:0;
+    font-family:'Share Tech Mono',monospace;
+    min-width:220px;
+    max-width:280px;
+    pointer-events:auto;
+    cursor:default;
+}
+.tactical-panel{ top:10px; right:10px; border-color:#00ffee44; }
+.survival-panel{ top:10px; right:250px; border-color:#ff880044; }
+.ai-panel{ top:10px; right:500px; border-color:#44ff8844; min-width:240px; max-width:300px; }
 .ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;padding:0 28px 28px}.ai-tile{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#081821;border:1px solid #00ffee33;border-radius:8px;color:#d7ffff;text-decoration:none;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1px;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s,transform 0.15s}.ai-tile:hover{border-color:#00ffee;box-shadow:0 0 18px #00ffee44,0 0 36px #00ffee22;background:#0c2430;transform:translateY(-2px);color:#00ffee;text-shadow:0 0 6px #00ffee88}.ai-tile-icon{font-size:22px;flex-shrink:0;width:30px;text-align:center}.ai-section-hdr{color:#00ffee;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;padding:20px 28px 6px;margin:0;border-bottom:1px solid #00ffee22;text-shadow:0 0 8px #00ffee66}
 /* Mobile hamburger button - hidden on desktop */
 #mobileMenuBtn{display:none;background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:22px;padding:6px 10px;cursor:pointer;border-radius:4px;font-family:'Share Tech Mono';line-height:1}
 #mobileMenuBtn:hover{background:#0c2430;box-shadow:0 0 12px #00ffee66}
 
-@media(max-width:768px){
+@media(max-width:1024px){
 #mobileMenuBtn{display:block}
-#commandHeader{grid-template-columns:auto 1fr auto;gap:6px;padding:8px 10px;text-align:center}
+#commandHeader{grid-template-columns:auto 1fr auto;gap:6px;padding:12px 10px;text-align:center}
 .brand-wrap{justify-content:flex-start;gap:8px}
-.radar-logo,.footer-radar{width:40px;height:40px}
-.callsign{font-size:16px;letter-spacing:1px}
+.radar-logo,.footer-radar{width:48px;height:48px}
+.callsign{font-size:18px;letter-spacing:1px}
 .subline{display:none}
-.header-center{display:none;position:absolute;top:100%;left:0;right:0;z-index:9999;background:#07141c;border-bottom:2px solid #00ffee55;padding:12px;flex-direction:column;gap:6px;box-shadow:0 8px 24px rgba(0,0,0,0.6)}
+.header-center{display:none;position:absolute;top:100%;left:0;right:0;z-index:9999;background:#07141c;border-bottom:2px solid #00ffee55;padding:12px;flex-direction:column;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.6)}
 .header-center.mobile-open{display:flex}
-#navBtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
-.command-btn{padding:12px 10px;font-size:12px;width:100%;text-align:center}
-#gmtClock{font-size:13px;padding:8px 0;border-top:1px solid #00ffee22;margin-top:4px}
+#navBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.command-btn{padding:14px 12px;font-size:13px;width:100%;text-align:center}
+#gmtClock{font-size:14px;padding:10px 0;border-top:1px solid #00ffee22;margin-top:4px}
 #setCountryBtn{display:none}
-.header-right{align-items:flex-end;gap:4px}
+.header-right{align-items:flex-end;gap:6px}
 .header-right .price-row{display:none}
-.donate-btn{font-size:10px;padding:6px 10px;white-space:nowrap}
-.placeholder{height:calc(100vh - 56px)}
-.ops-bay{width:100%;height:calc(100vh - 56px);border:none;border-radius:0}
-#opsMenu{position:fixed;top:56px;left:0;width:0;height:calc(100vh - 56px);z-index:9998;overflow:hidden;transition:width 0.2s;background:#07141c}
-#opsMenu .panel-trigger{position:fixed;top:62px;left:6px;z-index:9999;width:36px;height:36px;font-size:16px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
-#opsMenu.open{width:220px;overflow-y:auto;border-right:1px solid #00ffee55;box-shadow:4px 0 24px rgba(0,0,0,0.6)}
+.donate-btn{font-size:11px;padding:8px 14px;white-space:nowrap}
+.placeholder{height:calc(100vh - 64px)}
+.ops-bay{width:100%;height:calc(100vh - 64px);border:none;border-radius:0}
+#opsMenu{position:fixed;top:64px;left:0;width:0;height:calc(100vh - 64px);z-index:9998;overflow:hidden;transition:width 0.2s;background:#07141c}
+#opsMenu .panel-trigger{position:fixed;top:70px;left:8px;z-index:9999;width:44px;height:44px;font-size:18px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
+#opsMenu.open{width:240px;overflow-y:auto;border-right:1px solid #00ffee55;box-shadow:4px 0 24px rgba(0,0,0,0.6)}
 #opsViewport{margin-left:0}
 #africaTimePanel{width:96vw;left:2vw;transform:none}
-.atw-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
-.atw-time{font-size:16px}
+.atw-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.atw-time{font-size:18px}
 #donatePanel{width:96vw;right:-40vw}
-.leaflet-popup-content{max-width:260px !important}
-#tacticalLayerPanel,#survivalLayerPanel,#aiDecisionPanel{top:auto !important;bottom:60px !important;right:6px !important;left:auto !important;width:170px !important;font-size:10px !important;max-height:50vh;overflow-y:auto}
-#persistentNewsBoxes .afrNewsBox,#persistentNewsBoxes>div{width:200px !important;height:140px !important}
-#newsTickerWrap{font-size:14px}
-.ticker-window{height:28px !important}
-.headline-link{font-size:14px;line-height:28px;padding-right:50px}
-.channel{padding:0 8px;font-size:10px}
-#newsGrid{grid-template-columns:1fr !important;grid-template-rows:none !important;overflow-y:auto !important}
-#newsGrid .feed-panel{min-height:200px}
+.leaflet-popup-content{max-width:280px !important}
+#tacticalLayerPanel,#survivalLayerPanel,#aiDecisionPanel{
+    width:180px;
+    min-width:180px;
+    font-size:11px;
+    max-height:50vh;
+    overflow-y:auto;
+    position:absolute;
+}
+#tacticalLayerPanel{bottom:260px;right:10px;top:auto;left:auto}
+#survivalLayerPanel{bottom:160px;right:10px;top:auto;left:auto}
+#aiDecisionPanel{bottom:60px;right:10px;top:auto;left:auto}
+#persistentNewsBoxes .afrNewsBox,#persistentNewsBoxes>div{width:280px !important;height:180px !important}
+#newsTickerWrap{font-size:15px}
+.ticker-window{height:32px !important}
+.headline-link{font-size:15px;line-height:32px;padding-right:60px}
+.channel{padding:0 10px;font-size:11px}
+#newsGrid{grid-template-columns:repeat(2, 1fr) !important;grid-template-rows:none !important;overflow-y:auto !important}
+#newsGrid .feed-panel{min-height:250px}
 #opsViewport>div[style*="display:flex"][style*="gap:4px"]{flex-direction:column !important}
 #opsViewport>div[style*="display:flex"][style*="gap:4px"]>div{min-height:45vh}
-#afrGoogleDirections{width:220px !important;bottom:6px !important;left:6px !important}
-#afrGoogleDirections input{font-size:10px;padding:5px}
-#afrGoogleDirections button{font-size:9px;padding:5px}
+#afrGoogleDirections{width:260px;bottom:10px;left:10px;top:auto;right:auto}
+#afrGoogleDirections input{font-size:12px;padding:8px}
+#afrGoogleDirections button{font-size:11px;padding:8px}
 #mapFeedPanel{width:100% !important;z-index:1200 !important}
 #webcamPanel{width:100% !important;z-index:1200 !important;left:0 !important}
-.ai-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;padding:0 12px 12px}
-.ai-tile{padding:12px;font-size:11px;gap:8px}
-.ai-section-hdr{padding:14px 12px 4px;font-size:12px}
-.ucp-bar{gap:4px;padding:6px 0;margin:8px 0}
-.ucp-btn{padding:5px 8px;font-size:10px}
+.ai-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:0 16px 16px}
+.ai-tile{padding:14px;font-size:12px;gap:10px}
+.ai-section-hdr{padding:16px 16px 6px;font-size:13px}
+.ucp-bar{gap:6px;padding:10px 0;margin:12px 0}
+.ucp-btn{padding:8px 12px;font-size:11px}
+}
+
+@media(max-width:768px){
+#newsGrid{grid-template-columns:1fr !important}
+#tacticalLayerPanel,#survivalLayerPanel,#aiDecisionPanel{width:170px}
+#persistentNewsBoxes .afrNewsBox,#persistentNewsBoxes>div{width:200px !important;height:140px !important}
 }
 @media(max-width:480px){
 #commandHeader{padding:6px 8px}
