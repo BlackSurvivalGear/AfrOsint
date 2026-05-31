@@ -8,29 +8,6 @@
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div id='splashScreen'>
-<div class='splash-title'>AfrOSINT</div>
-<div class='splash-sub'>Pan-African OSINT</div>
-<div class='loader-wrap'><div class='loader-bar'></div></div>
-</div>
-<script>
-!function(){
-  var dismissed = false;
-  function dismiss(){
-    if(dismissed) return;
-    dismissed = true;
-    var s = document.getElementById('splashScreen');
-    if(s){
-      s.classList.add('fade-out');
-      setTimeout(function(){s.remove()}, 500);
-    }
-  }
-  setTimeout(dismiss, 5000);
-  window.addEventListener('load', dismiss);
-  var s = document.getElementById('splashScreen');
-  if(s) s.addEventListener('click', dismiss);
-}()
-</script>
 <header id='commandHeader'>
 <div class='brand-wrap'>
 <a href='#' target='_blank'><img class='radar-logo' src='assets/images/AFROSINT LOGO.png' alt='AfrOSINT' style='cursor:pointer'></a>
