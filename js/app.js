@@ -1003,7 +1003,10 @@ else{var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;
 (globeDiv);
 afrMapInstance.pointOfView({lat:5,lng:20,altitude:2.2},0);
 afrMapInstance.controls().autoRotate=true;afrMapInstance.controls().autoRotateSpeed=0.3;
-var globeCanvas=globeDiv.querySelector('canvas');if(globeCanvas)globeCanvas.style.touchAction='none';
+var _globeRenderer=afrMapInstance.renderer();if(_globeRenderer&&window.devicePixelRatio>1){_globeRenderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5))}
+var globeCanvas=globeDiv.querySelector('canvas');if(globeCanvas){globeCanvas.style.touchAction='none';
+globeCanvas.addEventListener('webglcontextlost',function(e){e.preventDefault();console.warn('WebGL context lost — pausing globe render');if(afrMapInstance&&afrMapInstance.pauseAnimation)afrMapInstance.pauseAnimation()},false);
+globeCanvas.addEventListener('webglcontextrestored',function(){console.log('WebGL context restored');if(afrMapInstance&&afrMapInstance.resumeAnimation)afrMapInstance.resumeAnimation()},false)}
 afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='SATELLITE';
 initCountryBorders();
 _globeRefreshLayers();}catch(e){console.error('Globe init error:',e);globeDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ff4444;font-family:Share Tech Mono,monospace;font-size:14px;text-align:center;padding:20px">⚠ 3D Globe requires WebGL.<br>Please enable hardware acceleration in your browser settings.</div>'}
@@ -1030,18 +1033,33 @@ afrMapInstance.arcsData(arcs).arcStartLat('startLat').arcStartLng('startLng').ar
 function _globeShowPopup(html,screenX,screenY){_globeClosePopup();var el=document.createElement('div');el.id='globePopupOverlay';el.style.cssText='position:absolute;z-index:2000;background:rgba(6,16,24,0.97);border:1px solid #00ffee44;border-radius:6px;padding:0;max-width:340px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 24px rgba(0,255,238,0.15);pointer-events:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch';el.innerHTML=html;el.addEventListener('touchstart',function(e){e.stopPropagation()},{passive:true});el.addEventListener('mousedown',function(e){e.stopPropagation()});var container=document.getElementById('afrMapContainer');if(!container)return;container.appendChild(el);var cw=container.offsetWidth,ch2=container.offsetHeight;var ew=Math.min(340,cw-20),eh=el.offsetHeight;var left=Math.min(Math.max(10,screenX-ew/2),cw-ew-10);var top=Math.min(Math.max(10,screenY-eh-20),ch2-eh-10);el.style.left=left+'px';el.style.top=top+'px';_globePopupEl=el}
 function _globeClosePopup(){var el=document.getElementById('globePopupOverlay');if(el)el.remove();_globePopupEl=null}
 var _globeHighlightedCountry=null,afrCountryDataCache={};
+function _simplifyRing(coords,tolerance){
+if(coords.length<=4)return coords;
+var out=[coords[0]];
+for(var i=1;i<coords.length-1;i++){
+var dx=coords[i][0]-out[out.length-1][0],dy=coords[i][1]-out[out.length-1][1];
+if(dx*dx+dy*dy>=tolerance*tolerance)out.push(coords[i])}
+out.push(coords[coords.length-1]);return out}
+function _simplifyFeature(f,tolerance){
+var g=f.geometry;if(!g)return f;
+var newCoords;
+if(g.type==='Polygon'){newCoords=g.coordinates.map(function(ring){return _simplifyRing(ring,tolerance)})}
+else if(g.type==='MultiPolygon'){newCoords=g.coordinates.map(function(poly){return poly.map(function(ring){return _simplifyRing(ring,tolerance)})})}
+else return f;
+return {type:'Feature',properties:f.properties,geometry:{type:g.type,coordinates:newCoords}}}
 function initCountryBorders(){
 if(!afrMapInstance||_globeCountryFeatures)return;
 fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
 .then(r=>r.json()).then(data=>{
-_globeCountryFeatures=data.features;
+var tolerance=0.5;
+_globeCountryFeatures=data.features.map(function(f){return _simplifyFeature(f,tolerance)});
 const countryLabels=_globeCountryFeatures.map(f=>{
 const name=f.properties.ADMIN||f.properties.name||'';
 let lat=0,lng=0,count=0;
 if(f.geometry.type==='Polygon'){f.geometry.coordinates[0].forEach(p=>{lng+=p[0];lat+=p[1];count++})}
 else if(f.geometry.type==='MultiPolygon'){f.geometry.coordinates.forEach(poly=>{poly[0].forEach(p=>{lng+=p[0];lat+=p[1];count++})})}
 return {name:name,lat:lat/count,lng:lng/count}});
-afrMapInstance.labelsData(countryLabels).labelLat(d=>d.lat).labelLng(d=>d.lng).labelText(d=>d.name).labelSize(0.6).labelDotRadius(0.2).labelColor(()=>'rgba(0,255,238,0.8)').labelResolution(2);
+afrMapInstance.labelsData(countryLabels).labelLat(d=>d.lat).labelLng(d=>d.lng).labelText(d=>d.name).labelSize(0.6).labelDotRadius(0.2).labelColor(()=>'rgba(0,255,238,0.8)').labelResolution(1);
 afrMapInstance.polygonsData(_globeCountryFeatures)
 .polygonCapColor(function(d){
 var name=d.properties.ADMIN||d.properties.name||'';
