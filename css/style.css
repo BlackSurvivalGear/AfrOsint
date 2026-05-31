@@ -11,10 +11,8 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 #proverbText.visible{opacity:1}
 @media(max-width:1024px){#proverbBanner{padding:4px 10px;min-height:26px}#proverbText{font-size:11px;letter-spacing:0.5px}.banner-text-btn{font-size:10px;letter-spacing:1px}#bannerBtns{left:10px;gap:8px}}
 @media(max-width:480px){#proverbBanner{padding:3px 6px;min-height:22px}#proverbText{font-size:10px}.banner-text-btn{font-size:9px;letter-spacing:1px}#bannerBtns{left:6px;gap:6px}}
-#commandHeader{position:relative;display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:8px 24px;background:linear-gradient(180deg,#07141c,#050b12);background-image:linear-gradient(180deg,rgba(7,20,28,0.88),rgba(5,11,18,0.92)),url('../assets/images/AFROSINT LOGO.png');background-size:cover;background-position:center;border-bottom:2px solid #00ffee55}
+#commandHeader{position:relative;display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:8px 24px;background:linear-gradient(180deg,#07141c,#050b12);background-image:linear-gradient(180deg,rgba(7,20,28,0.88),rgba(5,11,18,0.92));border-bottom:2px solid #00ffee55}
 .brand-wrap{display:flex;align-items:center;gap:15px}
-.radar-logo,.footer-radar{width:56px;height:56px;border-radius:50%;border:1px solid #00ffee88;box-shadow:0 0 16px #00ffee55;animation:radarPulse 4s infinite;transition:box-shadow 0.3s ease;object-fit:cover;overflow:hidden}
-@keyframes radarPulse{50%{box-shadow:0 0 26px #00ffeeaa}}
 .callsign{font-size:22px;font-weight:700;letter-spacing:2px;color:#4dc9c2;text-shadow:0 0 8px #4dc9c244,0 0 20px #4dc9c222;transition:text-shadow 0.3s ease;cursor:default}
 .subline{font-size:13px;letter-spacing:4px;color:#fff;text-shadow:0 0 10px #00ffee,0 0 20px #00ffee88;transition:font-size 0.3s ease,text-shadow 0.3s ease}
 
@@ -74,7 +72,7 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .panel-trigger:hover,.panel-trigger:active{background:#0c2430;text-shadow:0 0 8px #00ffee}
 #opsShell.fullscreen #opsMenu{display:none}
 #opsShell.fullscreen #opsViewport{margin-left:0}
-#opsViewport{margin-left:48px;background-image:linear-gradient(180deg,rgba(4,11,16,0.92),rgba(6,16,24,0.95)),url('../assets/images/AFROSINT LOGO.png');background-size:cover;background-position:center;background-repeat:no-repeat}
+#opsViewport{margin-left:48px;background-image:linear-gradient(180deg,rgba(4,11,16,0.92),rgba(6,16,24,0.95))}
 .feed-panel{position:relative;background:#000;border:1px solid #0f2730}
 .feed-label{position:absolute;top:10px;left:10px;padding:6px 10px;background:rgba(3,22,29,.8);border:1px solid #00ffee66;color:#00ffee;z-index:2}
 iframe,.map-frame{width:100%;height:100%;border:none}
@@ -82,7 +80,7 @@ iframe,.map-frame{width:100%;height:100%;border:none}
 #flightFrame iframe{filter:invert(92%) hue-rotate(180deg) grayscale(.9) brightness(.6) contrast(1.2)}
 #commandFooter{padding:28px;display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg,#050b12,#07141c);border-top:2px solid #00ffee55;position:relative}
 .version{position:absolute;right:20px;bottom:12px;font-size:11px;color:#00ffee55;font-family:'Share Tech Mono'}
-#donatePanel,#sharePanel{display:none;position:absolute;top:0;left:16px;z-index:10000;margin-top:4px;width:min(420px,92vw);background:#061018 url('../assets/images/AFROSINT LOGO.png') center center/60% no-repeat;border:1px solid #00ffee44;border-radius:12px;padding:20px;box-sizing:border-box;text-align:center;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44;touch-action:auto;-webkit-overflow-scrolling:touch}
+#donatePanel,#sharePanel{display:none;position:absolute;top:0;left:16px;z-index:10000;margin-top:4px;width:min(420px,92vw);background:#061018;border:1px solid #00ffee44;border-radius:12px;padding:20px;box-sizing:border-box;text-align:center;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44;touch-action:auto;-webkit-overflow-scrolling:touch}
 #sharePanel{width:min(300px,92vw)}
 #donatePanel.open,#sharePanel.open{display:block}
 .donate-toggle{display:flex;gap:0;margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #00ffee66}
@@ -148,7 +146,6 @@ a{color:#00ffee;text-decoration:none}
 #mobileMenuBtn{display:block}
 #commandHeader{grid-template-columns:auto 1fr auto;gap:6px;padding:6px 10px;text-align:center}
 .brand-wrap{justify-content:flex-start;gap:8px}
-.radar-logo,.footer-radar{width:48px;height:48px}
 .callsign{font-size:18px;letter-spacing:1px}
 .subline{display:none}
 .header-center{display:none;position:absolute;top:100%;left:0;right:0;z-index:9999;background:#07141c;border-bottom:2px solid #00ffee55;padding:12px;flex-direction:column;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.6)}
@@ -210,7 +207,6 @@ a{color:#00ffee;text-decoration:none}
 }
 @media(max-width:480px){
 #commandHeader{padding:4px 8px}
-.radar-logo,.footer-radar{width:32px;height:32px}
 .callsign{font-size:14px}
 #navBtns{grid-template-columns:1fr 1fr}
 .command-btn{padding:10px 6px;font-size:11px}
