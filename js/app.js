@@ -98,7 +98,8 @@ atwSearchBox.addEventListener('input',()=>{atwRender();atwUpdateTimes()});
 atwToggleBtn.addEventListener('click',()=>{atwShowAll=!atwShowAll;atwToggleBtn.textContent=atwShowAll?'Collapse List':'Show All Countries';atwRender();atwUpdateTimes()});
 atwSelect.addEventListener('change',()=>{const idx=atwSelect.value;if(idx!==''){let card=document.getElementById('atw-card-'+idx);if(!card){atwShowAll=true;atwToggleBtn.textContent='Collapse List';atwRender();atwUpdateTimes();card=document.getElementById('atw-card-'+idx)}if(card){card.classList.add('highlight');card.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>card.classList.remove('highlight'),2000)}}});
 atwHourFormat.addEventListener('change',atwUpdateTimes);
-document.addEventListener('click',function(e){const panel=document.getElementById('africaTimePanel');const clock=document.getElementById('gmtClock');const flag=document.getElementById('gmtClockFlag');const setBtn=document.getElementById('setCountryBtn');if(africaTimePanelOpen&&document.contains(e.target)&&!panel.contains(e.target)&&!clock.contains(e.target)&&!(flag&&flag.contains(e.target))&&!(setBtn&&setBtn.contains(e.target))){panel.classList.remove('open');africaTimePanelOpen=false}});
+function _atwOutsideClose(e){const panel=document.getElementById('africaTimePanel');const clock=document.getElementById('gmtClock');const flag=document.getElementById('gmtClockFlag');const setBtn=document.getElementById('setCountryBtn');if(africaTimePanelOpen&&document.contains(e.target)&&!panel.contains(e.target)&&!clock.contains(e.target)&&!(flag&&flag.contains(e.target))&&!(setBtn&&setBtn.contains(e.target))){panel.classList.remove('open');africaTimePanelOpen=false}}
+document.addEventListener('click',_atwOutsideClose);document.addEventListener('touchend',function(e){if(e.touches&&e.touches.length>0)return;_atwOutsideClose(e)},{passive:true});
 function atwRestoreWidget(){
 document.getElementById('africaTimePanel').onmouseleave=scheduleAfricaTimeHide;
 const w=document.getElementById('africaTimeWidget');
@@ -516,7 +517,7 @@ var nameEsc=v.name.replace(/'/g,"\\'");
 return '<span onclick="navigateToVisaFreeCountry(\''+nameEsc+'\')" style="color:#7fd6df;font-size:13px;padding:6px 0;display:inline-block;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onmouseover="this.style.color=\'#00ffee\'" onmouseout="this.style.color=\'#7fd6df\'">'+label+'</span>'}
 let full=false,idx=0;
 function active(id){document.querySelectorAll('.command-btn').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function renderOps(menu,content){opsBay.style.cssText='';full=false;opsBay.innerHTML=`<div id='opsShell'><div id='opsMenu'><button class='panel-trigger' onclick="document.getElementById('opsMenu').classList.toggle('open')" title='COMMAND PANEL'>☰</button><div class='menu-content'>${menu}</div></div><div id='opsViewport' style='height:100%;overflow-y:auto;min-height:0'>${content}</div></div>`;hideLayerPanels()}
+function renderOps(menu,content){opsBay.style.cssText='';full=false;opsBay.innerHTML=`<div id='opsShell'><div id='opsMenu'><button class='panel-trigger' onclick="document.getElementById('opsMenu').classList.toggle('open')" title='COMMAND PANEL'>☰</button><div class='menu-content'>${menu}</div></div><div id='opsViewport' style='height:100%;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch'>${content}</div></div>`;hideLayerPanels();var vp=document.getElementById('opsViewport');if(vp){vp.addEventListener('touchstart',function(){var om=document.getElementById('opsMenu');if(om&&om.classList.contains('open'))om.classList.remove('open')},{passive:true})}}
 
 const globalFeeds=[['RT','https://rumble.com/embed/v33aw1a/?pub=4jw3x3'],['AL JAZEERA','https://www.youtube.com/embed/gCNeDWCI0vo'],['AFRICA','https://www.youtube.com/embed/W8nThq62Vb4'],['BLOOMBERG','https://www.youtube.com/embed/iEpJwprxDdk'],['DW','https://www.youtube.com/embed/LuKwFajn37U'],['SKY','https://www.youtube.com/embed/YDvsBbKfLPA']];
 
@@ -983,7 +984,7 @@ function loadAfrMap(){afrRegionIdx=0;active('afrMapBtn');renderOps(`
 var container=document.getElementById('afrMapContainer');
 var globeDiv=document.createElement('div');globeDiv.id='globeMount';globeDiv.style.cssText='width:100%;height:100%;position:absolute;top:0;left:0;z-index:1;background:#000;touch-action:none';
 container.insertBefore(globeDiv,container.firstChild);
-var vp=document.getElementById('opsViewport');if(vp){vp.style.overflow='';vp.style.touchAction=''}
+var vp=document.getElementById('opsViewport');if(vp){vp.style.overflow='';vp.style.touchAction='auto'}
 try{if(typeof Globe==='undefined')throw new Error('Globe library not loaded');afrMapInstance=Globe()
 .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
@@ -1026,7 +1027,7 @@ afrMapInstance.pointsData(pts).pointLat('lat').pointLng('lng').pointAltitude(0.0
 afrMapInstance.ringsData(rings).ringLat('lat').ringLng('lng').ringMaxRadius('maxR').ringPropagationSpeed('propagationSpeed').ringRepeatPeriod('repeatPeriod').ringColor(function(d){return[d.color]});
 afrMapInstance.arcsData(arcs).arcStartLat('startLat').arcStartLng('startLng').arcEndLat('endLat').arcEndLng('endLng').arcColor(function(d){return[d.color,d.color]}).arcStroke(0.5).arcDashLength(0.4).arcDashGap(0.2).arcDashAnimateTime(1500);
 }
-function _globeShowPopup(html,screenX,screenY){_globeClosePopup();var el=document.createElement('div');el.id='globePopupOverlay';el.style.cssText='position:absolute;z-index:2000;background:rgba(6,16,24,0.97);border:1px solid #00ffee44;border-radius:6px;padding:0;max-width:340px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 24px rgba(0,255,238,0.15);pointer-events:auto';el.innerHTML=html;var container=document.getElementById('afrMapContainer');if(!container)return;container.appendChild(el);var cw=container.offsetWidth,ch2=container.offsetHeight;var ew=Math.min(340,cw-20),eh=el.offsetHeight;var left=Math.min(Math.max(10,screenX-ew/2),cw-ew-10);var top=Math.min(Math.max(10,screenY-eh-20),ch2-eh-10);el.style.left=left+'px';el.style.top=top+'px';_globePopupEl=el}
+function _globeShowPopup(html,screenX,screenY){_globeClosePopup();var el=document.createElement('div');el.id='globePopupOverlay';el.style.cssText='position:absolute;z-index:2000;background:rgba(6,16,24,0.97);border:1px solid #00ffee44;border-radius:6px;padding:0;max-width:340px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 24px rgba(0,255,238,0.15);pointer-events:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch';el.innerHTML=html;el.addEventListener('touchstart',function(e){e.stopPropagation()},{passive:true});el.addEventListener('mousedown',function(e){e.stopPropagation()});var container=document.getElementById('afrMapContainer');if(!container)return;container.appendChild(el);var cw=container.offsetWidth,ch2=container.offsetHeight;var ew=Math.min(340,cw-20),eh=el.offsetHeight;var left=Math.min(Math.max(10,screenX-ew/2),cw-ew-10);var top=Math.min(Math.max(10,screenY-eh-20),ch2-eh-10);el.style.left=left+'px';el.style.top=top+'px';_globePopupEl=el}
 function _globeClosePopup(){var el=document.getElementById('globePopupOverlay');if(el)el.remove();_globePopupEl=null}
 var _globeHighlightedCountry=null,afrCountryDataCache={};
 function initCountryBorders(){
@@ -1590,7 +1591,7 @@ var tabAes=document.getElementById('mapFeedTabAes');
 var tabIran=document.getElementById('mapFeedTabIran');
 if(tabAes){tabAes.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();_switchMapFeedTab('aes')})}
 if(tabIran){tabIran.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();_switchMapFeedTab('iran')})}
-panel.addEventListener('mousedown',function(e){e.stopPropagation()});panel.addEventListener('wheel',function(e){e.stopPropagation()})
+panel.addEventListener('mousedown',function(e){e.stopPropagation()});panel.addEventListener('touchstart',function(e){e.stopPropagation()},{passive:true});panel.addEventListener('wheel',function(e){e.stopPropagation()})
 }}
 function _showMapFeedOnLoad(){
 var panel=document.getElementById('mapFeedPanel');
@@ -1724,7 +1725,7 @@ function _initWebcamScroll(){
 var panel=document.getElementById('webcamPanel');var content=document.getElementById('webcamContent');var handle=document.getElementById('webcamDragHandle');var colBtn=document.getElementById('webcamCollapseBtn');var clsBtn=document.getElementById('webcamCloseBtn');
 if(!panel||!content)return;
 if(!_webcamScrollInit){_webcamScrollInit=true;
-panel.addEventListener('mousedown',function(e){e.stopPropagation()});panel.addEventListener('wheel',function(e){e.stopPropagation()})
+panel.addEventListener('mousedown',function(e){e.stopPropagation()});panel.addEventListener('touchstart',function(e){e.stopPropagation()},{passive:true});panel.addEventListener('wheel',function(e){e.stopPropagation()})
 panel.addEventListener('wheel',function(e){e.stopPropagation()},{passive:false});
 panel.addEventListener('touchmove',function(e){e.stopPropagation()},{passive:false});
 content.addEventListener('wheel',function(e){e.stopPropagation()},{passive:false});
@@ -1909,12 +1910,14 @@ document.getElementById('shareWA').href=`https://api.whatsapp.com/send?text=${tx
 function copyShareLink(){const url=window.location.href;navigator.clipboard.writeText(url).then(()=>{const btn=document.getElementById('shareCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY LINK'},2000)}).catch(()=>{const t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);const btn=document.getElementById('shareCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY LINK'},2000)})}
 function switchDonateNetwork(net){donateNetwork=net;const w=donateWallets[net];document.getElementById('donateBtcBtn').classList.toggle('active',net==='btc');document.getElementById('donateUsdtBtn').classList.toggle('active',net==='usdt');document.getElementById('donateAddr').textContent=w.addr;document.getElementById('donateQrImg').src=w.qr;document.getElementById('donateCopyBtn').textContent='COPY'}
 function copyDonateAddr(){if(!donateWallets[donateNetwork])return;const addr=donateWallets[donateNetwork].addr;navigator.clipboard.writeText(addr).then(()=>{const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)}).catch(()=>{const t=document.createElement('textarea');t.value=addr;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)})}
-document.addEventListener('click',function(e){
+function _closePanelsOutside(e){
 const dPanel=document.getElementById('donatePanel');const dBtn=document.querySelector('.donate-btn');
-if(dPanel.classList.contains('open')&&!dPanel.contains(e.target)&&!dBtn.contains(e.target))dPanel.classList.remove('open');
+if(dPanel&&dPanel.classList.contains('open')&&!dPanel.contains(e.target)&&!dBtn.contains(e.target))dPanel.classList.remove('open');
 const sPanel=document.getElementById('sharePanel');const sBtn=document.querySelector('.share-btn');
-if(sPanel.classList.contains('open')&&!sPanel.contains(e.target)&&!sBtn.contains(e.target))sPanel.classList.remove('open');
-});
+if(sPanel&&sPanel.classList.contains('open')&&!sPanel.contains(e.target)&&!sBtn.contains(e.target))sPanel.classList.remove('open');
+}
+document.addEventListener('click',_closePanelsOutside);
+document.addEventListener('touchend',function(e){if(e.touches&&e.touches.length>0)return;_closePanelsOutside(e)},{passive:true});
 loadAfrMap();
 
 // Mobile nav: close menu when a nav button is clicked
