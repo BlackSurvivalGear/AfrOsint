@@ -1049,7 +1049,7 @@ if(g.type==='Polygon'){newCoords=g.coordinates.map(function(ring){return _simpli
 else if(g.type==='MultiPolygon'){newCoords=g.coordinates.map(function(poly){return poly.map(function(ring){return _simplifyRing(ring,tolerance)})})}
 else return f;
 return {type:'Feature',properties:f.properties,geometry:{type:g.type,coordinates:newCoords}}}
-var _FOCUS_ISOS=new Set(['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH','ATG','BHS','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF','KNA']);
+var _FOCUS_ISOS=new Set(['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH','ATG','BHS','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF']);
 function _isFocusCountry(f){var iso=f.properties['ISO3166-1-Alpha-3']||f.properties.ISO_A3||'';return _FOCUS_ISOS.has(iso)}
 function _extractOutlinePaths(features,tolerance){
 var paths=[];
