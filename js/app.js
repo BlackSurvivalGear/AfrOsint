@@ -1049,12 +1049,30 @@ if(g.type==='Polygon'){newCoords=g.coordinates.map(function(ring){return _simpli
 else if(g.type==='MultiPolygon'){newCoords=g.coordinates.map(function(poly){return poly.map(function(ring){return _simplifyRing(ring,tolerance)})})}
 else return f;
 return {type:'Feature',properties:f.properties,geometry:{type:g.type,coordinates:newCoords}}}
+var _FOCUS_ISOS=new Set(['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH','ATG','BHS','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF']);
+function _isFocusCountry(f){var iso=f.properties['ISO3166-1-Alpha-3']||f.properties.ISO_A3||'';return _FOCUS_ISOS.has(iso)}
+function _extractOutlinePaths(features,tolerance){
+var paths=[];
+features.forEach(function(f){
+var g=f.geometry;if(!g)return;
+var rings=[];
+if(g.type==='Polygon'){rings=g.coordinates}
+else if(g.type==='MultiPolygon'){g.coordinates.forEach(function(poly){rings=rings.concat(poly)})}
+rings.forEach(function(ring){
+var simplified=_simplifyRing(ring,tolerance);
+if(simplified.length>=3){paths.push({coords:simplified.map(function(p){return{lng:p[0],lat:p[1]}})})}
+})});
+return paths}
 function initCountryBorders(){
 if(!afrMapInstance||_globeCountryFeatures)return;
 fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
 .then(r=>r.json()).then(data=>{
-var tolerance=0.5;
-_globeCountryFeatures=data.features.map(function(f){return _simplifyFeature(f,tolerance)});
+var focusTolerance=0.5;
+var outlineTolerance=1.5;
+var focusFeatures=[];var otherFeatures=[];
+data.features.forEach(function(f){if(_isFocusCountry(f)){focusFeatures.push(f)}else{otherFeatures.push(f)}});
+_globeCountryFeatures=focusFeatures.map(function(f){return _simplifyFeature(f,focusTolerance)});
+var outlinePaths=_extractOutlinePaths(otherFeatures,outlineTolerance);
 const countryLabels=_globeCountryFeatures.map(f=>{
 const name=f.properties.ADMIN||f.properties.name||'';
 let lat=0,lng=0,count=0;
@@ -1076,7 +1094,7 @@ return name===_globeHighlightedCountry?0.008:0.001})
 .onPolygonClick(function(polygon,event,coords){
 var pos=_getEvPos(event);
 var name=polygon.properties.ADMIN||polygon.properties.name||'Unknown';
-var iso=polygon.properties.ISO_A3||polygon.properties.ISO_A2||'';
+var iso=polygon.properties['ISO3166-1-Alpha-3']||polygon.properties.ISO_A3||'';
 _globeHighlightedCountry=name;
 afrMapInstance.polygonsData(_globeCountryFeatures);
 var container=document.getElementById('afrMapContainer');
@@ -1087,6 +1105,7 @@ showCountryPopup(name,iso,{lat:coords.lat,lng:coords.lng},pos.clientX-rect.left,
 if(afrMapInstance){
 document.querySelector('#afrMapContainer').style.cursor=polygon?'pointer':'grab'}
 });
+afrMapInstance.pathsData(outlinePaths).pathPoints('coords').pathPointLat('lat').pathPointLng('lng').pathColor(function(){return'rgba(0,255,238,0.15)'}).pathStroke(0.3).pathDashLength(1).pathDashGap(0).pathDashAnimateTime(0);
 }).catch(function(){});
 }
 function showCountryPopup(name,iso,latlng,screenX,screenY){
