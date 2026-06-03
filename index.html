@@ -6,8 +6,20 @@
 <title>AfrOSINT — Pan-African OSINT</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="js/afrosint-auth.js"></script>
 </head>
 <body>
+<div id="authLoadingScreen">
+<div class="loader-content">
+<div class="loader-spinner"></div>
+<div class="loader-text">AUTHENTICATING PERSONNEL...</div>
+</div>
+</div>
+<div id="mainAppContainer" style="display: none;">
 <div id='proverbBanner'><div id='bannerBtns'><button class='banner-text-btn' onclick='toggleSharePanel()'>SHARE</button><button class='banner-text-btn' onclick='toggleDonatePanel()'>SUPPORT</button></div><span id='proverbText'></span><div id='bannerPanels'><div id='sharePanel'>
 <h2>SHARE PLATFORM</h2>
 <div class='share-grid'>
@@ -45,6 +57,14 @@
 <header id='commandHeader'>
 <div class='brand-wrap'>
 <div><div class='callsign'>AfrOSINT</div><div class='subline'>Pan-African OSINT</div></div>
+</div>
+<div id="userProfile" class="user-profile-header">
+<img id="userProfileImg" src="assets/images/default-avatar.png" alt="Profile" class="user-avatar">
+<div class="user-details">
+<div id="userDisplayName" class="user-name">Loading...</div>
+<div id="userRole" class="user-role">Personnel</div>
+</div>
+<button id="logoutBtn" onclick="handleLogout()" class="logout-btn">LOGOUT</button>
 </div>
 <button id='mobileMenuBtn' onclick='document.querySelector(".header-center").classList.toggle("mobile-open");this.textContent=this.textContent==="☰"?"✕":"☰"' aria-label='Menu'>☰</button>
 <div class='header-center' style='position:relative'>
@@ -102,6 +122,7 @@
 <a href='#'>AfrOSINT</a>
 <span class='version'>v1.0.0</span>
 </footer>
+</div>
 <script src='js/data/bugout-data.js'></script>
 <script src='js/data/ai-risk-data.js'></script>
 <script src='js/prompts/deepDive.js'></script>
