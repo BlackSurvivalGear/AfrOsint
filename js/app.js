@@ -1032,7 +1032,7 @@ afrMapInstance.arcsData(arcs).arcStartLat('startLat').arcStartLng('startLng').ar
 }
 function _globeShowPopup(html,screenX,screenY){_globeClosePopup();var el=document.createElement('div');el.id='globePopupOverlay';el.style.cssText='position:absolute;z-index:2000;background:rgba(6,16,24,0.97);border:1px solid #00ffee44;border-radius:6px;padding:0;max-width:340px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 24px rgba(0,255,238,0.15);pointer-events:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch';el.innerHTML=html;el.addEventListener('touchstart',function(e){e.stopPropagation()},{passive:true});el.addEventListener('mousedown',function(e){e.stopPropagation()});var container=document.getElementById('afrMapContainer');if(!container)return;container.appendChild(el);var cw=container.offsetWidth,ch2=container.offsetHeight;var ew=Math.min(340,cw-20),eh=el.offsetHeight;var left=Math.min(Math.max(10,screenX-ew/2),cw-ew-10);var top=Math.min(Math.max(10,screenY-eh-20),ch2-eh-10);el.style.left=left+'px';el.style.top=top+'px';_globePopupEl=el}
 function _globeClosePopup(){var el=document.getElementById('globePopupOverlay');if(el)el.remove();_globePopupEl=null}
-var _globeHighlightedCountry=null,afrCountryDataCache={};
+var _globeHighlightedCountry=null, _globeHoveredCountry=null, afrCountryDataCache={};
 function _simplifyRing(coords,tolerance){
 if(coords.length<=4)return coords;
 var out=[coords[0]];
@@ -1049,8 +1049,13 @@ if(g.type==='Polygon'){newCoords=g.coordinates.map(function(ring){return _simpli
 else if(g.type==='MultiPolygon'){newCoords=g.coordinates.map(function(poly){return poly.map(function(ring){return _simplifyRing(ring,tolerance)})})}
 else return f;
 return {type:'Feature',properties:f.properties,geometry:{type:g.type,coordinates:newCoords}}}
-var _FOCUS_ISOS=new Set(['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH','ATG','BHS','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF']);
-function _isFocusCountry(f){var iso=f.properties['ISO3166-1-Alpha-3']||f.properties.ISO_A3||'';return _FOCUS_ISOS.has(iso)}
+var interactiveCountries = ['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH'];
+var diasporaCountries = ['ATG','BHS','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF'];
+var nonInteractiveCountries = [];
+var _AFRICA_SET = new Set(interactiveCountries);
+var _DIASPORA_SET = new Set(diasporaCountries);
+var _INTERACTIVE_SET = new Set([...interactiveCountries, ...diasporaCountries]);
+function _isFocusCountry(f){var iso=f.properties['ISO3166-1-Alpha-3']||f.properties.ISO_A3||'';return _INTERACTIVE_SET.has(iso)}
 function _extractOutlinePaths(features,tolerance){
 var paths=[];
 features.forEach(function(f){
@@ -1068,12 +1073,8 @@ if(!afrMapInstance||_globeCountryFeatures)return;
 fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
 .then(r=>r.json()).then(data=>{
 var focusTolerance=0.5;
-var outlineTolerance=1.5;
-var focusFeatures=[];var otherFeatures=[];
-data.features.forEach(function(f){if(_isFocusCountry(f)){focusFeatures.push(f)}else{otherFeatures.push(f)}});
-_globeCountryFeatures=focusFeatures.map(function(f){return _simplifyFeature(f,focusTolerance)});
-var outlinePaths=_extractOutlinePaths(otherFeatures,outlineTolerance);
-const countryLabels=_globeCountryFeatures.map(f=>{
+_globeCountryFeatures=data.features.map(function(f){return _simplifyFeature(f,focusTolerance)});
+const countryLabels=_globeCountryFeatures.filter(_isFocusCountry).map(f=>{
 const name=f.properties.ADMIN||f.properties.name||'';
 let lat=0,lng=0,count=0;
 if(f.geometry.type==='Polygon'){f.geometry.coordinates[0].forEach(p=>{lng+=p[0];lat+=p[1];count++})}
@@ -1081,21 +1082,48 @@ else if(f.geometry.type==='MultiPolygon'){f.geometry.coordinates.forEach(poly=>{
 return {name:name,lat:lat/count,lng:lng/count}});
 afrMapInstance.labelsData(countryLabels).labelLat(d=>d.lat).labelLng(d=>d.lng).labelText(d=>d.name).labelSize(0.6).labelDotRadius(0.2).labelColor(()=>'rgba(0,255,238,0.8)').labelResolution(1);
 afrMapInstance.polygonsData(_globeCountryFeatures)
+.polygonLabel(function(d){
+var name = d.properties.ADMIN || d.properties.name || 'Unknown';
+var iso = d.properties['ISO3166-1-Alpha-3'] || d.properties.ISO_A3 || '';
+var type = 'Reference Country';
+if (_AFRICA_SET.has(iso)) type = 'African Country';
+else if (_DIASPORA_SET.has(iso)) type = 'Caribbean Diaspora Country';
+return `<div class="afrosint-tooltip">
+<div class="tooltip-title">${name}</div>
+<div class="tooltip-category">${type}</div>
+</div>`;
+})
 .polygonCapColor(function(d){
 var name=d.properties.ADMIN||d.properties.name||'';
-return name===_globeHighlightedCountry?'rgba(0,255,238,0.15)':'rgba(0,0,0,0)'})
+var iso = d.properties['ISO3166-1-Alpha-3'] || d.properties.ISO_A3 || '';
+if (!_INTERACTIVE_SET.has(iso)) return 'rgba(0,0,0,0)';
+var isHighlighted = name===_globeHighlightedCountry;
+var isHovered = name===_globeHoveredCountry;
+return (isHighlighted || isHovered) ? 'rgba(0,255,238,0.15)' : 'rgba(0,0,0,0)';
+})
 .polygonSideColor(function(){return'rgba(0,0,0,0)'})
 .polygonStrokeColor(function(d){
 var name=d.properties.ADMIN||d.properties.name||'';
-return name===_globeHighlightedCountry?'#00ffee':'rgba(0,255,238,0.35)'})
+var iso = d.properties['ISO3166-1-Alpha-3'] || d.properties.ISO_A3 || '';
+if (!_INTERACTIVE_SET.has(iso)) return 'rgba(0,255,238,0.2)';
+var isHighlighted = name===_globeHighlightedCountry;
+var isHovered = name===_globeHoveredCountry;
+return (isHighlighted || isHovered) ? '#00ffee' : 'rgba(0,255,238,0.35)';
+})
 .polygonAltitude(function(d){
 var name=d.properties.ADMIN||d.properties.name||'';
-return name===_globeHighlightedCountry?0.008:0.001})
+var iso = d.properties['ISO3166-1-Alpha-3'] || d.properties.ISO_A3 || '';
+if (!_INTERACTIVE_SET.has(iso)) return 0.001;
+var isHighlighted = name===_globeHighlightedCountry;
+var isHovered = name===_globeHoveredCountry;
+return (isHighlighted || isHovered) ? 0.008 : 0.001;
+})
 .onPolygonClick(function(polygon,event,coords){
 if(!polygon||!polygon.properties)return;
+var iso=polygon.properties['ISO3166-1-Alpha-3']||polygon.properties.ISO_A3||'';
+if (!_INTERACTIVE_SET.has(iso)) return;
 var pos=_getEvPos(event);
 var name=polygon.properties.ADMIN||polygon.properties.name||'Unknown';
-var iso=polygon.properties['ISO3166-1-Alpha-3']||polygon.properties.ISO_A3||'';
 _globeHighlightedCountry=name;
 setTimeout(function(){afrMapInstance.polygonsData(_globeCountryFeatures)},0);
 var container=document.getElementById('afrMapContainer');
@@ -1104,9 +1132,13 @@ showCountryPopup(name,iso,{lat:coords.lat,lng:coords.lng},pos.clientX-rect.left,
 })
 .onPolygonHover(function(polygon){
 if(afrMapInstance){
-document.querySelector('#afrMapContainer').style.cursor=polygon?'pointer':'grab'}
+var name = polygon && (polygon.properties.ADMIN || polygon.properties.name || '');
+var iso = polygon && (polygon.properties['ISO3166-1-Alpha-3'] || polygon.properties.ISO_A3 || '');
+var isInteractive = iso && _INTERACTIVE_SET.has(iso);
+_globeHoveredCountry = name;
+setTimeout(function(){afrMapInstance.polygonsData(_globeCountryFeatures)},0);
+document.querySelector('#afrMapContainer').style.cursor=polygon?(isInteractive?'pointer':'not-allowed'):'grab'}
 });
-afrMapInstance.pathsData(outlinePaths).pathPoints('coords').pathPointLat('lat').pathPointLng('lng').pathColor(function(){return'rgba(0,255,238,0.55)'}).pathStroke(1.2).pathDashLength(1).pathDashGap(0).pathDashAnimateTime(0);
 }).catch(function(){});
 }
 function showCountryPopup(name,iso,latlng,screenX,screenY){
