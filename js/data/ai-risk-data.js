@@ -29,7 +29,7 @@ aiDSVisible=!aiDSVisible;
 if(typeof _globeRefreshLayers==='function')_globeRefreshLayers();
 var leg=document.getElementById('aiDSLegend');if(leg)leg.style.display=aiDSVisible?'block':'none';
 var cb=document.getElementById('aiDSRiskToggle');if(cb)cb.checked=aiDSVisible;
-var btn=document.getElementById('aiDSToggleBtn');if(btn){btn.style.borderColor=aiDSVisible?'#44ff88':'#00ffee44';btn.style.color=aiDSVisible?'#44ff88':'#00ffee'}
+var btn=document.getElementById('aiDSToggleBtn');if(btn){btn.style.borderColor=aiDSVisible?'#00ffee':'#00ffee44';btn.style.color=aiDSVisible?'#00ffee':'#00ffee'}
 }
 
 var aiDSApiKey='';
@@ -45,7 +45,7 @@ keyField.style.display='none';
 document.getElementById('aiDSKeyInput').style.display='none';
 }
 statusEl.style.display='block';
-statusEl.innerHTML='<span style="color:#44ff88">⟳ Generating fresh intel via GPT-4...</span>';
+statusEl.innerHTML='<span style="color:#00ffee">⟳ Generating fresh intel via GPT-4...</span>';
 btn.disabled=true;btn.style.opacity='0.5';
 var countries=aiDSCountryRisk.map(function(c){return c.name+' ('+c.lat+','+c.lng+')'}).join(', ');
 var prompt='You are an OSINT intelligence analyst. Generate an updated threat assessment for these African countries/regions: '+countries+'. For EACH country return a JSON object with these exact fields: name, lat (number), lng (number), risk (one of: CRITICAL, HIGH, ELEVATED, MODERATE, LOW, LOW-MODERATE), score (number 1-10, one decimal), travel (one of: DO NOT TRAVEL, AVOID ALL TRAVEL, RECONSIDER TRAVEL, EXERCISE CAUTION, NORMAL PRECAUTIONS), color (hex: #ff0000 for CRITICAL, #ff2200/#ff4400 for HIGH, #ff6600/#ff8800 for ELEVATED, #ffcc00 for MODERATE, #44cc44/#88cc44 for LOW/LOW-MODERATE), threats (array of 2-4 short strings), stability (1 sentence), humanitarian (1 sentence), forecast (1 sentence). Return ONLY a JSON array, no markdown, no explanation. Base your assessment on current geopolitical conditions as of 2024-2025.';
@@ -64,7 +64,7 @@ if(!Array.isArray(newData)||newData.length===0)throw new Error('Invalid response
 aiDSCountryRisk.length=0;
 newData.forEach(function(c){aiDSCountryRisk.push(c)});
 if(typeof _globeRefreshLayers==='function')_globeRefreshLayers();
-statusEl.innerHTML='<span style="color:#44ff88">✓ Intel updated — '+newData.length+' countries refreshed</span>';
+statusEl.innerHTML='<span style="color:#00ffee">✓ Intel updated — '+newData.length+' countries refreshed</span>';
 setTimeout(function(){statusEl.style.display='none'},5000);
 }).catch(function(err){
 statusEl.innerHTML='<span style="color:#ff4444">✗ Error: '+err.message+'</span>';

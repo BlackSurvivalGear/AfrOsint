@@ -18,7 +18,7 @@ body:JSON.stringify({model:'gpt-4o',messages:[{role:'system',content:'You are a 
 }).then(function(r){if(!r.ok)throw new Error('API error: '+r.status);return r.json()}).then(function(data){
 var content=data.choices[0].message.content;
 content=content.replace(/^## (.+)$/gm,'<div style="color:#ffaa00;font-size:12px;letter-spacing:1px;margin-top:14px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #ffaa0033">$1</div>');
-content=content.replace(/^### (.+)$/gm,'<div style="color:#44ff88;font-size:11px;margin-top:10px;margin-bottom:4px">$1</div>');
+content=content.replace(/^### (.+)$/gm,'<div style="color:#00ffee;font-size:11px;margin-top:10px;margin-bottom:4px">$1</div>');
 content=content.replace(/^\- (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">• $1</div>');
 content=content.replace(/\*\*(.+?)\*\*/g,'<span style="color:#ffffff;font-weight:bold">$1</span>');
 content=content.replace(/\n/g,'<br>');
