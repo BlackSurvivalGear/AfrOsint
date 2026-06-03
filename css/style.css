@@ -241,3 +241,113 @@ a{color:#00ffee;text-decoration:none}
     align-items: center;
     justify-content: center;
 }
+
+/* Authentication Loading Screen */
+#authLoadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20000;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 255, 238, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--cyan);
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 15px rgba(0, 255, 238, 0.2);
+}
+
+.loader-text {
+    color: var(--cyan);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(0, 255, 238, 0.5);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* User Profile Header */
+.user-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 20px;
+    border-left: 1px solid rgba(0, 255, 238, 0.2);
+    margin-left: 10px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--cyan);
+    box-shadow: 0 0 8px rgba(0, 255, 238, 0.3);
+    object-fit: cover;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.user-role {
+    color: var(--cyan);
+    font-size: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.logout-btn {
+    background: transparent;
+    border: 1px solid #ff444466;
+    color: #ff4444;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 68, 68, 0.1);
+    border-color: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+}
+
+@media(max-width: 1024px) {
+    .user-profile-header {
+        padding-left: 0;
+        border-left: none;
+        margin-left: 0;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
