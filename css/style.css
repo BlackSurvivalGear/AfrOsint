@@ -13,7 +13,7 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 @media(max-width:480px){#proverbBanner{padding:3px 6px;min-height:22px}#proverbText{font-size:10px}.banner-text-btn{font-size:9px;letter-spacing:1px}#bannerBtns{left:6px;gap:6px}}
 #commandHeader{position:relative;display:flex;flex-direction:column;align-items:center;padding:12px 24px;background:linear-gradient(180deg,#07141c,#050b12);background-image:linear-gradient(180deg,rgba(7,20,28,0.88),rgba(5,11,18,0.92));border-bottom:2px solid #00ffee55;gap:12px}
 .header-left{position:absolute;top:12px;left:24px}
-.header-right{position:absolute;top:12px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;justify-content:flex-start}
+.header-right{position:absolute;top:12px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;justify-content:flex-start;width:320px}
 .header-center-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:1200px}
 .brand-wrap{display:flex;align-items:center;gap:12px}
 .header-logo{width:40px;height:auto;filter:drop-shadow(0 0 8px rgba(0,255,238,0.4))}

@@ -1,4 +1,4 @@
-// AfrOSINT Authentication Module
+// AfrOsint Authentication Module
 
 const firebaseConfig = {
     apiKey: "AIzaSyAcsURFK7yDd0mJe_i_Jlmu-_2GpSfc2js",
@@ -98,8 +98,4 @@ async function handleLogout() {
 }
 
 // Start auth check
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', checkAuthentication);
-} else {
-    checkAuthentication();
-}
+document.addEventListener('DOMContentLoaded', checkAuthentication);
