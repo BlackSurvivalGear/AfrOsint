@@ -1,6 +1,6 @@
 // === REAL-TIME NEWS ANALYSIS ===
 function aiNewsAnalysis(){
-if(!aiDSApiKey){alert('Enter your OpenAI API key in the AI Decision Support panel first.');return}
+if(typeof window.userApiKeys !== 'undefined' && window.userApiKeys.openai) aiDSApiKey = window.userApiKeys.openai; if(!aiDSApiKey){alert('Enter your OpenAI API key in the Profile dropdown menu first.');return}
 var tickerEl=document.getElementById('newsTicker');
 var headlines=[];
 if(tickerEl){var links=tickerEl.querySelectorAll('.headline-link');links.forEach(function(a){headlines.push(a.textContent.trim())})}

@@ -1,6 +1,6 @@
 // === AI STRATEGIC RELOCATION OVERVIEW ===
 function aiStrategicRelocation(countryName){
-if(!aiDSApiKey){alert('Enter your OpenAI API key in the AI Decision Support panel first, then click UPDATE INTEL.');return}
+if(typeof window.userApiKeys !== 'undefined' && window.userApiKeys.openai) aiDSApiKey = window.userApiKeys.openai; if(!aiDSApiKey){alert('Enter your OpenAI API key in the Profile dropdown menu first.');return}
 var overlay=document.createElement('div');
 overlay.id='aiStrategicReloOverlay';
 overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';

@@ -225,24 +225,11 @@ var popupNewsEmbed={"Nigeria":{name:"NAN",embed:"https://www.youtube.com/embed/d
 function _renderCpApiKey(){
 var w=document.getElementById('cpApiKeyWrap');
 if(!w)return;
-if(aiDSApiKey){
-w.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;width:100%"><span style="color:#00ffee;font-size:10px;font-family:Share Tech Mono,monospace">🔑 AI modules enabled</span><span onclick="_cpApiKeyReset()" style="color:#ff444488;font-size:9px;cursor:pointer;font-family:Share Tech Mono,monospace;text-decoration:underline">reset</span></div>';
+if(window.userApiKeys && window.userApiKeys.openai){
+w.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;width:100%"><span style="color:#00ffee;font-size:10px;font-family:Share Tech Mono,monospace">🔑 AI modules enabled</span></div>';
 }else{
-w.innerHTML='<div style="display:flex;align-items:center;gap:6px;width:100%"><input id="countryPanelApiKey" type="password" placeholder="Integrate your API key..." style="flex:1;min-width:0;padding:4px 6px;background:#081821;border:1px solid #00ffee33;color:#d7ffff;font-size:10px;border-radius:3px;font-family:Share Tech Mono,monospace;box-sizing:border-box" /><span onclick="_cpApiKeySet()" style="color:#00ffee;font-size:10px;cursor:pointer;font-family:Share Tech Mono,monospace;white-space:nowrap;text-decoration:underline">Enable AI</span></div>';
+w.innerHTML='<div style="display:flex;align-items:center;gap:6px;width:100%"><span style="color:#ff4444;font-size:10px;font-family:Share Tech Mono,monospace">⚠ API key not configured</span></div>';
 }
-}
-function _cpApiKeySet(){
-var inp=document.getElementById('countryPanelApiKey');
-if(!inp)return;
-var k=inp.value.trim();
-if(!k){alert('Enter an API key');return}
-aiDSApiKey=k.replace(/[^\x20-\x7E]/g,'');
-_renderCpApiKey();
-var b=document.getElementById('aiCardBody');if(b)b.style.display='block';var a=document.getElementById('aiCardCollapseArrow');if(a)a.textContent='\u25bc';
-}
-function _cpApiKeyReset(){
-aiDSApiKey='';
-_renderCpApiKey();
 }
 async function atwViewCountry(name,iso){
 const w=document.getElementById('africaTimeWidget');

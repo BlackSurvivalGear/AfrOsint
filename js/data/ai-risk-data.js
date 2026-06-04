@@ -36,13 +36,13 @@ var aiDSApiKey='';
 function refreshAiIntel(){
 var statusEl=document.getElementById('aiDSRefreshStatus');
 var btn=document.getElementById('aiDSRefreshBtn');
-var keyField=document.getElementById('aiDSKeyField');
+if(typeof window.userApiKeys !== 'undefined' && window.userApiKeys.openai) {
+    aiDSApiKey = window.userApiKeys.openai;
+}
 if(!aiDSApiKey){
-var k=keyField.value.trim();
-if(!k){statusEl.style.display='block';statusEl.innerHTML='<span style="color:#ffaa00">⚠ Enter your OpenAI API key above first</span>';return}
-aiDSApiKey=k.replace(/[^\x20-\x7E]/g,'');
-keyField.style.display='none';
-document.getElementById('aiDSKeyInput').style.display='none';
+    statusEl.style.display='block';
+    statusEl.innerHTML='<span style="color:#ffaa00">⚠ API key not configured in Profile dropdown</span>';
+    return;
 }
 statusEl.style.display='block';
 statusEl.innerHTML='<span style="color:#00ffee">⟳ Generating fresh intel via GPT-4...</span>';
@@ -68,7 +68,9 @@ statusEl.innerHTML='<span style="color:#00ffee">✓ Intel updated — '+newData.
 setTimeout(function(){statusEl.style.display='none'},5000);
 }).catch(function(err){
 statusEl.innerHTML='<span style="color:#ff4444">✗ Error: '+err.message+'</span>';
-if(err.message.indexOf('401')>-1){aiDSApiKey='';document.getElementById('aiDSKeyInput').style.display='block';document.getElementById('aiDSKeyField').style.display='block';document.getElementById('aiDSKeyField').value='';statusEl.innerHTML+='<br><span style="color:#ffaa00">Invalid API key — try again</span>'}
+if(err.message.indexOf('401')>-1){
+    statusEl.innerHTML+='<br><span style="color:#ffaa00">Invalid API key — check your profile settings</span>';
+}
 }).finally(function(){
 btn.disabled=false;btn.style.opacity='1';
 });

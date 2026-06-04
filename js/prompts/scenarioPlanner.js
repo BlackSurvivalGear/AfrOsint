@@ -3,7 +3,7 @@ function aiScenarioPlanner(){
 var input=document.getElementById('aiScenarioInput');
 var scenario=input.value.trim();
 if(!scenario){alert('Enter a "What if..." scenario to analyze.');return}
-if(!aiDSApiKey){alert('Enter your OpenAI API key in the AI Decision Support panel first.');return}
+if(typeof window.userApiKeys !== 'undefined' && window.userApiKeys.openai) aiDSApiKey = window.userApiKeys.openai; if(!aiDSApiKey){alert('Enter your OpenAI API key in the Profile dropdown menu first.');return}
 var overlay=document.createElement('div');
 overlay.id='aiScenarioOverlay';
 overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
