@@ -1,14 +1,14 @@
 AFROSINT PROPRIETARY SOFTWARE LICENSE (v1.0)
 
-Copyright (c) 2026 BlackSurvivalGear / AfrOSINT
+Copyright (c) 2026 BlackSurvivalGear / AfrOsint
 
 All rights reserved.
 
 1. DEFINITIONS
-"Software" refers to the AfrOSINT platform, including all source code, design, assets, data structures, scripts, and associated materials contained in this repository.
+"Software" refers to the AfrOsint platform, including all source code, design, assets, data structures, scripts, and associated materials contained in this repository.
 
 2. OWNERSHIP
-The Software is the exclusive property of BlackSurvivalGear / AfrOSINT.
+The Software is the exclusive property of BlackSurvivalGear / AfrOsint.
 No ownership rights are transferred under this License.
 
 3. PERMITTED USE
@@ -33,7 +33,7 @@ For licensing inquiries:
 Contact: [INSERT YOUR EMAIL]
 
 6. INTELLECTUAL PROPERTY
-All trademarks, branding, logos (including AfrOSINT), and system designs are protected.
+All trademarks, branding, logos (including AfrOsint), and system designs are protected.
 
 7. TERMINATION
 This license is automatically terminated if any terms are violated.

@@ -1,3 +1,3 @@
-# AfrOSINT
+# AfrOsint
 
-AfrOSINT — Africa-focused Open Source Intelligence platform.
+AfrOsint — Africa-focused Open Source Intelligence platform.

@@ -7,7 +7,7 @@ overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;backgr
 var tickerEl=document.getElementById('newsTicker');
 var headlines=[];
 if(tickerEl){var links=tickerEl.querySelectorAll('.headline-link');links.forEach(function(a){headlines.push(a.textContent.trim())})}
-var headlineContext=headlines.length>0?'\n\nCurrent headlines from AfrOSINT live ticker (use these to ground your analysis in real-time events):\n'+headlines.slice(0,20).map(function(h,i){return(i+1)+'. '+h}).join('\n'):'';
+var headlineContext=headlines.length>0?'\n\nCurrent headlines from AfrOsint live ticker (use these to ground your analysis in real-time events):\n'+headlines.slice(0,20).map(function(h,i){return(i+1)+'. '+h}).join('\n'):'';
 overlay.innerHTML='<div style="background:rgba(6,16,24,0.98);border:1px solid #00ccff;border-radius:8px;max-width:680px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;font-family:Share Tech Mono,monospace;color:#d7ffff;font-size:12px;line-height:1.6;position:relative"><button onclick="document.getElementById(\'aiDiasporaOverlay\').remove()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#ff4444;font-size:18px;cursor:pointer">✕</button><div style="color:#00ccff;font-size:14px;letter-spacing:2px;margin-bottom:6px;text-shadow:0 0 8px #00ccff66">🌍 DIASPORA INTELLIGENCE BRIEF</div><div style="color:#7fd6df;font-size:10px;margin-bottom:12px">Continent-wide digest for the African diaspora — investment, travel, safety, culture & opportunity.</div><div id="aiDiasporaContent" style="color:#7fd6df">⟳ Generating diaspora intelligence brief...</div></div>';
 document.body.appendChild(overlay);
 var today=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
