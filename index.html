@@ -74,12 +74,7 @@
 </div>
 <button id="logoutBtn" onclick="event.stopPropagation();handleLogout()" class="logout-btn">LOGOUT</button>
 </div>
-<div class='price-row'>
-<div class='market-box'><div>BRENT</div><div class='market-price' id='priceBrent'>--</div></div>
-<div class='market-box'><div>GOLD</div><div class='market-price' id='priceGold'>--</div></div>
-<div class='market-box'><div>SILVER</div><div class='market-price' id='priceSilver'>--</div></div>
-<div class='market-box'><div>BTC</div><div class='market-price' id='priceBtc'>--</div></div>
-</div>
+
 </div>
 <div class='header-center-wrap'>
 <div id='navBtns'>
@@ -107,7 +102,6 @@
 <option value='12'>12-hour</option>
 <option value='24'>24-hour</option>
 </select>
-<button class='atw-small-button' id='atwToggleShow'>Show All Countries</button>
 <button class='atw-small-button' id='atwResetGmt' onclick="setHeaderTime(null,'','')">RESET TO GMT</button>
 </div>
 <select id='atwCountrySelect'><option value=''>Jump to country...</option></select>
