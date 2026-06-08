@@ -62,7 +62,7 @@
 </div>
 </div>
 <div class='header-right'>
-<div id="userProfile" class="user-profile-header">
+<div id="userProfile" class="user-profile-header" onclick="window.location.href='https://blacksurvivalgear.github.io/login/dashboard.html'">
 <img id="userProfileImg" src="assets/images/default-avatar.png" alt="Profile" class="user-avatar">
 <div class="user-details">
 <div id="userDisplayName" class="user-name">Loading...</div>
@@ -71,7 +71,7 @@
     <div class="badge-icon"></div>
 </div>
 </div>
-<button id="logoutBtn" onclick="handleLogout()" class="logout-btn">LOGOUT</button>
+<button id="logoutBtn" onclick="event.stopPropagation();handleLogout()" class="logout-btn">LOGOUT</button>
 </div>
 <div class='price-row'>
 <div class='market-box'><div>BRENT</div><div class='market-price' id='priceBrent'>--</div></div>

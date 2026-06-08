@@ -301,6 +301,7 @@ a{color:#00ffee;text-decoration:none}
     border-radius: 50px;
     margin: 4px 0;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .user-profile-header:hover {
