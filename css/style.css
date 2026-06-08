@@ -152,7 +152,7 @@ a{color:#00ffee;text-decoration:none}
 #commandHeader{padding:10px;gap:10px;display:flex;flex-direction:row;justify-content:space-between;align-items:center}
 .header-left{position:static;top:auto;left:auto}
 .header-right{display:none}
-.header-center-wrap{display:none;position:absolute;top:100%;left:0;right:0;z-index:9999;background:#07141c;border-bottom:2px solid #00ffee55;padding:16px;flex-direction:column;gap:16px;box-shadow:0 8px 24px rgba(0,0,0,0.6);align-items:center}
+.header-center-wrap{display:none;position:absolute;top:100%;left:0;right:0;z-index:20001;background:#07141c;border-bottom:2px solid #00ffee55;padding:16px;flex-direction:column;gap:16px;box-shadow:0 8px 24px rgba(0,0,0,0.6);align-items:center}
 .header-center-wrap.mobile-open{display:flex}
 .brand-wrap{justify-content:flex-start;gap:8px}
 .callsign{font-size:18px;letter-spacing:1px}
