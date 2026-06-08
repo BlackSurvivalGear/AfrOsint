@@ -53,10 +53,10 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .atw-set-btn:hover,.atw-set-btn:active{background:#0c2430;box-shadow:0 0 12px #00ffee66}
 .atw-set-btn.active{background:#00ffee;color:#061018;font-weight:bold}
 #atwSearchBox{flex-grow:3}
-.header-right .price-row{display:flex;align-items:center;gap:12px}
-.market-box{padding:4px 0;text-align:right;min-width:70px}
+.header-right .price-row{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.market-box{padding:4px 0;text-align:right}
 .market-box div:first-child{font-size:10px;color:#7fd6df;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
-.market-price{font-size:18px;color:#00ffee;font-weight:700;font-family:'Share Tech Mono',monospace}
+.market-price{font-size:16px;color:#00ffee;font-weight:700;font-family:'Share Tech Mono',monospace}
 
 #newsTickerWrap{display:flex;flex-direction:column;background:#050b12;border-top:1px solid #00ffee55;border-bottom:1px solid #00ffee55;overflow:hidden}
 .channel{background:#071923;border:none;color:#7fd6df;padding:0 14px;cursor:pointer;font-family:'Share Tech Mono';font-size:12px;white-space:nowrap;transition:background 0.15s,color 0.15s,text-shadow 0.15s,box-shadow 0.15s}.channel.active{background:#0c2430;color:#00ffee;font-weight:700;text-shadow:0 0 8px #00ffee;box-shadow:inset 0 -2px 0 #00ffee}
