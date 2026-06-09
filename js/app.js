@@ -2144,14 +2144,29 @@ try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitco
 }
 fetchPrices();setInterval(fetchPrices,60000);
 
-const donateWallets={btc:{addr:'bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6',qr:'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6'},usdt:{addr:'TJXpvDnuTtx2Zth2YBNgHZnkbymJTnrgzx',qr:'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TJXpvDnuTtx2Zth2YBNgHZnkbymJTnrgzx'}};
+const donateWallets = {
+    btc: {
+        addr: 'bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6',
+        qr: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6'
+    },
+    usdt: {
+        addr: 'TJXpvDnuTtx2Zth2YBNgHZnkbymJTnrgzx',
+        qr: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TJXpvDnuTtx2Zth2YBNgHZnkbymJTnrgzx'
+    }
+};
 let donateCategory='crypto';
 function switchDonateCategory(cat){donateCategory=cat;document.getElementById('donateCategoryBtnCrypto').classList.toggle('active',cat==='crypto');document.getElementById('donateCategoryBtnFiat').classList.toggle('active',cat==='fiat');document.getElementById('donateCryptoCategory').style.display=cat==='crypto'?'block':'none';document.getElementById('donateFiatCategory').style.display=cat==='fiat'?'block':'none'}
 let donateNetwork='btc';
-function toggleDonatePanel(){document.getElementById('donatePanel').classList.toggle('open');document.getElementById('sharePanel').classList.remove('open')}
+function toggleDonatePanel(){
+const p=document.getElementById('donatePanel');
+p.classList.toggle('open');
+document.getElementById('sharePanel').classList.remove('open');
+if(p.classList.contains('open'))bringToFront(p);
+}
 function toggleSharePanel(){
 const p=document.getElementById('sharePanel');p.classList.toggle('open');document.getElementById('donatePanel').classList.remove('open');
 if(p.classList.contains('open')){
+bringToFront(p);
 const url=encodeURIComponent(window.location.href);const txt=encodeURIComponent('Check out AfrOsint — Pan-African OSINT platform');
 document.getElementById('shareX').href=`https://twitter.com/intent/tweet?text=${txt}&url=${url}`;
 document.getElementById('shareFB').href=`https://www.facebook.com/sharer/sharer.php?u=${url}`;
@@ -2162,10 +2177,12 @@ function copyShareLink(){const url=window.location.href;navigator.clipboard.writ
 function switchDonateNetwork(net){donateNetwork=net;const w=donateWallets[net];document.getElementById('donateBtcBtn').classList.toggle('active',net==='btc');document.getElementById('donateUsdtBtn').classList.toggle('active',net==='usdt');document.getElementById('donateAddr').textContent=w.addr;document.getElementById('donateQrImg').src=w.qr;document.getElementById('donateCopyBtn').textContent='COPY'}
 function copyDonateAddr(){if(!donateWallets[donateNetwork])return;const addr=donateWallets[donateNetwork].addr;navigator.clipboard.writeText(addr).then(()=>{const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)}).catch(()=>{const t=document.createElement('textarea');t.value=addr;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);const btn=document.getElementById('donateCopyBtn');btn.textContent='COPIED';setTimeout(()=>{btn.textContent='COPY'},2000)})}
 function _closePanelsOutside(e){
-const dPanel=document.getElementById('donatePanel');const dBtn=document.querySelector('.donate-btn');
-if(dPanel&&dPanel.classList.contains('open')&&!dPanel.contains(e.target)&&!dBtn.contains(e.target))dPanel.classList.remove('open');
-const sPanel=document.getElementById('sharePanel');const sBtn=document.querySelector('.share-btn');
-if(sPanel&&sPanel.classList.contains('open')&&!sPanel.contains(e.target)&&!sBtn.contains(e.target))sPanel.classList.remove('open');
+const dPanel=document.getElementById('donatePanel');
+const sPanel=document.getElementById('sharePanel');
+if(!dPanel||!sPanel)return;
+const isToggle=e.target.closest('#supportBtn')||e.target.closest('.banner-text-btn');
+if(dPanel.classList.contains('open')&&!dPanel.contains(e.target)&&!isToggle)dPanel.classList.remove('open');
+if(sPanel.classList.contains('open')&&!sPanel.contains(e.target)&&!isToggle)sPanel.classList.remove('open');
 }
 document.addEventListener('click',_closePanelsOutside);
 document.addEventListener('touchend',function(e){if(e.touches&&e.touches.length>0)return;_closePanelsOutside(e)},{passive:true});

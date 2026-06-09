@@ -15,7 +15,7 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 #commandHeader{position:relative;display:flex;flex-direction:column;align-items:center;padding:12px 24px;background:linear-gradient(180deg,#07141c,#050b12);background-image:linear-gradient(180deg,rgba(7,20,28,0.88),rgba(5,11,18,0.92));border-bottom:2px solid #00ffee55;gap:12px}
 .header-left{position:absolute;top:12px;left:24px}
 .header-right{position:absolute;top:12px;right:24px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;justify-content:flex-start;width:320px}
-.header-center-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:1200px}
+.header-center-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:1200px}
 .brand-wrap{display:flex;align-items:center;gap:12px}
 .header-logo{width:40px;height:auto;filter:drop-shadow(0 0 8px rgba(0,255,238,0.4))}
 .callsign{font-size:24px;font-weight:700;letter-spacing:2px;color:#00ffee;text-shadow:0 0 10px rgba(0,255,238,0.5);transition:text-shadow 0.3s ease;cursor:default}
@@ -85,7 +85,7 @@ iframe,.map-frame{width:100%;height:100%;border:none}
 #flightFrame iframe{filter:invert(92%) hue-rotate(180deg) grayscale(.9) brightness(.6) contrast(1.2)}
 #commandFooter{padding:28px;display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg,#050b12,#07141c);border-top:2px solid #00ffee55;position:relative}
 .version{position:absolute;right:20px;bottom:12px;font-size:11px;color:#00ffee55;font-family:'Share Tech Mono'}
-#donatePanel,#sharePanel{display:none;position:absolute;top:0;left:16px;z-index:10000;margin-top:4px;width:min(420px,92vw);background:#061018;border:1px solid #00ffee44;border-radius:12px;padding:20px;box-sizing:border-box;text-align:center;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44;touch-action:auto;-webkit-overflow-scrolling:touch}
+#donatePanel,#sharePanel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:10000;margin-top:4px;width:min(420px,92vw);background:#061018;border:1px solid #00ffee44;border-radius:12px;padding:20px;box-sizing:border-box;text-align:center;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44;touch-action:auto;-webkit-overflow-scrolling:touch}
 #sharePanel{width:min(300px,92vw)}
 #donatePanel.open,#sharePanel.open{display:block}
 .donate-toggle{display:flex;gap:0;margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #00ffee66}
@@ -174,6 +174,7 @@ a{color:#00ffee;text-decoration:none}
 #africaTimePanel{width:96vw;left:2vw;transform:none}
 .atw-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
 .atw-time{font-size:18px}
+#donatePanel,#sharePanel{left:50%;transform:translateX(-50%);margin-top:8px}
 #donatePanel{width:min(420px,92vw)}
 .leaflet-popup-content{max-width:280px !important}
 #tacticalLayerPanel,#survivalLayerPanel,#aiDecisionPanel{
