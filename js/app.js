@@ -1037,6 +1037,7 @@ else{var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;
 })
 (globeDiv);
 afrMapInstance.pointOfView({lat:5,lng:20,altitude:2.2},0);
+requestAnimationFrame(function _globeSizeFix(){if(afrMapInstance&&globeDiv.parentElement){var w=globeDiv.clientWidth,h=globeDiv.clientHeight;if(w>0&&h>0){afrMapInstance.width(w).height(h)}else{requestAnimationFrame(_globeSizeFix)}}});
 afrMapInstance.controls().autoRotate=true;afrMapInstance.controls().autoRotateSpeed=0.3;
 var _globeRenderer=afrMapInstance.renderer();if(_globeRenderer&&window.devicePixelRatio>1){_globeRenderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5))}
 var globeCanvas=globeDiv.querySelector('canvas');if(globeCanvas){globeCanvas.style.touchAction='none';
