@@ -26,7 +26,7 @@ var aiDSLayer=true;var aiDSVisible=false;
 function initAiDecisionSupport(){}
 function toggleAiDSLayer(){
 aiDSVisible=!aiDSVisible;
-if(typeof _globeRefreshLayers==='function')_globeRefreshLayers();
+if(typeof afrMapMode!=='undefined'&&afrMapMode.startsWith('globe')){if(typeof _globeRefreshLayers==='function')_globeRefreshLayers()}else{if(typeof _leafletRefreshLayers==='function')_leafletRefreshLayers()}
 var leg=document.getElementById('aiDSLegend');if(leg)leg.style.display=aiDSVisible?'block':'none';
 var cb=document.getElementById('aiDSRiskToggle');if(cb)cb.checked=aiDSVisible;
 var btn=document.getElementById('aiDSToggleBtn');if(btn){btn.style.borderColor=aiDSVisible?'#00ffee':'#00ffee44';btn.style.color=aiDSVisible?'#00ffee':'#00ffee'}
@@ -63,7 +63,7 @@ var newData=JSON.parse(content);
 if(!Array.isArray(newData)||newData.length===0)throw new Error('Invalid response format');
 aiDSCountryRisk.length=0;
 newData.forEach(function(c){aiDSCountryRisk.push(c)});
-if(typeof _globeRefreshLayers==='function')_globeRefreshLayers();
+if(typeof afrMapMode!=='undefined'&&afrMapMode.startsWith('globe')){if(typeof _globeRefreshLayers==='function')_globeRefreshLayers()}else{if(typeof _leafletRefreshLayers==='function')_leafletRefreshLayers()}
 statusEl.innerHTML='<span style="color:#00ffee">✓ Intel updated — '+newData.length+' countries refreshed</span>';
 setTimeout(function(){statusEl.style.display='none'},5000);
 }).catch(function(err){
