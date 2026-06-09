@@ -24,40 +24,7 @@
 </div>
 <div id="mainAppContainer" style="display: none;">
 <div class="watermark-bg"></div>
-<div id='proverbBanner'><div id='bannerBtns'><button class='banner-text-btn' onclick='toggleSharePanel()'>SHARE</button><button class='banner-text-btn' onclick='toggleDonatePanel()'>SUPPORT</button></div><span id='proverbText'></span><div id='bannerPanels'><div id='sharePanel'>
-<h2>SHARE PLATFORM</h2>
-<div class='share-grid'>
-<a id='shareX' href='#' target='_blank' class='atw-small-button share-link'>X / TWITTER</a>
-<a id='shareFB' href='#' target='_blank' class='atw-small-button share-link'>FACEBOOK</a>
-<a id='shareLI' href='#' target='_blank' class='atw-small-button share-link'>LINKEDIN</a>
-<a id='shareWA' href='#' target='_blank' class='atw-small-button share-link'>WHATSAPP</a>
-</div>
-<button class='donate-copy-btn' onclick='copyShareLink()' id='shareCopyBtn' style='width:100%'>COPY LINK</button>
-</div><div id='donatePanel'>
-<h2 style='color:#00ffee;font-family:Share Tech Mono,monospace;letter-spacing:2px;text-shadow:0 0 10px #00ffee88;margin-bottom:14px'>SUPPORT AfrOsint</h2>
-<div class='donate-toggle'>
-<button id='donateCategoryBtnCrypto' class='active' onclick='switchDonateCategory("crypto")'>CRYPTO</button>
-<button id='donateCategoryBtnFiat' onclick='switchDonateCategory("fiat")'>FIAT</button>
-</div>
-<div id='donateCryptoCategory'>
-<div class='donate-toggle' style='margin-bottom:12px'>
-<button id='donateBtcBtn' class='active' onclick='switchDonateNetwork("btc")'>BTC</button>
-<button id='donateUsdtBtn' onclick='switchDonateNetwork("usdt")'>USDT (TRON)</button>
-</div>
-<div class='donate-qr'><img id='donateQrImg' src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6' alt='QR Code' /></div>
-<div class='donate-addr-wrap'>
-<span class='donate-addr' id='donateAddr'>bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6</span>
-<button class='donate-copy-btn' id='donateCopyBtn' onclick='copyDonateAddr()'>COPY</button>
-</div>
-</div>
-<div id='donateFiatCategory' style='display:none'>
-<div style='display:flex;flex-direction:column;gap:12px;margin:20px 0'>
-<a href='https://www.paypal.com/ncp/payment/496D9VBSUK462' target='_blank' rel='noopener noreferrer' class='donate-btn' style='display:inline-block;text-decoration:none;padding:14px 32px;font-size:15px;text-align:center'>DONATE VIA PAYPAL</a>
-<a href='https://www.paypal.com/ncp/payment/496D9VBSUK462' target='_blank' rel='noopener noreferrer' class='donate-btn' style='display:inline-block;text-decoration:none;padding:14px 32px;font-size:15px;text-align:center'>DONATE VIA APPLE PAY</a>
-</div>
-<p style='color:#7fd6df;font-size:12px;font-family:Share Tech Mono,monospace;margin-top:8px'>You will be redirected to complete your donation.</p>
-</div>
-</div></div></div>
+<div id='proverbBanner'><div id='bannerBtns'><button class='banner-text-btn' onclick='toggleSharePanel()'>SHARE</button><button class='banner-text-btn' onclick='toggleDonatePanel()'>SUPPORT</button></div><span id='proverbText'></span></div>
 <header id='commandHeader'>
 <div class='header-left'>
 <div class='brand-wrap'>
@@ -90,6 +57,7 @@
 <button id='aiLaunchpadBtn' class='command-btn'>AI Launchpad</button>
 <button id='commsBtn' class='command-btn'>Discord</button>
 <button id='liveFeedBtn' class='command-btn'>Live Feed</button>
+<button id='supportBtn' class='command-btn' onclick='toggleDonatePanel()'>SUPPORT</button>
 </div>
 <div class='clock-section'>
 <div id='gmtClock' onclick='toggleAfricaTime()'></div>
@@ -110,6 +78,41 @@
 </div>
 <select id='atwCountrySelect'><option value=''>Jump to country...</option></select>
 <div class='atw-grid' id='atwCityGrid'></div>
+</div>
+</div>
+<div id='sharePanel'>
+<h2>SHARE PLATFORM</h2>
+<div class='share-grid'>
+<a id='shareX' href='#' target='_blank' class='atw-small-button share-link'>X / TWITTER</a>
+<a id='shareFB' href='#' target='_blank' class='atw-small-button share-link'>FACEBOOK</a>
+<a id='shareLI' href='#' target='_blank' class='atw-small-button share-link'>LINKEDIN</a>
+<a id='shareWA' href='#' target='_blank' class='atw-small-button share-link'>WHATSAPP</a>
+</div>
+<button class='donate-copy-btn' onclick='copyShareLink()' id='shareCopyBtn' style='width:100%'>COPY LINK</button>
+</div><div id='donatePanel'>
+<h2 style='color:#00ffee;font-family:Share Tech Mono,monospace;letter-spacing:2px;text-shadow:0 0 10px #00ffee88;margin-bottom:14px'>SUPPORT AfrOsint</h2>
+<div class='donate-toggle'>
+<button id='donateCategoryBtnCrypto' class='active' onclick='switchDonateCategory("crypto")'>CRYPTO</button>
+<button id='donateCategoryBtnFiat' onclick='switchDonateCategory("fiat")'>FIAT</button>
+</div>
+<div id='donateCryptoCategory'>
+<div class='donate-toggle' style='margin-bottom:12px'>
+<button id='donateBtcBtn' class='active' onclick='switchDonateNetwork("btc")'>BTC</button>
+<button id='donateUsdtBtn' onclick='switchDonateNetwork("usdt")'>USDT (TRON)</button>
+</div>
+<div class='donate-qr'><img id='donateQrImg' src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6' alt='QR Code' /></div>
+<div class='donate-addr-wrap'>
+<span class='donate-addr' id='donateAddr'>bc1quy9rhgtc4jg2auyjpj0tns0fk3s7h7ktzr62p6</span>
+<button class='donate-copy-btn' id='donateCopyBtn' onclick='copyDonateAddr()'>COPY</button>
+</div>
+</div>
+<div id='donateFiatCategory' style='display:none'>
+<div style='display:flex;flex-direction:column;gap:12px;margin:20px 0'>
+<a href='https://www.paypal.com/ncp/payment/496D9VBSUK462' target='_blank' rel='noopener noreferrer' class='donate-btn' style='display:inline-block;text-decoration:none;padding:14px 32px;font-size:15px;text-align:center'>DONATE VIA PAYPAL</a>
+<a href='https://www.paypal.com/ncp/payment/496D9VBSUK462' target='_blank' rel='noopener noreferrer' class='donate-btn' style='display:inline-block;text-decoration:none;padding:14px 32px;font-size:15px;text-align:center'>DONATE VIA APPLE PAY</a>
+<a href='https://www.paypal.com/ncp/payment/496D9VBSUK462' target='_blank' rel='noopener noreferrer' class='donate-btn' style='display:inline-block;text-decoration:none;padding:14px 32px;font-size:15px;text-align:center'>DONATE VIA CARD</a>
+</div>
+<p style='color:#7fd6df;font-size:12px;font-family:Share Tech Mono,monospace;margin-top:8px'>You will be redirected to complete your donation.</p>
 </div>
 </div>
 </div>
