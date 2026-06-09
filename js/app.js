@@ -244,6 +244,8 @@ function _cpApiKeyReset(){
 aiDSApiKey='';
 _renderCpApiKey();
 }
+const _countryNameMap={'Algeria':'Algeria','Angola':'Angola','Benin':'Benin','Botswana':'Botswana','Burkina Faso':'BurkinaFaso','Burundi':'Burundi','Cameroon':'Cameroon','Cape Verde':'CapeVerde','Central African Republic':'CentralAfricanRepublic','Chad':'Chad','Congo (Brazzaville)':'Congo','Congo (Kinshasa)':'DRCongo',"C\u00f4te d'Ivoire":'IvoryCoast','Djibouti':'Djibouti','Egypt':'Egypt','Equatorial Guinea':'EquatorialGuinea','Eritrea':'Eritrea','Eswatini':'Eswatini','Ethiopia':'Ethiopia','Gabon':'Gabon','Gambia':'Gambia','Ghana':'Ghana','Guinea':'Guinea','Guinea-Bissau':'GuineaBissau','Kenya':'Kenya','Lesotho':'Lesotho','Liberia':'Liberia','Libya':'Libya','Madagascar':'Madagascar','Malawi':'Malawi','Mali':'Mali','Mauritania':'Mauritania','Morocco':'Morocco','Mozambique':'Mozambique','Namibia':'Namibia','Niger':'Niger','Nigeria':'Nigeria','Rwanda':'Rwanda',"S\u00e3o Tom\u00e9 and Pr\u00edncipe":'SaoTome','Senegal':'Senegal','Sierra Leone':'SierraLeone','Somalia':'Somalia','South Africa':'SouthAfrica','South Sudan':'SouthSudan','Sudan':'Sudan','Tanzania':'Tanzania','Togo':'Togo','Tunisia':'Tunisia','Uganda':'Uganda','Zambia':'Zambia','Zimbabwe':'Zimbabwe','Antigua and Barbuda':'AntiguaAndBarbuda','Barbados':'Barbados','Brazil':'Brazil','Grenada':'Grenada','Guyana':'Guyana','Jamaica':'Jamaica','Saint Lucia':'SaintLucia','Trinidad and Tobago':'TrinidadAndTobago'};
+function _getNewsSources(name){var dataKey=_countryNameMap[name]||'';var sources=[];if(dataKey){for(var reg of Object.values(africaData)){if(reg[dataKey]){sources=reg[dataKey];break}}}return sources}
 async function atwViewCountry(name,iso){
 const w=document.getElementById('africaTimeWidget');
 w.innerHTML=`<div style='text-align:center;padding:40px;color:#00ffee;font-family:Share Tech Mono,monospace'>Loading ${name}...</div>`;
@@ -270,8 +272,7 @@ let exRate='N/A';
 try{const er=await fetch('https://api.exchangerate-api.com/v4/latest/USD');const ed=await er.json();if(ed.rates&&ed.rates[currTicker])exRate=ed.rates[currTicker].toFixed(2)}catch(e){}
 const bpop=blackPopPct[name];const bpopStr=bpop!==undefined?bpop+'%':'N/A';
 const liveMapUrl=liveuamapUrls[name]||'https://africa.liveuamap.com/';
-const countryNameMap={'Algeria':'Algeria','Angola':'Angola','Benin':'Benin','Botswana':'Botswana','Burkina Faso':'BurkinaFaso','Burundi':'Burundi','Cameroon':'Cameroon','Cape Verde':'CapeVerde','Central African Republic':'CentralAfricanRepublic','Chad':'Chad','Congo (Brazzaville)':'Congo','Congo (Kinshasa)':'DRCongo',"C\u00f4te d'Ivoire":'IvoryCoast','Djibouti':'Djibouti','Egypt':'Egypt','Equatorial Guinea':'EquatorialGuinea','Eritrea':'Eritrea','Eswatini':'Eswatini','Ethiopia':'Ethiopia','Gabon':'Gabon','Gambia':'Gambia','Ghana':'Ghana','Guinea':'Guinea','Guinea-Bissau':'GuineaBissau','Kenya':'Kenya','Lesotho':'Lesotho','Liberia':'Liberia','Libya':'Libya','Madagascar':'Madagascar','Malawi':'Malawi','Mali':'Mali','Mauritania':'Mauritania','Morocco':'Morocco','Mozambique':'Mozambique','Namibia':'Namibia','Niger':'Niger','Nigeria':'Nigeria','Rwanda':'Rwanda',"S\u00e3o Tom\u00e9 and Pr\u00edncipe":'SaoTome','Senegal':'Senegal','Sierra Leone':'SierraLeone','Somalia':'Somalia','South Africa':'SouthAfrica','South Sudan':'SouthSudan','Sudan':'Sudan','Tanzania':'Tanzania','Togo':'Togo','Tunisia':'Tunisia','Uganda':'Uganda','Zambia':'Zambia','Zimbabwe':'Zimbabwe','Antigua and Barbuda':'AntiguaAndBarbuda','Barbados':'Barbados','Brazil':'Brazil','Grenada':'Grenada','Guyana':'Guyana','Jamaica':'Jamaica','Saint Lucia':'SaintLucia','Trinidad and Tobago':'TrinidadAndTobago'};
-const dataKey=countryNameMap[name]||'';
+const dataKey=_countryNameMap[name]||'';
 let newsSources=[];
 if(dataKey){for(const reg of Object.values(africaData)){if(reg[dataKey]){newsSources=reg[dataKey];break}}}
 let localBtns='';
@@ -292,7 +293,7 @@ w.innerHTML=`<div style='padding:12px;position:relative'>
 <div><a href='${passIdx}' target='_blank' style='color:#00ffee;text-decoration:none'>🛃 Passport Index</a></div>
 <div id='countryWeather' style='grid-column:span 2'><span style='color:#7fd6df'>☀️ Weather:</span> <span style='color:#88aacc'>Loading...</span></div>
 </div>
-<div style='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px'><button class='atw-small-button' onclick="showBugoutSlidePanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>✈️ TRAVEL</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button><button class='atw-small-button' onclick="showLiveNewsPanel('${escapedName}')" style='background:#0c2430;border-color:#00ffee;color:#00ffee;text-shadow:0 0 6px #00ffee88'>📺 LIVE NEWS</button></div>
+<div style='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px'><button class='atw-small-button' onclick="showDashPanel('${escapedName}')" style='background:#0c2430;border-color:#44ddff;color:#44ddff;text-shadow:0 0 6px #44ddff88'>📊 DASH</button><button class='atw-small-button' onclick="showBugoutSlidePanel('${escapedName}','${iso}')" style='background:#0c2430;border-color:#ff8800;color:#ff8800;text-shadow:0 0 6px #ff880088'>✈️ TRAVEL</button><button class='atw-small-button' onclick="showFxPanel('${currTicker}','${escapedName}')" style='background:#0c2430;border-color:#ffcc00;color:#ffcc00;text-shadow:0 0 6px #ffcc0088'>💱 FX RATES</button><button class='atw-small-button' onclick="showLiveNewsPanel('${escapedName}')" style='background:#0c2430;border-color:#00ffee;color:#00ffee;text-shadow:0 0 6px #00ffee88'>📺 LIVE NEWS</button></div>
 <div id='aiCardPanel' style='position:absolute;top:12px;right:12px;z-index:10;display:flex;flex-direction:column;align-items:stretch;gap:6px;background:#081821;border:1px solid #00ffee44;border-radius:8px;padding:0;min-width:200px;box-shadow:0 4px 20px rgba(0,255,238,0.1)'>
 <div id='aiCardHeader' style='cursor:pointer;padding:6px 12px;border-bottom:1px solid #00ffee22;display:flex;align-items:center;justify-content:space-between;user-select:none;transition:background 0.2s' onmouseover="this.style.background='#0c2a35'" onmouseout="this.style.background='transparent'"><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66'>⚡ AI Reports ${name}</span><span id='aiCardCollapseArrow' style='color:#00ffee88;font-size:9px;padding:2px 4px'>▶</span></div>
 <div id='aiCardBody' style='padding:8px 12px;display:none'>
@@ -310,6 +311,7 @@ ${localBtns}
 <div id='fxPanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
 <div id='bugoutSlidePanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
 <div id='liveNewsPanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
+<div id='dashPanel' style='position:absolute;top:0;left:0;width:100%;min-height:100%;background:#061018;transform:translateX(100%);transition:transform 0.3s ease;display:none;overflow-y:auto;padding:12px;box-sizing:border-box'></div>
 </div>
 </div>`;
 _renderCpApiKey();
@@ -347,7 +349,7 @@ h+="</div>";
 panel.innerHTML=h;
 setTimeout(function(){var c=panel.querySelector('#tvChartWrap .tradingview-widget-container');if(!c)return;var s=document.createElement('script');s.type='text/javascript';s.src='https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';s.async=true;s.textContent=JSON.stringify({"allow_symbol_change":true,"calendar":false,"details":false,"hide_side_toolbar":true,"hide_top_toolbar":false,"hide_legend":false,"hide_volume":false,"hotlist":false,"interval":"D","locale":"en","save_image":true,"style":"1","symbol":"FX_IDC:USD"+currTicker,"theme":"dark","timezone":"Etc/UTC","backgroundColor":"#0F0F0F","gridColor":"rgba(242, 242, 242, 0.06)","watchlist":["FX_IDC:GBP"+currTicker,"FX_IDC:EUR"+currTicker,"FX_IDC:CAD"+currTicker,"FX_IDC:CNY"+currTicker],"withdateranges":false,"compareSymbols":[],"studies":[],"autosize":true});c.appendChild(s)},100);
 }).catch(function(){panel.innerHTML="<button class='atw-small-button' onclick='hideFxPanel()' style='margin-bottom:12px'>\u2B05 BACK</button><div style='color:#ff4444;padding:20px;text-align:center'>Failed to load FX rates.</div>"})}
-function _hideAllCountryPanels(){['fxPanel','bugoutSlidePanel','liveNewsPanel'].forEach(function(id){var p=document.getElementById(id);if(p){p.style.transform='translateX(100%)';p.style.display='none';var ifr=p.querySelector('iframe');if(ifr)ifr.src='about:blank'}});var atp=document.getElementById('africaTimePanel');if(atp)atp.scrollTop=0}
+function _hideAllCountryPanels(){['fxPanel','bugoutSlidePanel','liveNewsPanel','dashPanel'].forEach(function(id){var p=document.getElementById(id);if(p){p.style.transform='translateX(100%)';p.style.display='none';p.querySelectorAll('iframe').forEach(function(ifr){ifr.src='about:blank'})}});var atp=document.getElementById('africaTimePanel');if(atp)atp.scrollTop=0}
 function hideFxPanel(){_hideAllCountryPanels()}
 var _liveNewsPanelIdx=0;
 function showLiveNewsPanel(countryName){
@@ -375,6 +377,36 @@ panel.innerHTML=h}
 function liveNewsPanelPrev(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;var countryName=panel.dataset.country;var channels=_getPopupChannels(countryName);_liveNewsPanelIdx=(_liveNewsPanelIdx-1+channels.length)%channels.length;_renderLiveNewsPanel(panel,countryName,channels)}
 function liveNewsPanelNext(){var panel=document.getElementById('liveNewsPanel');if(!panel)return;var countryName=panel.dataset.country;var channels=_getPopupChannels(countryName);_liveNewsPanelIdx=(_liveNewsPanelIdx+1)%channels.length;_renderLiveNewsPanel(panel,countryName,channels)}
 function hideLiveNewsPanel(){_hideAllCountryPanels()}
+function showDashPanel(countryName){
+_hideAllCountryPanels();
+var panel=document.getElementById('dashPanel');if(!panel)return;
+panel.dataset.country=countryName;
+var channels=_getPopupChannels(countryName);
+var ch=channels[0];
+var embedSrc=ch.embed.indexOf('youtube.com')>=0?(ch.embed+'?autoplay=1&mute=1'):ch.embed;
+var newsSources=_getNewsSources(countryName);
+var h="<button class='atw-small-button' onclick='hideDashPanel()' style='margin-bottom:8px'>\u2B05 BACK</button>";
+h+="<h3 style='color:#44ddff;font-family:Share Tech Mono,monospace;margin-bottom:8px;text-shadow:0 0 8px #44ddff66'>\uD83D\uDCCA DASH \u2014 "+countryName+"</h3>";
+h+="<div style='display:flex;gap:6px;height:420px'>";
+h+="<div style='flex:1;display:flex;flex-direction:column;min-width:0'>";
+h+="<div style='display:flex;align-items:center;gap:6px;margin-bottom:4px'><span style='color:#ff4444;font-size:8px'>&#9679;</span><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:11px;letter-spacing:1px'>"+ch.name+"</span></div>";
+h+="<iframe src='"+embedSrc+"' style='flex:1;width:100%;border:1px solid #00ffee33;border-radius:6px;background:#081821' frameborder='0' allow='autoplay;encrypted-media' allowfullscreen></iframe>";
+h+="</div>";
+h+="<div style='flex:1;display:flex;flex-direction:column;min-width:0'>";
+h+="<div id='dashSourceBar' style='display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;max-height:60px;overflow-y:auto'>";
+var firstIframeSrc=null;
+newsSources.forEach(function(s){
+var blocked=typeof iframeBlockedSites!=='undefined'&&iframeBlockedSites.has(s[1]);
+if(blocked){h+="<a class='ucp-btn' href='"+safeHref(s[1])+"' target='_blank' style='text-decoration:none;opacity:0.7;font-size:9px;padding:3px 8px' title='Opens in new tab'>"+esc(s[0])+" \u2197</a>"}
+else{if(!firstIframeSrc)firstIframeSrc=s[1];h+="<button class='ucp-btn"+(firstIframeSrc===s[1]?' active':'')+"' onclick=\"dashLoadFeed(this,&quot;"+safeHref(s[1])+"&quot;)\" style='font-size:9px;padding:3px 8px'>"+esc(s[0])+"</button>"}
+});
+h+="</div>";
+h+="<iframe id='dashFeedFrame' src='"+(firstIframeSrc||'about:blank')+"' style='flex:1;width:100%;border:1px solid #00ffee33;border-radius:6px;background:#081821' sandbox='allow-scripts allow-same-origin allow-popups'></iframe>";
+h+="</div></div>";
+panel.innerHTML=h;
+panel.style.display='block';setTimeout(function(){panel.style.transform='translateX(0)'},10)}
+function dashLoadFeed(btn,url){document.querySelectorAll('#dashSourceBar .ucp-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');var frame=document.getElementById('dashFeedFrame');frame.style.opacity='0';setTimeout(function(){frame.src=url;frame.onload=function(){frame.style.opacity='1'};setTimeout(function(){frame.style.opacity='1'},3000)},200)}
+function hideDashPanel(){_hideAllCountryPanels()}
 function showBugoutSlidePanel(name,iso){
 _hideAllCountryPanels();
 var panel=document.getElementById('bugoutSlidePanel');if(!panel)return;
