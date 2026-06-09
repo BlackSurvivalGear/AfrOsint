@@ -747,7 +747,7 @@ async function exchUpdateTable(){try{const rates=await exchFetchRates('NGN');con
 async function exchConvert(){const amount=parseFloat(document.getElementById('exchAmount').value);const from=document.getElementById('exchFrom').value;const to=document.getElementById('exchTo').value;const res=document.getElementById('exchResult');const err=document.getElementById('exchError');if(isNaN(amount)||amount<=0){err.textContent='Please enter a valid amount.';res.textContent='';return}err.textContent='';res.textContent='';try{const rates=await exchFetchRates(from);const rate=rates[to];if(rate){res.textContent=amount+' '+from+' = '+(amount*rate).toFixed(2)+' '+to}else{res.textContent='Conversion not available.'}}catch(e){res.textContent='';err.textContent='Failed to fetch rates.'}}
 
 newsBtn.onclick=loadNews;marketsBtn.onclick=loadMarkets;fxBtn.onclick=function(){active('fxBtn');renderOps(`<button class='command-btn' onclick='loadAfricanExchange()'>REFRESH</button>`,`<div id='marketFrame' style='height:100%'></div>`);loadAfricanExchange()};headlinesBtn.onclick=loadHeadlines;radioBtn.onclick=loadRadio;aiLaunchpadBtn.onclick=loadAILaunchpad;afrMapBtn.onclick=loadAfrMap;commsBtn.onclick=loadComms;liveFeedBtn.onclick=loadLiveFeed;
-var afrMapInstance=null;var afrConflictVisible=false;var afrBasesVisible=false;var afrShippingVisible=false;var afrOilVisible=false;var afrDisputedVisible=false;var afrLangVisible=false;var afrUseGoogle=false;var afrRegionIdx=0;var afrRegions=[{name:'AFRICA',lat:5,lng:20,alt:2.2},{name:'NORTH',lat:32,lng:10,alt:1.5},{name:'WEST',lat:10,lng:-2,alt:1.5},{name:'SAHEL',lat:15,lng:18,alt:1.5},{name:'CENTRAL',lat:-5,lng:28,alt:1.5},{name:'EAST',lat:2,lng:38,alt:1.5},{name:'SOUTHERN',lat:-25,lng:28,alt:1.5},{name:'HORN',lat:12,lng:44,alt:1.5},{name:'CARIBBEAN',lat:18,lng:-70,alt:1.5},{name:'MIDDLE EAST',lat:30,lng:44,alt:1.5}];var _globeCountryFeatures=null;var _globePopupEl=null;
+var afrMapInstance=null;var afrLeafletMap=null;var afrMapMode='globe-dark';var afrConflictVisible=false;var afrBasesVisible=false;var afrShippingVisible=false;var afrOilVisible=false;var afrDisputedVisible=false;var afrLangVisible=false;var afrSafeVisible=false;var afrRiskyVisible=false;var afrUseGoogle=false;var afrRegionIdx=0;var afrRegions=[{name:'AFRICA',lat:5,lng:20,alt:2.2},{name:'NORTH',lat:32,lng:10,alt:1.5},{name:'WEST',lat:10,lng:-2,alt:1.5},{name:'SAHEL',lat:15,lng:18,alt:1.5},{name:'CENTRAL',lat:-5,lng:28,alt:1.5},{name:'EAST',lat:2,lng:38,alt:1.5},{name:'SOUTHERN',lat:-25,lng:28,alt:1.5},{name:'HORN',lat:12,lng:44,alt:1.5},{name:'CARIBBEAN',lat:18,lng:-70,alt:1.5},{name:'MIDDLE EAST',lat:30,lng:44,alt:1.5}];var _globeCountryFeatures=null;var _globePopupEl=null;
 const afrLangZones=[
 // English-speaking
 {name:'Nigeria',lat:9.08,lng:7.49,radius:450000,lang:'en',info:'English (official)'},
@@ -1004,10 +1004,11 @@ const afrDisputedTerritories=[
 
 
 function loadAfrMap(){afrRegionIdx=0;active('afrMapBtn');renderOps(`
+<div style='display:flex;gap:4px;margin-bottom:12px'><button class='command-btn' onclick='setAfrMapMode("globe-dark")' style='flex:1;padding:8px 0'>GLOBE</button><button class='command-btn' onclick='setAfrMapMode("flat-dark")' style='flex:1;padding:8px 0'>FLAT DARK</button><button class='command-btn' onclick='setAfrMapMode("flat-sat")' style='flex:1;padding:8px 0'>FLAT SAT</button></div>
 <button class='command-btn' onclick='toggleMapFeedPanel()' id='mapFeedToggleBtn' style='border-color:#ff444444;color:#ff4444'>LIVE FEED</button><br><br>
 <button class='command-btn' onclick='afrAddNewsBox()'>+ LIVE NEWS</button><br><br>
 <button class='command-btn' onclick='cycleAfrRegion()' id='afrRegionBtn'>REGION: AFRICA</button><br><br>
-<button class='command-btn' onclick='toggleAfrTiles()' id='afrTileToggleBtn'>GOOGLE MAP</button><br><br>
+<button class='command-btn' onclick='toggleAfrTiles()' id='afrTileToggleBtn'>SATELLITE</button><br><br>
 <button class='command-btn' onclick='toggleAiDSLayer();this.style.borderColor=aiDSVisible?"#00ffee":"#00ffee44";this.style.color=aiDSVisible?"#00ffee":"#00ffee"' id='aiDSToggleBtn' style='border-color:#00ffee44'>⚡ AI INTEL</button><br><br>
 <button class='command-btn' onclick='aiNewsAnalysis()' style='border-color:#ffaa0044;color:#ffaa00'>📡 NEWS INTEL</button><br><br>
 <button class='command-btn' onclick='aiDiasporaBrief()' style='border-color:#00ccff44;color:#00ccff'>🌍 DIASPORA BRIEF</button><br><br>
@@ -1017,6 +1018,8 @@ function loadAfrMap(){afrRegionIdx=0;active('afrMapBtn');renderOps(`
 var container=document.getElementById('afrMapContainer');
 var globeDiv=document.createElement('div');globeDiv.id='globeMount';globeDiv.style.cssText='width:100%;height:100%;position:absolute;top:0;left:0;z-index:1;background:#000;touch-action:none';
 container.insertBefore(globeDiv,container.firstChild);
+var leafletDiv=document.createElement('div');leafletDiv.id='leafletMount';leafletDiv.style.cssText='width:100%;height:100%;position:absolute;top:0;left:0;z-index:1;background:#061018;display:none';
+container.insertBefore(leafletDiv,container.firstChild);
 var vp=document.getElementById('opsViewport');if(vp){vp.style.overflow='';vp.style.touchAction='auto'}
 try{if(typeof Globe==='undefined')throw new Error('Globe library not loaded');afrMapInstance=Globe()
 .width(globeDiv.clientWidth).height(globeDiv.clientHeight)
@@ -1046,21 +1049,89 @@ afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.t
 initCountryBorders();
 _globeRefreshLayers();}catch(e){console.error('Globe init error:',e);globeDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ff4444;font-family:Share Tech Mono,monospace;font-size:14px;text-align:center;padding:20px">⚠ 3D Globe requires WebGL.<br>Please enable hardware acceleration in your browser settings.</div>'}
 afrNewsBoxCount=0;document.getElementById('afrNewsBoxes').innerHTML='';afrAddNewsBox();showLayerPanels();_showMapFeedOnLoad();_webcamScrollInit=false;_webcamVisible=false;_webcamCollapsed=false;_webcamTab='all'},100)}
+function _initLeafletMap(){
+    if(afrLeafletMap)return;
+    var mount=document.getElementById('leafletMount');
+    if(!mount)return;
+    afrLeafletMap=L.map(mount,{attributionControl:false,zoomControl:false}).setView([5,20],3);
+    afrLeafletMap._tileLayers={
+        'dark':L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'),
+        'sat':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}')
+    };
+    afrLeafletMap.on('click',function(){_globeClosePopup()});
+}
+function _leafletRefreshLayers(){
+    if(!afrLeafletMap)return;
+    if(afrLeafletMap._currentTiles)afrLeafletMap.removeLayer(afrLeafletMap._currentTiles);
+    var tileKey=afrMapMode==='flat-sat'?'sat':'dark';
+    afrLeafletMap._currentTiles=afrLeafletMap._tileLayers[tileKey].addTo(afrLeafletMap);
+    if(afrLeafletMap._dataGroup)afrLeafletMap.removeLayer(afrLeafletMap._dataGroup);
+    afrLeafletMap._dataGroup=L.layerGroup().addTo(afrLeafletMap);
+    var group=afrLeafletMap._dataGroup;
+    const baseColors={US:'#4488ff',UK:'#00ffee',FR:'#ffffff'};
+    if(afrBasesVisible){afrMilitaryBases.forEach(b=>{
+        L.circleMarker([b.lat,b.lng],{radius:5,color:baseColors[b.co]||'#4488ff',fillOpacity:0.8}).addTo(group).bindTooltip('<strong>'+b.name+'</strong><br>'+b.info);
+    })}
+    if(afrOilVisible){afrOilGas.forEach(o=>{
+        L.circleMarker([o.lat,o.lng],{radius:4,color:'#ffaa00',fillOpacity:0.8}).addTo(group).bindTooltip('<strong>'+o.name+'</strong><br>'+o.info);
+    })}
+    if(aiDSVisible&&typeof aiDSCountryRisk!=='undefined'){aiDSCountryRisk.forEach(c=>{
+        L.circleMarker([c.lat,c.lng],{radius:c.score*2,color:c.color,fillOpacity:0.6}).addTo(group).on('click',function(e){
+            var html='<div style="font-family:Share Tech Mono,monospace;font-size:11px;max-width:320px;line-height:1.5;color:#d7ffff;padding:10px">'+'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #00ffee33"><strong style="color:'+c.color+';font-size:14px;text-shadow:0 0 8px '+c.color+'66">'+c.name+'</strong><span style="background:'+c.color+';color:#000;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:bold;letter-spacing:1px">'+c.risk+'</span></div>'+'<div style="margin-bottom:8px;color:#7fd6df;font-size:12px">RISK SCORE: <span style="color:'+c.color+';font-weight:bold">'+c.score+'/10</span> — Travel: <span style="color:#ffcc00">'+c.travel+'</span></div>'+'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,100,100,0.08);border-left:2px solid #ff6666;border-radius:0 4px 4px 0"><span style="color:#ff6666;font-weight:bold">THREATS:</span><br><span style="color:#e0e8ef">'+c.threats.map(function(t){return'• '+t}).join('<br>')+'</span></div>'+'<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,170,0,0.08);border-left:2px solid #ffaa00;border-radius:0 4px 4px 0"><span style="color:#ffaa00;font-weight:bold">STABILITY:</span><br><span style="color:#e0e8ef">'+c.stability+'</span></div>'+'<div style="padding:6px 8px;background:rgba(68,255,136,0.08);border-left:2px solid #00ffee;border-radius:0 4px 4px 0"><span style="color:#00ffee;font-weight:bold">AI FORECAST:</span><br><span style="color:#e0e8ef">'+c.forecast+'</span></div>'+'<div style="margin-top:10px;border-top:1px solid #00ffee33;padding-top:8px"><button onclick="aiDeepDive(\''+c.name.replace(/'/g,"\\'")+'\')" style="width:100%;padding:7px;background:#081a1a;border:1px solid #00ffee;color:#00ffee;font-size:10px;cursor:pointer;border-radius:3px;font-family:Share Tech Mono,monospace;letter-spacing:1px">AI DEEP DIVE</button></div></div>';
+            var pos=_getEvPos(e.originalEvent);var cont=document.getElementById('afrMapContainer');var rect=cont.getBoundingClientRect();_globeShowPopup(html,pos.clientX-rect.left,pos.clientY-rect.top);
+        }).bindTooltip('<strong>'+c.name+'</strong><br>'+c.risk);
+    })}
+    if(afrConflictVisible){afrConflictZones.forEach(z=>{
+        L.circle([z.lat,z.lng],{radius:z.radius,color:z.color,fillOpacity:0.2}).addTo(group).bindTooltip('<strong>'+z.name+'</strong><br>'+z.info);
+    })}
+    if(afrDisputedVisible){afrDisputedTerritories.forEach(d=>{
+        L.circle([d.lat,d.lng],{radius:d.radius,color:'#cc44ff',fillOpacity:0.2}).addTo(group).bindTooltip('<strong>'+d.name+'</strong><br>'+d.info);
+    })}
+    const langColors={en:'#ff6666',fr:'#6699ff',pt:'#66ff66',de:'#ffcc00',es:'#ff9933',nl:'#ff66cc',ar:'#00ffcc'};
+    if(afrLangVisible){afrLangZones.forEach(z=>{
+        L.circle([z.lat,z.lng],{radius:z.radius,color:langColors[z.lang]||'#ffffff',fillOpacity:0.2}).addTo(group).bindTooltip('<strong>'+z.name+'</strong><br>'+z.info);
+    })}
+    if(afrSafeVisible&&typeof safeZones!=='undefined'){safeZones.forEach(z=>{
+        L.circle([z.lat,z.lng],{radius:z.radius,color:'#00ffee',fillOpacity:0.1}).addTo(group).bindTooltip('<strong>'+z.name+'</strong><br>'+z.info);
+    })}
+    if(afrRiskyVisible&&typeof riskyZones!=='undefined'){riskyZones.forEach(z=>{
+        L.circle([z.lat,z.lng],{radius:z.radius,color:'#ff4444',fillOpacity:0.1}).addTo(group).bindTooltip('<strong>'+z.name+'</strong><br>'+z.info);
+    })}
+    if(afrShippingVisible){afrShippingRoutes.forEach(r=>{
+        L.polyline(r.points.map(p=>[p[0],p[1]]),{color:'#44ddff',weight:2,dashArray:'5, 5'}).addTo(group).bindTooltip('<strong>'+r.name+'</strong><br>'+r.info);
+    })}
+}
 function _globeRefreshLayers(){if(!afrMapInstance)return;
 var pts=[];
 var rings=[];
 var arcs=[];
 const baseColors={US:'#4488ff',UK:'#00ffee',FR:'#ffffff'};
-if(afrConflictVisible){afrConflictZones.forEach(z=>{rings.push({lat:z.lat,lng:z.lng,maxR:z.radius/80000,propagationSpeed:2,repeatPeriod:1200,color:z.color,name:z.name,info:z.info,_cat:'conflict'})})}
+if(afrConflictVisible){afrConflictZones.forEach(z=>{
+    const maxR=z.radius/80000;
+    rings.push({lat:z.lat,lng:z.lng,maxR:maxR,propagationSpeed:maxR/1.2,repeatPeriod:1200,color:z.color,name:z.name,info:z.info,_cat:'conflict'})
+})}
 if(afrBasesVisible){afrMilitaryBases.forEach(b=>{const c=baseColors[b.co]||'#4488ff';pts.push({lat:b.lat,lng:b.lng,size:0.12,color:c,name:b.name,info:b.info,_cat:'bases'})})}
 if(afrShippingVisible){afrShippingRoutes.forEach(r=>{for(var i=0;i<r.points.length-1;i++){arcs.push({startLat:r.points[i][0],startLng:r.points[i][1],endLat:r.points[i+1][0],endLng:r.points[i+1][1],color:'#44ddff',name:r.name,info:r.info,_cat:'shipping'})}})}
 if(afrOilVisible){afrOilGas.forEach(o=>{pts.push({lat:o.lat,lng:o.lng,size:0.1,color:'#ffaa00',name:o.name,info:o.info,_cat:'oil'})})}
-if(afrDisputedVisible){afrDisputedTerritories.forEach(d=>{rings.push({lat:d.lat,lng:d.lng,maxR:d.radius/80000,propagationSpeed:1,repeatPeriod:2000,color:'#cc44ff',name:d.name,info:d.info,_cat:'disputed'})})}
+if(afrDisputedVisible){afrDisputedTerritories.forEach(d=>{
+    const maxR=d.radius/80000;
+    rings.push({lat:d.lat,lng:d.lng,maxR:maxR,propagationSpeed:maxR/2,repeatPeriod:2000,color:'#cc44ff',name:d.name,info:d.info,_cat:'disputed'})
+})}
 const langColors={en:'#ff6666',fr:'#6699ff',pt:'#66ff66',de:'#ffcc00',es:'#ff9933',nl:'#ff66cc',ar:'#00ffcc'};
-if(afrLangVisible){afrLangZones.forEach(z=>{const c=langColors[z.lang]||'#ffffff';rings.push({lat:z.lat,lng:z.lng,maxR:z.radius/80000,propagationSpeed:1,repeatPeriod:2500,color:c,name:z.name,info:z.info,_cat:'lang'})})}
+if(afrLangVisible){afrLangZones.forEach(z=>{
+    const c=langColors[z.lang]||'#ffffff';
+    const maxR=z.radius/80000;
+    rings.push({lat:z.lat,lng:z.lng,maxR:maxR,propagationSpeed:maxR/2.5,repeatPeriod:2500,color:c,name:z.name,info:z.info,_cat:'lang'})
+})}
 if(aiDSVisible&&typeof aiDSCountryRisk!=='undefined'){aiDSCountryRisk.forEach(function(c){pts.push({lat:c.lat,lng:c.lng,size:c.score*0.04,color:c.color,name:c.name,info:c.risk+' — '+c.travel,_cat:'aiDS',_aiDS:c})})}
-if(afrSafeVisible&&typeof safeZones!=='undefined'){safeZones.forEach(function(z){rings.push({lat:z.lat,lng:z.lng,maxR:z.radius/80000,propagationSpeed:1,repeatPeriod:2000,color:'#00ffee',name:z.name,info:z.info,_cat:'safe'})})}
-if(afrRiskyVisible&&typeof riskyZones!=='undefined'){riskyZones.forEach(function(z){rings.push({lat:z.lat,lng:z.lng,maxR:z.radius/80000,propagationSpeed:1,repeatPeriod:2000,color:'#ff4444',name:z.name,info:z.info,_cat:'risky'})})}
+if(afrSafeVisible&&typeof safeZones!=='undefined'){safeZones.forEach(function(z){
+    const maxR=z.radius/80000;
+    rings.push({lat:z.lat,lng:z.lng,maxR:maxR,propagationSpeed:maxR/2,repeatPeriod:2000,color:'#00ffee',name:z.name,info:z.info,_cat:'safe'})
+})}
+if(afrRiskyVisible&&typeof riskyZones!=='undefined'){riskyZones.forEach(function(z){
+    const maxR=z.radius/80000;
+    rings.push({lat:z.lat,lng:z.lng,maxR:maxR,propagationSpeed:maxR/2,repeatPeriod:2000,color:'#ff4444',name:z.name,info:z.info,_cat:'risky'})
+})}
 afrMapInstance.pointsData(pts).pointLat('lat').pointLng('lng').pointAltitude(0.01).pointRadius('size').pointColor('color').pointLabel(function(d){return '<div style="font-family:Share Tech Mono,monospace;font-size:12px;background:rgba(6,16,24,0.95);border:1px solid #00ffee44;padding:8px 12px;border-radius:4px;color:#d7ffff"><strong style="color:'+d.color+'">'+d.name+'</strong><br>'+d.info+'</div>'});
 afrMapInstance.ringsData(rings).ringLat('lat').ringLng('lng').ringMaxRadius('maxR').ringPropagationSpeed('propagationSpeed').ringRepeatPeriod('repeatPeriod').ringColor(function(d){return[d.color]});
 afrMapInstance.arcsData(arcs).arcStartLat('startLat').arcStartLng('startLng').arcEndLat('endLat').arcEndLng('endLng').arcColor(function(d){return[d.color,d.color]}).arcStroke(0.5).arcDashLength(0.4).arcDashGap(0.2).arcDashAnimateTime(1500);
@@ -1218,14 +1289,94 @@ var html='<div style="font-family:Share Tech Mono,monospace;font-size:12px;min-w
 '</div>';
 var sx=screenX||200,sy=screenY||200;_globeShowPopup('<div style="padding:10px">'+html+'</div>',sx,sy);
 }
-function cycleAfrRegion(){if(!afrMapInstance)return;var r=afrRegions[afrRegionIdx];afrMapInstance.pointOfView({lat:r.lat,lng:r.lng,altitude:r.alt},1000);afrRegionIdx=(afrRegionIdx+1)%afrRegions.length;var next=afrRegions[afrRegionIdx];var btn=document.getElementById('afrRegionBtn');if(btn)btn.textContent='REGION: '+next.name}
-function toggleAfrTiles(){if(!afrMapInstance)return;if(afrUseGoogle){afrMapInstance.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg');afrUseGoogle=false;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='SATELLITE'}else{afrMapInstance.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');afrUseGoogle=true;var tb=document.getElementById('afrTileToggleBtn');if(tb)tb.textContent='DARK'}}
-function afrGoogleDirectionsGo(){var from=document.getElementById('afrGFrom').value;var to=document.getElementById('afrGTo').value;if(!to){alert('Please enter a destination');return}if(!from&&afrMapInstance){var c=afrMapInstance.pointOfView();from=c.lat.toFixed(6)+','+c.lng.toFixed(6)}window.open('https://www.google.com/maps/dir/'+encodeURIComponent(from)+'/'+encodeURIComponent(to),'_blank')}
-function afrGoogleSearch(){var to=document.getElementById('afrGTo').value;if(!to&&afrMapInstance){var c=afrMapInstance.pointOfView();to=c.lat.toFixed(6)+','+c.lng.toFixed(6)}window.open('https://www.google.com/maps/search/'+encodeURIComponent(to),'_blank')}
+function cycleAfrRegion(){
+    var r=afrRegions[afrRegionIdx];
+    if(afrMapMode.startsWith('globe')){
+        if(afrMapInstance)afrMapInstance.pointOfView({lat:r.lat,lng:r.lng,altitude:r.alt},1000);
+    }else{
+        if(afrLeafletMap)afrLeafletMap.setView([r.lat,r.lng],r.alt===2.2?3:5);
+    }
+    afrRegionIdx=(afrRegionIdx+1)%afrRegions.length;
+    var next=afrRegions[afrRegionIdx];
+    var btn=document.getElementById('afrRegionBtn');
+    if(btn)btn.textContent='REGION: '+next.name;
+}
+function setAfrMapMode(mode){
+    afrMapMode=mode;
+    var g=document.getElementById('globeMount');
+    var l=document.getElementById('leafletMount');
+    if(!g||!l)return;
+    if(mode.startsWith('globe')){
+        g.style.display='block';l.style.display='none';
+        if(afrMapInstance){
+            afrMapInstance.globeImageUrl(mode==='globe-sat'?'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg':'https://unpkg.com/three-globe/example/img/earth-dark.jpg');
+            _globeRefreshLayers();
+        }
+    }else{
+        g.style.display='none';l.style.display='block';
+        if(!afrLeafletMap)_initLeafletMap();
+        _leafletRefreshLayers();
+    }
+}
+function toggleAfrTiles(){
+    if(afrMapMode.startsWith('globe')){
+        setAfrMapMode(afrMapMode==='globe-dark'?'globe-sat':'globe-dark');
+        var tb=document.getElementById('afrTileToggleBtn');
+        if(tb)tb.textContent=afrMapMode==='globe-dark'?'SATELLITE':'DARK';
+    }else{
+        setAfrMapMode(afrMapMode==='flat-dark'?'flat-sat':'flat-dark');
+        var tb=document.getElementById('afrTileToggleBtn');
+        if(tb)tb.textContent=afrMapMode==='flat-dark'?'SATELLITE':'DARK';
+    }
+}
+function afrGoogleDirectionsGo(){
+    var from=document.getElementById('afrGFrom').value;
+    var to=document.getElementById('afrGTo').value;
+    if(!to){alert('Please enter a destination');return}
+    if(!from){
+        if(afrMapMode.startsWith('globe')&&afrMapInstance){
+            var c=afrMapInstance.pointOfView();from=c.lat.toFixed(6)+','+c.lng.toFixed(6);
+        }else if(afrLeafletMap){
+            var c=afrLeafletMap.getCenter();from=c.lat.toFixed(6)+','+c.lng.toFixed(6);
+        }
+    }
+    window.open('https://www.google.com/maps/dir/'+encodeURIComponent(from)+'/'+encodeURIComponent(to),'_blank');
+}
+function afrGoogleSearch(){
+    var to=document.getElementById('afrGTo').value;
+    if(!to){
+        if(afrMapMode.startsWith('globe')&&afrMapInstance){
+            var c=afrMapInstance.pointOfView();to=c.lat.toFixed(6)+','+c.lng.toFixed(6);
+        }else if(afrLeafletMap){
+            var c=afrLeafletMap.getCenter();to=c.lat.toFixed(6)+','+c.lng.toFixed(6);
+        }
+    }
+    window.open('https://www.google.com/maps/search/'+encodeURIComponent(to),'_blank');
+}
 var afrSvPanelOpen=false;
-function afrGoogleStreetView(){if(!afrMapInstance)return;var existing=document.getElementById('afrStreetViewPanel');if(existing){existing.remove();afrSvPanelOpen=false;return}afrSvPanelOpen=true;var c=afrMapInstance.pointOfView();var lat=c.lat.toFixed(6);var lng=c.lng.toFixed(6);var svUrl='https://data.mashedworld.com/dualmaps/map.htm?lat='+lat+'&lng='+lng+'&z=18&slat='+lat+'&slng='+lng+'&sh=85.434&sp=0&sz=1&gm=0&panel=msbi&mi=1&be=0&pc=1';var container=document.getElementById('afrMapContainer');var panel=document.createElement('div');panel.id='afrStreetViewPanel';panel.style.cssText='position:absolute;top:10px;right:10px;width:55%;height:70%;z-index:1200;pointer-events:auto;background:#000;border:1px solid #00ffee44;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 20px #00ffee33';panel.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#081821,#0c2a35);padding:6px 10px;border-bottom:1px solid #00ffee33;cursor:move;user-select:none;flex-shrink:0" onmousedown="afrSvDrag(event)" ontouchstart="afrSvDrag(event)"><span style="color:#00ffee;font-family:Share Tech Mono,monospace;font-size:11px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66">STREET VIEW — DUAL MAPS</span><div style="display:flex;gap:4px"><button onclick="afrSvToggleFs()" style="background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:Share Tech Mono,monospace" title="Full Screen">&#x26F6;</button><button onclick="afrSvRefresh()" style="background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:Share Tech Mono,monospace" title="Refresh to map center">&#x21BB;</button><button onclick="afrSvClose()" style="background:transparent;border:1px solid #ff444488;color:#ff4444;font-size:10px;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:Share Tech Mono,monospace" title="Close">&times;</button></div></div><iframe id="afrSvFrame" src="'+svUrl+'" style="flex:1;width:100%;border:none" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe><div style="padding:2px 8px;background:#081821;border-top:1px solid #00ffee22;text-align:right"><a href="https://www.mashedworld.com/DualMaps.aspx" target="_blank" style="color:#00ffee66;font-family:Share Tech Mono,monospace;font-size:9px;text-decoration:none">Dual Maps</a></div>';container.appendChild(panel)}
+function afrGoogleStreetView(){
+    var existing=document.getElementById('afrStreetViewPanel');
+    if(existing){existing.remove();afrSvPanelOpen=false;return}
+    var lat,lng;
+    if(afrMapMode.startsWith('globe')&&afrMapInstance){
+        var c=afrMapInstance.pointOfView();lat=c.lat.toFixed(6);lng=c.lng.toFixed(6);
+    }else if(afrLeafletMap){
+        var c=afrLeafletMap.getCenter();lat=c.lat.toFixed(6);lng=c.lng.toFixed(6);
+    }else return;
+    afrSvPanelOpen=true;
+    var svUrl='https://data.mashedworld.com/dualmaps/map.htm?lat='+lat+'&lng='+lng+'&z=18&slat='+lat+'&slng='+lng+'&sh=85.434&sp=0&sz=1&gm=0&panel=msbi&mi=1&be=0&pc=1';
+    var container=document.getElementById('afrMapContainer');
+    var panel=document.createElement('div');panel.id='afrStreetViewPanel';panel.style.cssText='position:absolute;top:10px;right:10px;width:55%;height:70%;z-index:1200;pointer-events:auto;background:#000;border:1px solid #00ffee44;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 20px #00ffee33';panel.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#081821,#0c2a35);padding:6px 10px;border-bottom:1px solid #00ffee33;cursor:move;user-select:none;flex-shrink:0" onmousedown="afrSvDrag(event)" ontouchstart="afrSvDrag(event)"><span style="color:#00ffee;font-family:Share Tech Mono,monospace;font-size:11px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66">STREET VIEW — DUAL MAPS</span><div style="display:flex;gap:4px"><button onclick="afrSvToggleFs()" style="background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:Share Tech Mono,monospace" title="Full Screen">&#x26F6;</button><button onclick="afrSvRefresh()" style="background:transparent;border:1px solid #00ffee44;color:#00ffee;font-size:10px;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:Share Tech Mono,monospace" title="Refresh to map center">&#x21BB;</button><button onclick="afrSvClose()" style="background:transparent;border:1px solid #ff444488;color:#ff4444;font-size:10px;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:Share Tech Mono,monospace" title="Close">&times;</button></div></div><iframe id="afrSvFrame" src="'+svUrl+'" style="flex:1;width:100%;border:none" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe><div style="padding:2px 8px;background:#081821;border-top:1px solid #00ffee22;text-align:right"><a href="https://www.mashedworld.com/DualMaps.aspx" target="_blank" style="color:#00ffee66;font-family:Share Tech Mono,monospace;font-size:9px;text-decoration:none">Dual Maps</a></div>';container.appendChild(panel)}
 function afrSvClose(){var p=document.getElementById('afrStreetViewPanel');if(p){p.remove();afrSvPanelOpen=false}}
-function afrSvRefresh(){if(!afrMapInstance)return;var c=afrMapInstance.pointOfView();var lat=c.lat.toFixed(6);var lng=c.lng.toFixed(6);var frame=document.getElementById('afrSvFrame');if(frame)frame.src='https://data.mashedworld.com/dualmaps/map.htm?lat='+lat+'&lng='+lng+'&z=18&slat='+lat+'&slng='+lng+'&sh=85.434&sp=0&sz=1&gm=0&panel=msbi&mi=1&be=0&pc=1'}
+function afrSvRefresh(){
+    var lat,lng;
+    if(afrMapMode.startsWith('globe')&&afrMapInstance){
+        var c=afrMapInstance.pointOfView();lat=c.lat.toFixed(6);lng=c.lng.toFixed(6);
+    }else if(afrLeafletMap){
+        var c=afrLeafletMap.getCenter();lat=c.lat.toFixed(6);lng=c.lng.toFixed(6);
+    }else return;
+    var frame=document.getElementById('afrSvFrame');if(frame)frame.src='https://data.mashedworld.com/dualmaps/map.htm?lat='+lat+'&lng='+lng+'&z=18&slat='+lat+'&slng='+lng+'&sh=85.434&sp=0&sz=1&gm=0&panel=msbi&mi=1&be=0&pc=1'
+}
 var afrSvFs=false;function afrSvToggleFs(){var p=document.getElementById('afrStreetViewPanel');if(!p)return;if(afrSvFs){p.style.cssText='position:absolute;top:10px;right:10px;width:55%;height:70%;z-index:1200;pointer-events:auto;background:#000;border:1px solid #00ffee44;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 20px #00ffee33';afrSvFs=false}else{p.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;z-index:1210;pointer-events:auto;background:#000;border:none;border-radius:0;overflow:hidden;display:flex;flex-direction:column';afrSvFs=true}}
 var afrSvDragEl=null,afrSvDragOX=0,afrSvDragOY=0,afrSvStartX=0,afrSvStartY=0,afrSvMoved=false;
 function afrSvDrag(e){
@@ -1340,7 +1491,15 @@ document.removeEventListener('mouseup',afrStopDrag);
 document.removeEventListener('touchmove',afrDoDrag);
 document.removeEventListener('touchend',afrStopDrag);
 afrDragEl=null}
-function toggleAfrLayer(id){const m={conflict:'afrConflictVisible',bases:'afrBasesVisible',shipping:'afrShippingVisible',oil:'afrOilVisible',disputed:'afrDisputedVisible',lang:'afrLangVisible'};const vis=m[id];if(!vis)return;window[vis]=!window[vis];_globeRefreshLayers();if(id==='bases'){const leg=document.getElementById('baseLegend');if(leg)leg.style.display=window[vis]?'block':'none'}if(id==='lang'){const leg=document.getElementById('langLegend');if(leg)leg.style.display=window[vis]?'block':'none'}}
+function toggleAfrLayer(id){
+    const m={conflict:'afrConflictVisible',bases:'afrBasesVisible',shipping:'afrShippingVisible',oil:'afrOilVisible',disputed:'afrDisputedVisible',lang:'afrLangVisible'};
+    const vis=m[id];
+    if(!vis)return;
+    window[vis]=!window[vis];
+    if(afrMapMode.startsWith('globe')){_globeRefreshLayers()}else{_leafletRefreshLayers()}
+    if(id==='bases'){const leg=document.getElementById('baseLegend');if(leg)leg.style.display=window[vis]?'block':'none'}
+    if(id==='lang'){const leg=document.getElementById('langLegend');if(leg)leg.style.display=window[vis]?'block':'none'}
+}
 var panelDragEl=null,panelDragOX=0,panelDragOY=0,panelDragStartX=0,panelDragStartY=0,panelDragActive=false;
 function startPanelDrag(e,panelId){
 var pos=_getEvPos(e);
@@ -1385,7 +1544,6 @@ setTimeout(function(){document.removeEventListener('click',cb,true)},100)}
 panelDragEl=null;panelDragActive=false}
 function showLayerPanels(){var t=document.getElementById('tacticalLayerPanel');var s=document.getElementById('survivalLayerPanel');var ai=document.getElementById('aiDecisionPanel');if(t)t.style.display='block';if(s)s.style.display='block';if(ai)ai.style.display='block'}
 function hideLayerPanels(){var t=document.getElementById('tacticalLayerPanel');var s=document.getElementById('survivalLayerPanel');var ai=document.getElementById('aiDecisionPanel');if(t)t.style.display='none';if(s)s.style.display='none';if(ai)ai.style.display='none'}
-var afrSafeVisible=false,afrRiskyVisible=false;
 var safeZones=[
 {name:'Sub-Sahara Safe Zone',lat:-10,lng:25,radius:2800000,info:'Sub-Saharan Africa (Sahel to South Africa) — High Black population density, generally safe for Black travelers'},
 {name:'West Africa Safe Zone',lat:10,lng:-2,radius:1200000,info:'West Africa (Senegal to Nigeria) — High Black population density, culturally welcoming for Black travelers'},
@@ -1429,11 +1587,10 @@ function initSurvivalLayers(){
 if(!afrMapInstance)return;
 }
 function toggleSurvivalLayer(type){
-if(!afrMapInstance)return;
-if(type==='safe'){afrSafeVisible=!afrSafeVisible}
-else if(type==='risky'){afrRiskyVisible=!afrRiskyVisible}
-_globeRefreshLayers();
-var leg=document.getElementById('survivalLegend');if(leg)leg.style.display=(afrSafeVisible||afrRiskyVisible)?'block':'none';
+    if(type==='safe'){afrSafeVisible=!afrSafeVisible}
+    else if(type==='risky'){afrRiskyVisible=!afrRiskyVisible}
+    if(afrMapMode.startsWith('globe')){_globeRefreshLayers()}else{_leafletRefreshLayers()}
+    var leg=document.getElementById('survivalLegend');if(leg)leg.style.display=(afrSafeVisible||afrRiskyVisible)?'block':'none';
 }
 function popoutDiscord(){window.open('https://e.widgetbot.io/channels/1500947025196220536','AfrOsint_Discord','width=900,height=700,menubar=no,toolbar=no,location=no,status=no')}
 function loadComms(){active('commsBtn');renderOps(`<button class='command-btn' onclick='loadComms()'>REFRESH</button><br><br><button class='command-btn' onclick='popoutDiscord()'>⧉ DISCORD</button>`,`<div style='height:100%;display:flex;gap:4px;background:#061018;padding:4px'><div style='flex:1;display:flex;flex-direction:column;border:1px solid #00ffee44;border-radius:8px;overflow:hidden'><div style='background:linear-gradient(90deg,#081821,#0c2a35);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #00ffee33'><div style='display:flex;align-items:center;gap:8px'><span style="font-size:16px">💬</span><span style='color:#00ffee;font-family:Share Tech Mono,monospace;font-size:12px;letter-spacing:2px;text-shadow:0 0 6px #00ffee66'>DISCORD</span></div><button onclick='popoutDiscord()' style='background:transparent;border:1px solid #00ffee44;color:#00ffee;font-family:Share Tech Mono,monospace;font-size:10px;padding:2px 8px;cursor:pointer;border-radius:3px'>⧉</button></div><iframe src="https://e.widgetbot.io/channels/1500947025196220536" allow="clipboard-write; fullscreen" style="flex:1;width:100%;border:none"></iframe></div></div>`)}
