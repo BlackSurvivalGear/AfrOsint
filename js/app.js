@@ -833,7 +833,6 @@ const afrLangZones=[
 {name:'Jamaica',lat:18.11,lng:-77.30,radius:80000,lang:'en',info:'English (official)'},
 {name:'Trinidad & Tobago',lat:10.69,lng:-61.22,radius:50000,lang:'en',info:'English (official)'},
 {name:'Barbados',lat:13.19,lng:-59.54,radius:25000,lang:'en',info:'English (official)'},
-{name:'Bahamas',lat:25.03,lng:-77.40,radius:80000,lang:'en',info:'English (official)'},
 {name:'Belize',lat:17.19,lng:-88.50,radius:80000,lang:'en',info:'English (official)'},
 {name:'Guyana',lat:4.86,lng:-58.93,radius:150000,lang:'en',info:'English (official)'},
 {name:'Grenada',lat:12.12,lng:-61.68,radius:20000,lang:'en',info:'English (official)'},
@@ -1085,7 +1084,7 @@ if(g.type==='Polygon'){newCoords=g.coordinates.map(function(ring){return _simpli
 else if(g.type==='MultiPolygon'){newCoords=g.coordinates.map(function(poly){return poly.map(function(ring){return _simplifyRing(ring,tolerance)})})}
 else return f;
 return {type:'Feature',properties:f.properties,geometry:{type:g.type,coordinates:newCoords}}}
-var _FOCUS_ISOS=new Set(['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH','ATG','BHS','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF']);
+var _FOCUS_ISOS=new Set(['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH','ATG','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF']);
 function _isFocusCountry(f){var iso=f.properties['ISO3166-1-Alpha-3']||f.properties.ISO_A3||'';return _FOCUS_ISOS.has(iso)}
 function _extractOutlinePaths(features,tolerance){
 var paths=[];
@@ -1393,7 +1392,6 @@ var safeZones=[
 {name:'Jamaica',lat:18.1,lng:-77.3,radius:120000,info:'~92% Black population'},
 {name:'Haiti',lat:19,lng:-72.3,radius:150000,info:'~95% Black population'},
 {name:'Trinidad & Tobago',lat:10.5,lng:-61.3,radius:80000,info:'~35% Black population, multicultural'},
-{name:'Bahamas',lat:24.2,lng:-76,radius:100000,info:'~90% Black population'},
 {name:'Barbados',lat:13.2,lng:-59.5,radius:60000,info:'~92% Black population'},
 {name:'Brazil — Bahia',lat:-13,lng:-38.5,radius:300000,info:'~80% Afro-Brazilian population in Salvador region'},
 {name:'Brazil — Rio',lat:-22.9,lng:-43.2,radius:200000,info:'Large Afro-Brazilian community'},
