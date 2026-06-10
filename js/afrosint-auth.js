@@ -67,13 +67,16 @@ function checkAuthentication() {
                 // Promotion/Personnel Access Control
                 const rankIndex = AFR_RANKS.indexOf(userRole);
                 const personnelBtn = document.getElementById('personnelBtn');
+                const adminBtn = document.getElementById('adminBtn');
+
+                // Intelligence Officer (index 5) and above can promote/demote/suspend
+                const isOfficerPlus = rankIndex >= 5;
+
                 if (personnelBtn) {
-                    // Intelligence Officer (index 5) and above can promote/demote/suspend
-                    if (rankIndex >= 5) {
-                        personnelBtn.style.display = 'block';
-                    } else {
-                        personnelBtn.style.display = 'none';
-                    }
+                    personnelBtn.style.display = isOfficerPlus ? 'block' : 'none';
+                }
+                if (adminBtn) {
+                    adminBtn.style.display = isOfficerPlus ? 'block' : 'none';
                 }
 
                 // Show application
