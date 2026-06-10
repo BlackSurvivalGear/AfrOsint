@@ -9,6 +9,8 @@ const firebaseConfig = {
     appId: "1:325085054891:web:3ac905ed01f1d57cfb74ee"
 };
 
+const AFR_RANKS = ["Member", "Analyst", "Senior Analyst", "Specialist", "Lead Analyst", "Intelligence Officer", "Senior Intelligence Officer", "Strategic Advisor", "Council Member", "AfroSINT Fellow"];
+
 // Initialize Firebase
 if (typeof firebase !== 'undefined') {
     firebase.initializeApp(firebaseConfig);
@@ -38,7 +40,7 @@ function checkAuthentication() {
                 // Update basic UI first
                 updateUserInfoUI({
                     displayName: user.displayName || "Authorized Personnel",
-                    role: "Personnel",
+                    role: "Member",
                     photoURL: user.photoURL || "assets/images/default-avatar.png"
                 });
 
@@ -46,12 +48,33 @@ function checkAuthentication() {
                 const userDoc = await db.collection('users').doc(user.uid).get();
                 const userData = userDoc.data() || {};
 
+                // Check for suspension
+                if (userData.suspended) {
+                    alert("Your account has been suspended. Contact an administrator.");
+                    await auth.signOut();
+                    window.location.href = LOGIN_URL;
+                    return;
+                }
+
                 // Update UI with full user info if available
+                const userRole = userData.role || "Member";
                 updateUserInfoUI({
                     displayName: user.displayName || userData.displayName || "Authorized Personnel",
-                    role: userData.role || "Personnel",
+                    role: userRole,
                     photoURL: user.photoURL || userData.photoURL || "assets/images/default-avatar.png"
                 });
+
+                // Promotion/Personnel Access Control
+                const rankIndex = AFR_RANKS.indexOf(userRole);
+                const personnelBtn = document.getElementById('personnelBtn');
+                if (personnelBtn) {
+                    // Intelligence Officer (index 5) and above can promote/demote/suspend
+                    if (rankIndex >= 5) {
+                        personnelBtn.style.display = 'block';
+                    } else {
+                        personnelBtn.style.display = 'none';
+                    }
+                }
 
                 // Show application
                 if (loadingScreen) loadingScreen.style.display = 'none';
@@ -62,7 +85,7 @@ function checkAuthentication() {
                 // Fallback to basic user info if Firestore fails
                 updateUserInfoUI({
                     displayName: user.displayName || "Authorized Personnel",
-                    role: "Personnel",
+                    role: "Member",
                     photoURL: user.photoURL || "assets/images/default-avatar.png"
                 });
                 if (loadingScreen) loadingScreen.style.display = 'none';

@@ -747,6 +747,100 @@ async function exchUpdateTable(){try{const toEl=document.getElementById('exchTo'
 async function exchConvert(){const amount=parseFloat(document.getElementById('exchAmount').value);const from=document.getElementById('exchFrom').value;const to=document.getElementById('exchTo').value;const res=document.getElementById('exchResult');const err=document.getElementById('exchError');if(isNaN(amount)||amount<=0){err.textContent='Please enter a valid amount.';res.textContent='';return}err.textContent='';res.textContent='';try{const rates=await exchFetchRates(from);const rate=rates[to];if(rate){res.textContent=amount+' '+from+' = '+(amount*rate).toFixed(2)+' '+to}else{res.textContent='Conversion not available.'}}catch(e){res.textContent='';err.textContent='Failed to fetch rates.'}}
 
 newsBtn.onclick=loadNews;marketsBtn.onclick=loadMarkets;fxBtn.onclick=function(){active('fxBtn');renderOps(`<button class='command-btn' onclick='loadAfricanExchange()'>REFRESH</button>`,`<div id='marketFrame' style='height:100%'></div>`);loadAfricanExchange()};headlinesBtn.onclick=loadHeadlines;radioBtn.onclick=loadRadio;aiLaunchpadBtn.onclick=loadAILaunchpad;afrMapBtn.onclick=loadAfrMap;commsBtn.onclick=loadComms;liveFeedBtn.onclick=loadLiveFeed;
+const personnelBtn = document.getElementById('personnelBtn');
+if (personnelBtn) personnelBtn.onclick = loadPersonnel;
+
+function loadPersonnel() {
+    active('personnelBtn');
+    renderOps(`
+<button class='command-btn' onclick='loadPersonnel()'>REFRESH</button><br><br>
+<div style='color:#7fd6df;font-size:11px;font-family:Share Tech Mono,monospace;padding:0 10px'>Authorized personnel only. Rank: Intelligence Officer+.</div>
+`, `<div id='personnelViewport' style='height:100%;overflow-y:auto;padding:20px;background:#061018'><h2 style='text-align:center;color:#00ffee;font-family:Share Tech Mono,monospace;letter-spacing:4px;padding:10px 0 20px;margin:0;text-shadow:0 0 12px #00ffee88'>PERSONNEL MANAGEMENT</h2><div id='personnelList' style='text-align:center;color:#00ffee;font-family:Share Tech Mono,monospace;padding:40px'>Initializing Personnel Records...</div></div>`);
+    fetchPersonnel();
+}
+
+async function fetchPersonnel() {
+    const listEl = document.getElementById('personnelList');
+    if (!listEl) return;
+    try {
+        const db = firebase.firestore();
+        const snapshot = await db.collection('users').get();
+        if (snapshot.empty) {
+            listEl.innerHTML = '<div style="color:#7fd6df">No personnel records found.</div>';
+            return;
+        }
+
+        let html = `<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:15px'>`;
+        snapshot.forEach(doc => {
+            const user = doc.data();
+            const uid = doc.id;
+            const role = user.role || "Member";
+            const isSuspended = user.suspended === true;
+            const statusColor = isSuspended ? "#ff4444" : "#00ffee";
+            const statusText = isSuspended ? "SUSPENDED" : "ACTIVE";
+
+            html += `<div style='background:#081821;border:1px solid #00ffee33;border-radius:8px;padding:15px;text-align:left;display:flex;flex-direction:column;gap:10px'>
+                <div style='display:flex;align-items:center;gap:12px'>
+                    <img src='${user.photoURL || "assets/images/default-avatar.png"}' style='width:40px;height:40px;border-radius:50%;border:1px solid #00ffee44'>
+                    <div style='flex:1;min-width:0'>
+                        <div style='color:#f1f5f9;font-weight:bold;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>${esc(user.displayName || "Unknown")}</div>
+                        <div style='color:#7fd6df;font-size:11px'>${esc(user.email || "No Email")}</div>
+                    </div>
+                    <div style='color:${statusColor};font-size:10px;font-weight:bold;border:1px solid ${statusColor}44;padding:2px 6px;border-radius:4px'>${statusText}</div>
+                </div>
+                <div style='display:flex;justify-content:space-between;align-items:center;border-top:1px solid #00ffee11;padding-top:8px'>
+                    <div style='color:#00ffee;font-size:12px'>RANK: <span style='color:#fff'>${role}</span></div>
+                    <div style='display:flex;gap:6px'>
+                        <button onclick='manageUserRank("${uid}", "${role}")' style='background:transparent;border:1px solid #00ffee66;color:#00ffee;font-size:10px;padding:4px 8px;cursor:pointer;border-radius:4px;font-family:Share Tech Mono'>RANK</button>
+                        <button onclick='toggleUserSuspension("${uid}", ${isSuspended})' style='background:transparent;border:1px solid ${isSuspended ? "#00ffee66" : "#ff444466"};color:${isSuspended ? "#00ffee" : "#ff4444"};font-size:10px;padding:4px 8px;cursor:pointer;border-radius:4px;font-family:Share Tech Mono'>${isSuspended ? "RESTORE" : "SUSPEND"}</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
+        listEl.innerHTML = html;
+    } catch (error) {
+        console.error("Error fetching personnel:", error);
+        listEl.innerHTML = `<div style="color:#ff4444">Access Denied or Database Error.</div>`;
+    }
+}
+
+async function manageUserRank(uid, currentRole) {
+    const ranks = typeof AFR_RANKS !== 'undefined' ? AFR_RANKS : ["Member", "Analyst", "Senior Analyst", "Specialist", "Lead Analyst", "Intelligence Officer", "Senior Intelligence Officer", "Strategic Advisor", "Council Member", "AfroSINT Fellow"];
+    let msg = "Select new rank index (0-9):\n" + ranks.map((r, i) => `${i}: ${r}`).join("\n");
+    const newRankIdx = prompt(msg, ranks.indexOf(currentRole));
+    if (newRankIdx === null) return;
+    const idx = parseInt(newRankIdx);
+    if (isNaN(idx) || idx < 0 || idx >= ranks.length) {
+        alert("Invalid rank index.");
+        return;
+    }
+
+    try {
+        const db = firebase.firestore();
+        await db.collection('users').doc(uid).update({ role: ranks[idx] });
+        alert(`User rank updated to ${ranks[idx]}`);
+        fetchPersonnel();
+    } catch (error) {
+        console.error("Error updating rank:", error);
+        alert("Failed to update rank. Check permissions.");
+    }
+}
+
+async function toggleUserSuspension(uid, currentlySuspended) {
+    const action = currentlySuspended ? "restore" : "suspend";
+    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+    try {
+        const db = firebase.firestore();
+        await db.collection('users').doc(uid).update({ suspended: !currentlySuspended });
+        alert(`User successfully ${currentlySuspended ? "restored" : "suspended"}.`);
+        fetchPersonnel();
+    } catch (error) {
+        console.error("Error toggling suspension:", error);
+        alert("Failed to change user status.");
+    }
+}
 var afrMapInstance=null;var afrLeafletMap=null;var afrMapMode='globe-dark';var afrConflictVisible=false;var afrBasesVisible=false;var afrShippingVisible=false;var afrOilVisible=false;var afrDisputedVisible=false;var afrLangVisible=false;var afrSafeVisible=false;var afrRiskyVisible=false;var afrUseGoogle=false;var afrRegionIdx=0;var afrRegions=[{name:'AFRICA',lat:5,lng:20,alt:2.2},{name:'NORTH',lat:32,lng:10,alt:1.5},{name:'WEST',lat:10,lng:-2,alt:1.5},{name:'SAHEL',lat:15,lng:18,alt:1.5},{name:'CENTRAL',lat:-5,lng:28,alt:1.5},{name:'EAST',lat:2,lng:38,alt:1.5},{name:'SOUTHERN',lat:-25,lng:28,alt:1.5},{name:'HORN',lat:12,lng:44,alt:1.5},{name:'CARIBBEAN',lat:18,lng:-70,alt:1.5},{name:'MIDDLE EAST',lat:30,lng:44,alt:1.5}];var _globeCountryFeatures=null;var _globePopupEl=null;
 const afrLangZones=[
 // English-speaking
