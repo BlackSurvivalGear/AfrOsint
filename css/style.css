@@ -431,3 +431,344 @@ a{color:#00ffee;text-decoration:none}
         width: auto;
     }
 }
+
+/* Reports System Styles */
+.report-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: rgba(8, 24, 33, 0.6);
+    border: 1px solid rgba(0, 255, 238, 0.2);
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.report-form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.report-form-label {
+    color: var(--cyan);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.report-input, .report-select, .report-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(6, 16, 24, 0.8);
+    border: 1px solid rgba(0, 255, 238, 0.3);
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.report-input:focus, .report-select:focus, .report-textarea:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(0, 255, 238, 0.2);
+}
+
+.report-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.source-entry {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background: rgba(0, 255, 238, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid var(--cyan);
+    position: relative;
+}
+
+.source-entry .full-width {
+    grid-column: span 2;
+}
+
+.remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ff4444;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.add-btn {
+    align-self: flex-start;
+    background: rgba(0, 255, 238, 0.1);
+    border: 1px dashed var(--cyan);
+    color: var(--cyan);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+    background: rgba(0, 255, 238, 0.2);
+}
+
+.confidence-selector {
+    display: flex;
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.confidence-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.confidence-option input {
+    accent-color: var(--cyan);
+}
+
+.location-mode-btns {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.location-mode-btn {
+    flex: 1;
+    padding: 8px;
+    background: rgba(8, 24, 33, 0.8);
+    border: 1px solid rgba(0, 255, 238, 0.2);
+    color: #7fd6df;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+}
+
+.location-mode-btn.active {
+    background: rgba(0, 255, 238, 0.15);
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+#reportLocationMap {
+    height: 300px;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 255, 238, 0.2);
+}
+
+.file-upload-area {
+    border: 2px dashed rgba(0, 255, 238, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-upload-area:hover {
+    border-color: var(--cyan);
+    background: rgba(0, 255, 238, 0.05);
+}
+
+.file-list {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.file-item {
+    background: rgba(6, 16, 24, 0.9);
+    border: 1px solid rgba(0, 255, 238, 0.2);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+    border-top: 1px solid rgba(0, 255, 238, 0.1);
+    padding-top: 20px;
+}
+
+.btn-submit {
+    background: var(--cyan);
+    color: #02070d;
+    font-weight: bold;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(0, 255, 238, 0.3);
+}
+
+.btn-draft {
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    padding: 12px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.btn-cancel {
+    background: transparent;
+    color: #7fd6df;
+    border: 1px solid rgba(127, 214, 223, 0.3);
+    padding: 12px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Dashboard Styles */
+.reports-dashboard {
+    padding: 20px;
+}
+
+.reports-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 255, 238, 0.2);
+}
+
+.reports-tab {
+    padding: 10px 20px;
+    background: rgba(6, 16, 24, 0.5);
+    border: none;
+    color: #7fd6df;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    border-radius: 6px 6px 0 0;
+}
+
+.reports-tab.active {
+    background: rgba(0, 255, 238, 0.1);
+    color: var(--cyan);
+    border-bottom: 2px solid var(--cyan);
+}
+
+.reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.reports-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background: rgba(0, 255, 238, 0.1);
+    color: var(--cyan);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.reports-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(0, 255, 238, 0.1);
+    color: #d7ffff;
+}
+
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-pending { background: rgba(255, 170, 0, 0.2); color: #ffaa00; border: 1px solid #ffaa0044; }
+.status-verified { background: rgba(0, 255, 238, 0.2); color: var(--cyan); border: 1px solid rgba(0, 255, 238, 0.4); }
+.status-published { background: rgba(68, 255, 136, 0.2); color: #44ff88; border: 1px solid #44ff8844; }
+.status-rejected { background: rgba(255, 68, 68, 0.2); color: #ff4444; border: 1px solid #ff444444; }
+.status-archived { background: rgba(127, 214, 223, 0.2); color: #7fd6df; border: 1px solid #7fd6df44; }
+
+.searchable-dropdown {
+    position: relative;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #081821;
+    border: 1px solid var(--cyan);
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    border-radius: 0 0 6px 6px;
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+    background: rgba(0, 255, 238, 0.1);
+}
+
+@media(max-width: 768px) {
+    .report-form { padding: 15px; }
+    .source-entry { grid-template-columns: 1fr; }
+    .source-entry .full-width { grid-column: span 1; }
+    .report-actions { flex-direction: column; }
+    .btn-submit, .btn-draft, .btn-cancel { width: 100%; }
+    .reports-table thead { display: none; }
+    .reports-table td { display: block; text-align: right; position: relative; padding-left: 50%; }
+    .reports-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        text-align: left;
+        font-weight: bold;
+        color: var(--cyan);
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+    }
+}
