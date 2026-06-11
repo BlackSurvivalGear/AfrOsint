@@ -68,19 +68,6 @@ function checkAuthentication() {
                 const rankIndex = AFR_RANKS.indexOf(userRole);
                 const personnelBtn = document.getElementById('personnelBtn');
                 const adminBtn = document.getElementById('adminBtn');
-                const reportBtn = document.getElementById('reportBtn');
-
-                // Show report button for all authenticated users
-                if (reportBtn) {
-                    reportBtn.style.display = 'block';
-                    reportBtn.onclick = () => {
-                        if (typeof loadReport === 'function') {
-                            loadReport();
-                        } else {
-                            console.error("loadReport function not found.");
-                        }
-                    };
-                }
 
                 // Intelligence Officer (index 5) and above can promote/demote/suspend
                 const isOfficerPlus = rankIndex >= 5;

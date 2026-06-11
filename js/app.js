@@ -2279,7 +2279,7 @@ function _closePanelsOutside(e){
 const dPanel=document.getElementById('donatePanel');
 const sPanel=document.getElementById('sharePanel');
 if(!dPanel||!sPanel)return;
-const isToggle=e.target.closest('#supportBtn')||e.target.closest('.banner-text-btn');
+const isToggle=e.target.closest('.banner-text-btn');
 if(dPanel.classList.contains('open')&&!dPanel.contains(e.target)&&!isToggle)dPanel.classList.remove('open');
 if(sPanel.classList.contains('open')&&!sPanel.contains(e.target)&&!isToggle)sPanel.classList.remove('open');
 }
