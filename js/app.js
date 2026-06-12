@@ -806,8 +806,8 @@ async function fetchPersonnel() {
 }
 
 async function manageUserRank(uid, currentRole) {
-    const ranks = typeof AFR_RANKS !== 'undefined' ? AFR_RANKS : ["Member", "Analyst", "Senior Analyst", "Specialist", "Lead Analyst", "Intelligence Officer", "Senior Intelligence Officer", "Strategic Advisor", "Council Member", "AfroSINT Fellow"];
-    let msg = "Select new rank index (0-9):\n" + ranks.map((r, i) => `${i}: ${r}`).join("\n");
+    const ranks = typeof AFR_RANKS !== 'undefined' ? AFR_RANKS : ["User", "Moderator", "Administrator", "Super Admin"];
+    let msg = "Select new rank index (0-" + (ranks.length - 1) + "):\n" + ranks.map((r, i) => `${i}: ${r}`).join("\n");
     const newRankIdx = prompt(msg, ranks.indexOf(currentRole));
     if (newRankIdx === null) return;
     const idx = parseInt(newRankIdx);
