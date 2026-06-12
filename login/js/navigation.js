@@ -89,34 +89,6 @@
 
         header.innerHTML = left + center + right;
         document.body.prepend(header);
-
-        // After injecting header, start notification listener
-        startReportNotificationListener(userData.uid);
-    }
-
-    /**
-     * Listen for status changes on user's reports
-     */
-    function startReportNotificationListener(uid) {
-        // Prevent multiple listeners
-        if (window.reportListenerStarted) return;
-        window.reportListenerStarted = true;
-
-        firebase.firestore().collection('reports')
-            .where('authorUid', '==', uid)
-            .onSnapshot(snapshot => {
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === "modified") {
-                        const report = change.doc.data();
-                        const oldReport = change.doc.data(); // This is not quite right in JS SDK, but we want to know if status changed
-
-                        // Show notification if status changed and is not Pending
-                        if (report.status !== 'Pending Review') {
-                            showOSINTNotification(`REPORT UPDATE: ${report.reportId} is now ${report.status.toUpperCase()}`);
-                        }
-                    }
-                });
-            });
     }
 
     /**

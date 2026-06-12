@@ -7,7 +7,7 @@
 function checkAuthState(protectedPage = false, adminOnly = false) {
     firebase.auth().onAuthStateChanged(async (user) => {
         const path = window.location.pathname;
-        const isAuthPage = path.includes('login.html') || path.includes('register.html') || path.endsWith('/') || path.includes('index.html');
+        const isAuthPage = path.includes('login.html') || path.includes('register.html');
 
         if (user) {
             // Immediate redirection for authenticated users on auth pages
