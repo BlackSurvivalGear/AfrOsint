@@ -2285,7 +2285,14 @@ if(sPanel.classList.contains('open')&&!sPanel.contains(e.target)&&!isToggle)sPan
 }
 document.addEventListener('click',_closePanelsOutside);
 document.addEventListener('touchend',function(e){if(e.touches&&e.touches.length>0)return;_closePanelsOutside(e)},{passive:true});
-loadAfrMap();
+function _handleInitialRouting(){
+const params=new URLSearchParams(window.location.search);
+const view=params.get('view');
+if(view==='ai')loadAILaunchpad();
+else if(view==='personnel')loadPersonnel();
+else loadAfrMap();
+}
+_handleInitialRouting();
 
 // Mobile nav: close menu when a nav button is clicked
 document.querySelectorAll('#navBtns .command-btn').forEach(function(btn){

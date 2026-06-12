@@ -46,9 +46,7 @@
                     </div>
                 </div>
                 <div class="mt-6 space-y-3">
-                    <a href="report.html" class="osint-button w-full px-6 py-3 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.4)] border-[#00E5FF] text-[#00E5FF]">REPORT</a>
-                    <a href="upgrade.html" class="osint-button w-full px-6 py-3 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center">UPGRADE ACCOUNT</a>
-                    <a href="admin.html" id="profileAdminLink" class="osint-button hidden w-full px-6 py-3 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center text-[#00E5FF] border-[#00E5FF]/40">ADMIN PANEL</a>
+                    <a href="../index.html?view=personnel" id="profileAdminLink" class="osint-button hidden w-full px-6 py-3 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center text-[#00E5FF] border-[#00E5FF]/40 shadow-[0_0_15px_rgba(0,229,255,0.4)]">ADMIN PANEL</a>
                     <button onclick="logoutUser()" class="osint-button w-full px-6 py-3 rounded text-sm font-bold uppercase tracking-wider">Logout</button>
                 </div>
 
@@ -71,40 +69,14 @@
                         <p class="text-gray-400 mb-6 max-w-lg">Your intelligence dashboard is ready. All surveillance feeds and data analysis modules are operational.</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                             <a href="../index.html" class="osint-button px-6 py-2 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center">Open App</a>
-                            <a href="ai-integrations.html" class="osint-button px-6 py-2 rounded text-sm font-bold uppercase tracking-wider text-[#00E5FF] border-[#00E5FF]/50 flex items-center justify-center">AI Integrations</a>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                            <a href="admin.html" id="panelAdminLink" class="osint-button hidden px-6 py-2 rounded text-sm font-bold uppercase tracking-wider text-[#00E5FF] border-[#00E5FF]/50 flex items-center justify-center">Admin</a>
-                            <a href="profile.html" class="osint-button px-6 py-2 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center">My Profile</a>
+                            <a href="../index.html?view=ai" class="osint-button px-6 py-2 rounded text-sm font-bold uppercase tracking-wider text-[#00E5FF] border-[#00E5FF]/50 flex items-center justify-center">AI Launchpad</a>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <a href="settings.html" class="osint-button px-6 py-2 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center">Settings</a>
+                            <a href="../index.html?view=personnel" id="panelAdminLink" class="osint-button hidden px-6 py-2 rounded text-sm font-bold uppercase tracking-wider text-[#00E5FF] border-[#00E5FF]/50 flex items-center justify-center">Admin Panel</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- My Reports -->
-                <div class="osint-card p-6 rounded-lg">
-                    <h4 class="text-lg font-bold text-white mb-4 uppercase tracking-widest border-b border-[#00E5FF]/20 pb-2">My Intelligence Reports</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="text-gray-500 uppercase tracking-wider border-b border-[#00E5FF]/10">
-                                    <th class="py-3 px-2">ID</th>
-                                    <th class="py-3 px-2">Title</th>
-                                    <th class="py-3 px-2">Submitted</th>
-                                    <th class="py-3 px-2">Status</th>
-                                    <th class="py-3 px-2 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="myReportsTableBody" class="divide-y divide-[#00E5FF]/5">
-                                <tr>
-                                    <td colspan="5" class="py-4 text-center text-gray-600 uppercase italic">Awaiting report data...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
                 <!-- Recent Activity -->
                 <div class="osint-card p-6 rounded-lg">
