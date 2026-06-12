@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | AfroSINT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-[#0a0a0a] min-h-screen flex items-center justify-center p-4">
+    <div class="watermark-bg"></div>
+    <div class="radar-bg absolute inset-0 opacity-20 pointer-events-none"></div>
+
+    <div class="osint-card w-full max-w-md p-8 rounded-lg relative z-10 shadow-2xl">
+        <div class="text-center mb-8">
+            <img src="AFROSINT LOGO.png" alt="AfrOsint Logo" class="w-32 h-32 object-contain mx-auto mb-4">
+            <h1 class="text-3xl font-bold text-[#00E5FF] tracking-widest uppercase">AfroSINT</h1>
+            <p class="text-gray-400 mt-2 text-xs">PERSONNEL ENROLLMENT</p>
+        </div>
+
+        <form id="registerForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-[#00E5FF] mb-2 uppercase">Full Name</label>
+                <input type="text" id="name" required class="osint-input w-full p-3 rounded bg-black text-[#00E5FF]" placeholder="John Doe">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-[#00E5FF] mb-2 uppercase">Personnel Email</label>
+                <input type="email" id="email" required class="osint-input w-full p-3 rounded bg-black text-[#00E5FF]" placeholder="j.doe@afrosint.int">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-[#00E5FF] mb-2 uppercase">Access Code</label>
+                <input type="password" id="password" required class="osint-input w-full p-3 rounded bg-black text-[#00E5FF]" placeholder="••••••••">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-[#00E5FF] mb-2 uppercase">Confirm Access Code</label>
+                <input type="password" id="confirmPassword" required class="osint-input w-full p-3 rounded bg-black text-[#00E5FF]" placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="osint-button w-full py-3 rounded font-bold uppercase tracking-widest mt-4">Initiate Enrollment</button>
+        </form>
+
+        <p class="mt-8 text-center text-xs text-gray-400 uppercase">
+            Already enrolled? <a href="login.html" class="text-[#00E5FF] hover:underline">Verify Identity</a>
+        </p>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/permissions.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        checkAuthState();
+
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            if (password.length < 6) {
+                alert("Password should be at least 6 characters.");
+                return;
+            }
+
+            registerUser(email, password, name);
+        });
+    </script>
+</body>
+</html>
