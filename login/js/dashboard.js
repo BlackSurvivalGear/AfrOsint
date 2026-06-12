@@ -58,6 +58,18 @@ firebase.auth().onAuthStateChanged(async (user) => {
                 if (profileAdminLink) profileAdminLink.classList.remove('hidden');
             }
 
+            // Report Submission Visibility
+            if (typeof canSubmitReports === 'function' && canSubmitReports(userData.rank)) {
+                const profileReportLink = document.getElementById('profileReportLink');
+                if (profileReportLink) profileReportLink.classList.remove('hidden');
+
+                const panelReportLink = document.getElementById('panelReportLink');
+                if (panelReportLink) panelReportLink.classList.remove('hidden');
+
+                const panelAnalystLink = document.getElementById('panelAnalystLink');
+                if (panelAnalystLink) panelAnalystLink.classList.remove('hidden');
+            }
+
         }
     }
 });

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst Dashboard | AfroSINT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-[#02070d] min-h-screen text-gray-300">
+    <div class="watermark-bg"></div>
+
+    <div class="reports-dashboard">
+        <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 24px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 255, 238, 0.3);">ANALYST REVIEW DASHBOARD</h1>
+                <p style="font-size: 12px; color: #7fd6df; margin-top: 5px; font-family: 'Share Tech Mono', monospace;">INTEL VERIFICATION HUB // LEVEL 2 CLEARANCE</p>
+            </div>
+            <button onclick="window.location.href='index.html'" class="atw-small-button" style="width: auto; font-size: 10px; padding: 6px 15px;">BACK TO MAP</button>
+        </header>
+
+        <!-- Filters -->
+        <div style="background: rgba(0, 255, 238, 0.03); border: 1px solid rgba(0, 255, 238, 0.1); border-radius: 8px; padding: 20px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            <div class="report-form-section">
+                <label class="report-form-label" style="font-size: 10px;">STATUS</label>
+                <select id="filterStatus" class="report-select" style="padding: 8px; font-size: 12px;">
+                    <option value="All">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="Escalated">Escalated</option>
+                    <option value="Verified">Verified</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+            <div class="report-form-section">
+                <label class="report-form-label" style="font-size: 10px;">CATEGORY</label>
+                <select id="filterCategory" class="report-select" style="padding: 8px; font-size: 12px;">
+                    <option value="All">All Categories</option>
+                    <option value="Security Incident">Security Incident</option>
+                    <option value="Political Development">Political Development</option>
+                    <option value="Economic Intelligence">Economic Intelligence</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                    <option value="Social Unrest">Social Unrest</option>
+                    <option value="Conflict Activity">Conflict Activity</option>
+                </select>
+            </div>
+            <div class="report-form-section">
+                <label class="report-form-label" style="font-size: 10px;">THREAT LEVEL</label>
+                <select id="filterThreat" class="report-select" style="padding: 8px; font-size: 12px;">
+                    <option value="All">All Levels</option>
+                    <option value="Low">Low</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                </select>
+            </div>
+            <div class="report-form-section">
+                <label class="report-form-label" style="font-size: 10px;">URGENCY</label>
+                <select id="filterUrgent" class="report-select" style="padding: 8px; font-size: 12px;">
+                    <option value="All">All Items</option>
+                    <option value="Urgent">Urgent Only</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Reports List -->
+        <div style="background: rgba(8, 24, 33, 0.6); border: 1px solid rgba(0, 255, 238, 0.2); border-radius: 12px; overflow: hidden;">
+            <table class="reports-table">
+                <thead>
+                    <tr>
+                        <th>REF #</th>
+                        <th>DATE</th>
+                        <th>CATEGORY</th>
+                        <th>COUNTRY</th>
+                        <th>THREAT</th>
+                        <th>REPORTER</th>
+                        <th>STATUS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsList">
+                    <!-- Dynamic Content -->
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #7fd6df; font-family: 'Share Tech Mono', monospace;">INITIALIZING SECURE LINK...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Report Detail Modal -->
+    <div id="reportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+        <div style="max-width: 1000px; margin: 40px auto; background: #061018; border: 1px solid var(--cyan); border-radius: 12px; padding: 30px; box-shadow: 0 0 50px rgba(0, 255, 238, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid rgba(0, 255, 238, 0.1); padding-bottom: 15px;">
+                <div>
+                    <h2 id="modalRef" style="color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 24px; letter-spacing: 4px;">AFR-XXXXXX</h2>
+                    <p id="modalTitle" style="font-size: 18px; color: #fff; margin-top: 5px;"></p>
+                </div>
+                <button onclick="closeModal()" style="background: none; border: 1px solid #ff4444; color: #ff4444; padding: 5px 15px; border-radius: 4px; cursor: pointer;">CLOSE</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                <div>
+                    <div style="margin-bottom: 20px;">
+                        <h4 class="report-form-label" style="margin-bottom: 10px;">DESCRIPTION</h4>
+                        <div id="modalDescription" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; line-height: 1.6; white-space: pre-wrap;"></div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <h4 class="report-form-label" style="margin-bottom: 10px;">ATTACHMENTS</h4>
+                        <div id="modalAttachments" class="file-list"></div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0, 255, 238, 0.02); padding: 20px; border-radius: 8px; border: 1px solid rgba(0, 255, 238, 0.05);">
+                    <h4 class="report-form-label" style="margin-bottom: 15px; text-align: center;">WORKFLOW MANAGEMENT</h4>
+
+                    <div class="report-form-section" style="margin-bottom: 15px;">
+                        <label class="report-form-label" style="font-size: 10px;">REPORT STATUS</label>
+                        <select id="updateStatus" class="report-select" style="padding: 8px; font-size: 12px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Escalated">Escalated</option>
+                            <option value="Verified">Verified</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+
+                    <div class="report-form-section" style="margin-bottom: 15px;">
+                        <label class="report-form-label" style="font-size: 10px;">ANALYST NOTES</label>
+                        <textarea id="analystNotes" class="report-textarea" style="min-height: 100px; font-size: 12px;" placeholder="Add internal verification notes..."></textarea>
+                    </div>
+
+                    <button id="updateReportBtn" class="btn-submit" style="width: 100%; font-size: 12px;">UPDATE RECORD</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login/js/permissions.js"></script>
+    <script src="js/afrosint-auth.js"></script>
+    <script src="js/analyst.js"></script>
+</body>
+</html>
