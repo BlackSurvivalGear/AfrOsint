@@ -151,7 +151,7 @@ a{color:#00ffee;text-decoration:none}
 #mobileMenuBtn{display:block}
 #commandHeader{padding:10px;gap:10px;display:flex;flex-direction:row;justify-content:space-between;align-items:center}
 .header-left{position:static;top:auto;left:auto}
-.header-right{display:none}
+.header-right{display:flex;position:static;width:auto}
 .header-center-wrap{display:none;position:absolute;top:100%;left:0;right:0;z-index:20001;background:#07141c;border-bottom:2px solid #00ffee55;padding:16px;flex-direction:column;gap:16px;box-shadow:0 8px 24px rgba(0,0,0,0.6);align-items:center}
 .header-center-wrap.mobile-open{display:flex}
 .brand-wrap{justify-content:flex-start;gap:8px}
@@ -162,7 +162,6 @@ a{color:#00ffee;text-decoration:none}
 #gmtClock{font-size:14px;padding:5px 0}
 #setCountryBtn{margin-top:4px}
 .clock-section{border-top:1px solid rgba(0, 255, 238, 0.1);padding-top:10px}
-.header-right{align-items:flex-end;gap:6px}
 .header-right .price-row{display:none}
 .donate-btn{font-size:11px;padding:8px 14px;white-space:nowrap}
 .placeholder{height:calc(100vh - 64px)}
@@ -425,10 +424,16 @@ a{color:#00ffee;text-decoration:none}
 
 @media(max-width: 1024px) {
     .user-profile-header {
-        padding: 6px 16px;
+        padding: 8px 20px;
         margin: 0;
         justify-content: center;
         width: auto;
+        gap: 20px;
+    }
+    .logout-btn, .admin-btn {
+        padding: 10px 18px;
+        font-size: 12px;
+        margin-left: 8px;
     }
 }
 
