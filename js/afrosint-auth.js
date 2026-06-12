@@ -18,7 +18,7 @@ if (typeof firebase !== 'undefined') {
     console.warn("Firebase SDK not found. Authentication will not function.");
 }
 
-const LOGIN_URL = "https://blacksurvivalgear.github.io/login/login.html";
+const LOGIN_URL = "login/login.html";
 
 function checkAuthentication() {
     if (typeof firebase === 'undefined' || !firebase.auth) {
