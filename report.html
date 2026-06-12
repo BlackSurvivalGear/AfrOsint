@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Intelligence Report | AfroSINT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+</head>
+<body class="bg-[#02070d] min-h-screen text-gray-300">
+    <div class="watermark-bg"></div>
+
+    <div class="report-container">
+        <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 24px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 255, 238, 0.3);">INTELLIGENCE REPORT SUBMISSION</h1>
+                <p style="font-size: 12px; color: #7fd6df; margin-top: 5px; font-family: 'Share Tech Mono', monospace;">SECURE CHANNEL // ENCRYPTED UPLINK</p>
+            </div>
+            <button onclick="window.location.href='index.html'" class="atw-small-button" style="width: auto; font-size: 10px; padding: 6px 15px;">BACK TO MAP</button>
+        </header>
+
+        <form id="reportForm" class="report-form">
+            <!-- Basic Information -->
+            <div class="report-form-section">
+                <label class="report-form-label">REPORT TITLE</label>
+                <input type="text" id="reportTitle" class="report-input" placeholder="Enter a descriptive title..." required>
+            </div>
+
+            <div class="report-form-section">
+                <label class="report-form-label">REPORT CATEGORY</label>
+                <select id="reportCategory" class="report-select" required>
+                    <option value="" disabled selected>Select category...</option>
+                    <option value="Security Incident">Security Incident</option>
+                    <option value="Political Development">Political Development</option>
+                    <option value="Economic Intelligence">Economic Intelligence</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                    <option value="Social Unrest">Social Unrest</option>
+                    <option value="Conflict Activity">Conflict Activity</option>
+                    <option value="Criminal Activity">Criminal Activity</option>
+                    <option value="Cyber Incident">Cyber Incident</option>
+                    <option value="Environmental Event">Environmental Event</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Location Information -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="report-form-section">
+                    <label class="report-form-label">COUNTRY</label>
+                    <input type="text" id="reportCountry" class="report-input" placeholder="Country" required>
+                </div>
+                <div class="report-form-section">
+                    <label class="report-form-label">STATE / PROVINCE</label>
+                    <input type="text" id="reportState" class="report-input" placeholder="State/Province">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="report-form-section">
+                    <label class="report-form-label">CITY / AREA</label>
+                    <input type="text" id="reportCity" class="report-input" placeholder="City/Area">
+                </div>
+                <div class="report-form-section">
+                    <label class="report-form-label">GPS COORDINATES (OPTIONAL)</label>
+                    <input type="text" id="reportCoordinates" class="report-input" placeholder="e.g. 9.08, 7.49">
+                </div>
+            </div>
+
+            <!-- Incident Details -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="report-form-section">
+                    <label class="report-form-label">INCIDENT DATE</label>
+                    <input type="date" id="reportDate" class="report-input">
+                </div>
+                <div class="report-form-section">
+                    <label class="report-form-label">INCIDENT TIME</label>
+                    <input type="time" id="reportTime" class="report-input">
+                </div>
+            </div>
+
+            <div class="report-form-section">
+                <label class="report-form-label">DETAILED DESCRIPTION</label>
+                <textarea id="reportDescription" class="report-textarea" placeholder="Provide full details of the incident or development..." required></textarea>
+            </div>
+
+            <!-- Intelligence Assessment -->
+            <div style="border: 1px solid rgba(0, 255, 238, 0.1); padding: 20px; border-radius: 8px; background: rgba(0, 255, 238, 0.02);">
+                <h3 style="color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 14px; margin-bottom: 15px; border-bottom: 1px solid rgba(0, 255, 238, 0.1); padding-bottom: 8px;">INTELLIGENCE ASSESSMENT</h3>
+
+                <div class="report-form-section" style="margin-bottom: 15px;">
+                    <label class="report-form-label">THREAT LEVEL</label>
+                    <select id="reportThreatLevel" class="report-select">
+                        <option value="Low">Low</option>
+                        <option value="Moderate" selected>Moderate</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="report-form-section">
+                        <label class="report-form-label">SOURCE RELIABILITY</label>
+                        <select id="reportSourceReliability" class="report-select">
+                            <option value="A – Completely Reliable">A – Completely Reliable</option>
+                            <option value="B – Usually Reliable">B – Usually Reliable</option>
+                            <option value="C – Fairly Reliable">C – Fairly Reliable</option>
+                            <option value="D – Not Usually Reliable">D – Not Usually Reliable</option>
+                            <option value="E – Unreliable">E – Unreliable</option>
+                            <option value="F – Reliability Cannot Be Judged">F – Reliability Cannot Be Judged</option>
+                        </select>
+                    </div>
+                    <div class="report-form-section">
+                        <label class="report-form-label">INFORMATION CREDIBILITY</label>
+                        <select id="reportInformationCredibility" class="report-select">
+                            <option value="1 – Confirmed by Multiple Sources">1 – Confirmed by Multiple Sources</option>
+                            <option value="2 – Probably True">2 – Probably True</option>
+                            <option value="3 – Possibly True">3 – Possibly True</option>
+                            <option value="4 – Doubtful">4 – Doubtful</option>
+                            <option value="5 – Improbable">5 – Improbable</option>
+                            <option value="6 – Truth Cannot Be Judged">6 – Truth Cannot Be Judged</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attachments -->
+            <div class="report-form-section">
+                <label class="report-form-label">ATTACHMENTS (IMAGES, PDF, VIDEO)</label>
+                <div class="file-upload-area" onclick="document.getElementById('reportAttachments').click()">
+                    <span style="color: #7fd6df; font-size: 14px;">Drop files here or click to upload</span>
+                    <input type="file" id="reportAttachments" multiple style="display: none" accept="image/*,video/*,application/pdf">
+                </div>
+                <div id="fileList" class="file-list"></div>
+                <div id="uploadProgress" style="display:none; margin-top: 10px;">
+                    <div style="height: 4px; width: 100%; background: rgba(0, 255, 238, 0.1); border-radius: 2px; overflow: hidden;">
+                        <div id="progressBar" style="height: 100%; width: 0%; background: var(--cyan); transition: width 0.3s ease;"></div>
+                    </div>
+                    <p id="progressText" style="font-size: 10px; color: var(--cyan); margin-top: 5px; font-family: 'Share Tech Mono', monospace;"></p>
+                </div>
+            </div>
+
+            <!-- Submission Options -->
+            <div style="display: flex; gap: 30px; margin-top: 10px;">
+                <label class="confidence-option">
+                    <input type="checkbox" id="reportAnonymous">
+                    <span class="report-form-label" style="font-size: 12px;">ANONYMOUS SUBMISSION</span>
+                </label>
+                <label class="confidence-option">
+                    <input type="checkbox" id="reportUrgent">
+                    <span class="report-form-label" style="font-size: 12px; color: #ff4444;">MARK AS URGENT</span>
+                </label>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="report-actions">
+                <button type="button" id="cancelBtn" class="btn-cancel">CANCEL</button>
+                <button type="button" id="draftBtn" class="btn-draft">SAVE DRAFT</button>
+                <button type="submit" id="submitBtn" class="btn-submit">SUBMIT REPORT</button>
+            </div>
+        </form>
+
+        <div id="successMessage" style="display: none; text-align: center; padding: 40px; background: rgba(0, 255, 238, 0.05); border: 1px solid var(--cyan); border-radius: 12px; margin-top: 50px;">
+            <h2 style="color: var(--cyan); font-family: 'Share Tech Mono', monospace; margin-bottom: 20px;">REPORT SUBMITTED SUCCESSFULLY</h2>
+            <div id="refNumberDisplay" style="font-size: 24px; color: #fff; font-family: 'Share Tech Mono', monospace; letter-spacing: 4px; margin-bottom: 30px;">AFR-XXXXXX</div>
+            <button onclick="window.location.href='index.html'" class="btn-submit" style="width: auto;">RETURN TO DASHBOARD</button>
+        </div>
+    </div>
+
+    <script src="login/js/permissions.js"></script>
+    <script src="js/afrosint-auth.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

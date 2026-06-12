@@ -68,6 +68,8 @@ function checkAuthentication() {
                 const rankIndex = AFR_RANKS.indexOf(userRole);
                 const personnelBtn = document.getElementById('personnelBtn');
                 const adminBtn = document.getElementById('adminBtn');
+                const reportBtn = document.getElementById('reportBtn');
+                const analystBtn = document.getElementById('analystBtn');
 
                 // Administrator (index 2) and above can promote/demote/suspend
                 const isAdminPlus = rankIndex >= 2;
@@ -77,6 +79,14 @@ function checkAuthentication() {
                 }
                 if (adminBtn) {
                     adminBtn.style.display = isAdminPlus ? 'block' : 'none';
+                }
+
+                // Check for report submission eligibility (Analyst level or above)
+                if (reportBtn || analystBtn) {
+                    const userRank = userData.rank || "member";
+                    const canSubmit = typeof canSubmitReports === 'function' ? canSubmitReports(userRank) : (rankIndex >= 1);
+                    if (reportBtn) reportBtn.style.display = canSubmit ? 'block' : 'none';
+                    if (analystBtn) analystBtn.style.display = canSubmit ? 'block' : 'none';
                 }
 
                 // Show application
