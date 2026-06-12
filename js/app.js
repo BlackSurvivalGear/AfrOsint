@@ -746,7 +746,7 @@ async function exchFetchRates(base){const r=await fetch('https://api.exchangerat
 async function exchUpdateTable(){try{const toEl=document.getElementById('exchTo');const to=toEl?toEl.value:'NGN';const title=document.getElementById('exchTableTitle');if(title)title.textContent=to+' EXCHANGE RATES';const head=document.getElementById('exchTableHead');if(head)head.textContent=to+' Rate';const rates=await exchFetchRates(to);const pairs={gbp:'GBP',usd:'USD',cad:'CAD',eur:'EUR',rub:'RUB',cny:'CNY',zar:'ZAR'};for(const[id,code]of Object.entries(pairs)){const el=document.getElementById('rate-'+id);if(el){const rate=rates[code];el.textContent=rate?(1/rate).toFixed(2):'0.00'}}}catch(e){}}
 async function exchConvert(){const amount=parseFloat(document.getElementById('exchAmount').value);const from=document.getElementById('exchFrom').value;const to=document.getElementById('exchTo').value;const res=document.getElementById('exchResult');const err=document.getElementById('exchError');if(isNaN(amount)||amount<=0){err.textContent='Please enter a valid amount.';res.textContent='';return}err.textContent='';res.textContent='';try{const rates=await exchFetchRates(from);const rate=rates[to];if(rate){res.textContent=amount+' '+from+' = '+(amount*rate).toFixed(2)+' '+to}else{res.textContent='Conversion not available.'}}catch(e){res.textContent='';err.textContent='Failed to fetch rates.'}}
 
-newsBtn.onclick=loadNews;marketsBtn.onclick=loadMarkets;fxBtn.onclick=function(){active('fxBtn');renderOps(`<button class='command-btn' onclick='loadAfricanExchange()'>REFRESH</button>`,`<div id='marketFrame' style='height:100%'></div>`);loadAfricanExchange()};headlinesBtn.onclick=loadHeadlines;radioBtn.onclick=loadRadio;aiLaunchpadBtn.onclick=loadAILaunchpad;afrMapBtn.onclick=loadAfrMap;commsBtn.onclick=loadComms;liveFeedBtn.onclick=loadLiveFeed;
+newsBtn.onclick=loadNews;marketsBtn.onclick=loadMarkets;fxBtn.onclick=function(){active('fxBtn');renderOps(`<button class='command-btn' onclick='loadAfricanExchange()'>REFRESH</button>`,`<div id='marketFrame' style='height:100%'></div>`);loadAfricanExchange()};headlinesBtn.onclick=loadHeadlines;radioBtn.onclick=loadRadio;aiLaunchpadBtn.onclick=loadAILaunchpad;afrMapBtn.onclick=loadAfrMap;commsBtn.onclick=loadComms;dashboardBtn.onclick=function(){window.location.href='login/dashboard.html'};
 const personnelBtn = document.getElementById('personnelBtn');
 if (personnelBtn) personnelBtn.onclick = loadPersonnel;
 
@@ -2103,7 +2103,6 @@ function _loadWebcams(){_renderWebcams()}
 
 var _liveFeedMode='osint',_liveFeedRegion='afrosint';
 function loadLiveFeed(){
-active('liveFeedBtn');
 var nb=document.getElementById('persistentNewsBoxes');if(nb)nb.innerHTML='';
 afrNewsBoxCount=0;
 renderOps(`
