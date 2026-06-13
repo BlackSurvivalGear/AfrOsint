@@ -21,7 +21,8 @@
 
                 if (userData) {
                     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-                    if (currentPage !== 'dashboard.html') {
+                    // Don't inject this header on Dashboard OR Admin page
+                    if (currentPage !== 'dashboard.html' && currentPage !== 'admin.html') {
                         injectHeader(userData);
                     }
                 }

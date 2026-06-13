@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnel Management | AfrOsint Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <style>
+        body {
+            background-color: #02070d;
+            background-image: radial-gradient(circle at 50% 50%, #07141c 0%, #02070d 100%);
+            min-height: 100vh;
+        }
+        .osint-card {
+            background: rgba(6, 16, 24, 0.8);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="text-gray-200 font-['Rajdhani']">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 border-b border-[#00E5FF]/20 pb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 border-2 border-[#00E5FF] rounded-lg flex items-center justify-center p-2 shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+                    <img src="../assets/images/AFROSINT LOGO.png" alt="Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-[0.2em] text-[#00E5FF] uppercase leading-none">Personnel</h1>
+                    <p class="text-xs font-['Share_Tech_Mono'] text-[#00E5FF]/60 mt-2 tracking-widest uppercase">Administrative Management Console</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="dashboard.html" class="px-6 py-2 border border-[#00E5FF]/40 text-[#00E5FF] font-['Share_Tech_Mono'] text-sm hover:bg-[#00E5FF]/10 transition-all uppercase tracking-wider">
+                    Back to Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="osint-card p-6 rounded-sm">
+                <div class="text-[#00E5FF]/60 text-xs font-['Share_Tech_Mono'] uppercase tracking-tighter mb-1">Total Personnel</div>
+                <div class="text-3xl font-bold text-white" id="statTotal">--</div>
+            </div>
+            <div class="osint-card p-6 rounded-sm">
+                <div class="text-green-500/60 text-xs font-['Share_Tech_Mono'] uppercase tracking-tighter mb-1">Active Now</div>
+                <div class="text-3xl font-bold text-white" id="statActive">--</div>
+            </div>
+            <div class="osint-card p-6 rounded-sm">
+                <div class="text-yellow-500/60 text-xs font-['Share_Tech_Mono'] uppercase tracking-tighter mb-1">Analyst Rank</div>
+                <div class="text-3xl font-bold text-white" id="statAnalysts">--</div>
+            </div>
+            <div class="osint-card p-6 rounded-sm">
+                <div class="text-red-500/60 text-xs font-['Share_Tech_Mono'] uppercase tracking-tighter mb-1">Suspended</div>
+                <div class="text-3xl font-bold text-white" id="statSuspended">--</div>
+            </div>
+        </div>
+
+        <!-- Management Area -->
+        <div class="osint-card rounded-sm overflow-hidden min-h-[600px]">
+            <div class="border-b border-[#00E5FF]/20 bg-[#00E5FF]/5 px-6 py-4 flex items-center justify-between">
+                <h2 class="font-['Share_Tech_Mono'] text-[#00E5FF] text-sm tracking-widest uppercase">Personnel Directory</h2>
+                <div class="flex gap-4">
+                    <input type="text" id="personnelSearch" placeholder="SEARCH CALLSIGN..." class="bg-[#02070d] border border-[#00E5FF]/30 px-3 py-1 text-xs font-['Share_Tech_Mono'] text-[#00E5FF] focus:outline-none focus:border-[#00E5FF] w-48 transition-all">
+                </div>
+            </div>
+
+            <div id="personnelList" class="p-6">
+                <!-- Data injected via admin.js -->
+                <div class="flex items-center justify-center py-20">
+                    <div class="text-[#00E5FF] font-['Share_Tech_Mono'] animate-pulse tracking-widest">INITIALIZING SECURE CONNECTION...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Config & Base Auth -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/permissions.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
