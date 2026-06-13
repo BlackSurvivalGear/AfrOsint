@@ -10,17 +10,10 @@ function checkAuthState(protectedPage = false, adminOnly = false) {
         const isAuthPage = path.includes('login.html') || path.includes('register.html');
 
         if (user) {
-            // Immediate redirection for authenticated users on auth pages
-            if (isAuthPage) {
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
             // User is signed in
             console.log("User logged in:", user.email);
 
-            // Handle user data and security checks in the background for regular pages
-            // But MUST wait if it's an admin-only page to prevent unauthorized access
+            // Handle user data and security checks
             const processUserData = async () => {
                 try {
                     // Check cache first
@@ -37,8 +30,14 @@ function checkAuthState(protectedPage = false, adminOnly = false) {
                         }
                     }
 
+                    // Immediate redirection for authenticated users on auth pages
+                    if (isAuthPage) {
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+
                     // Check if account is disabled
-                    if (userData && userData.disabled === true) {
+                    if (userData && (userData.disabled === true || userData.suspended === true)) {
                         alert("Account Disabled: Access revoked by administrator.");
                         await firebase.auth().signOut();
                         window.location.href = 'login.html';
