@@ -5,7 +5,7 @@
 const ROLES = {
     USER: 'user',
     MODERATOR: 'moderator',
-    ADMIN: 'admin',
+    ADMIN: 'administrator',
     SUPER_ADMIN: 'super_admin'
 };
 
