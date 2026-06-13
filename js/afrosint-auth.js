@@ -37,31 +37,36 @@ function checkAuthentication() {
             console.log("User authenticated:", user.email);
 
             try {
-                // Update basic UI first
-                updateUserInfoUI({
-                    displayName: user.displayName || "Authorized Personnel",
-                    role: "User",
-                    photoURL: user.photoURL || "assets/images/default-avatar.png"
-                });
+                // Check cache first
+                let userData = null;
+                const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}`);
+                if (cachedData) {
+                    userData = JSON.parse(cachedData);
+                } else {
+                    // Fetch additional user data from Firestore
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    userData = userDoc.data();
+                    if (userData) {
+                        sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(userData));
+                    }
+                }
 
-                // Fetch additional user data from Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                const userData = userDoc.data() || {};
+                if (!userData) userData = {};
 
                 // Check for suspension
-                if (userData.suspended) {
+                if (userData.suspended || userData.disabled) {
                     alert("Your account has been suspended. Contact an administrator.");
                     await auth.signOut();
                     window.location.href = LOGIN_URL;
                     return;
                 }
 
-                // Update UI with full user info if available
-                const userRole = userData.role || "User";
+                // Update UI with full user info
                 updateUserInfoUI({
-                    displayName: user.displayName || userData.displayName || "Authorized Personnel",
-                    role: userRole,
-                    photoURL: user.photoURL || userData.photoURL || "assets/images/default-avatar.png"
+                    displayName: userData.displayName || user.displayName || "Authorized Personnel",
+                    role: userData.role || "User",
+                    rank: userData.rank || "member",
+                    photoURL: userData.photoURL || user.photoURL || "assets/images/default-avatar.png"
                 });
 
                 // Show application
@@ -74,6 +79,7 @@ function checkAuthentication() {
                 updateUserInfoUI({
                     displayName: user.displayName || "Authorized Personnel",
                     role: "User",
+                    rank: "member",
                     photoURL: user.photoURL || "assets/images/default-avatar.png"
                 });
                 if (loadingScreen) loadingScreen.style.display = 'none';
@@ -90,10 +96,51 @@ function updateUserInfoUI(data) {
     const nameEl = document.getElementById('userDisplayName');
     const roleEl = document.getElementById('userRole');
     const imgEl = document.getElementById('userProfileImg');
+    const profileContainer = document.getElementById('userProfile');
 
     if (nameEl) nameEl.textContent = data.displayName;
-    if (roleEl) roleEl.textContent = data.role;
+    if (roleEl) {
+        // Use getRankName if available (from permissions or common utilities)
+        roleEl.textContent = (typeof getRankName === 'function') ? getRankName(data.rank) : data.role;
+    }
     if (imgEl) imgEl.src = data.photoURL;
+
+    // Inject Admin/Report buttons if they don't exist
+    if (profileContainer) {
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Remove existing dynamic buttons to avoid duplicates
+        const existingAdmin = document.getElementById('headerAdminBtn');
+        const existingReport = document.getElementById('headerReportBtn');
+        if (existingAdmin) existingAdmin.remove();
+        if (existingReport) existingReport.remove();
+
+        // 1. Admin Access - Requires Administrator role or above
+        if (typeof isAdmin === 'function' && isAdmin(data.role)) {
+            const adminBtn = document.createElement('button');
+            adminBtn.id = 'headerAdminBtn';
+            adminBtn.className = 'admin-btn';
+            adminBtn.textContent = 'ADMIN';
+            adminBtn.onclick = (e) => {
+                e.stopPropagation();
+                window.location.href = 'login/dashboard.html?view=personnel';
+            };
+            if (logoutBtn) profileContainer.insertBefore(adminBtn, logoutBtn);
+        }
+
+        // 2. Report Access - Requires Analyst rank or above
+        if (typeof canSubmitReports === 'function' && canSubmitReports(data.rank)) {
+            const reportBtn = document.createElement('button');
+            reportBtn.id = 'headerReportBtn';
+            reportBtn.className = 'admin-btn'; // Re-use styling
+            reportBtn.textContent = 'SUBMIT REPORT';
+            reportBtn.onclick = (e) => {
+                e.stopPropagation();
+                window.location.href = 'report.html';
+            };
+            if (logoutBtn) profileContainer.insertBefore(reportBtn, logoutBtn);
+        }
+    }
 }
 
 async function handleLogout() {
