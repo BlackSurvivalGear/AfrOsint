@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function checkSubmissionAccess(user) {
     try {
-        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+        const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
+        const userDoc = await firebase.firestore().collection('users').doc(docId).get();
         const userData = userDoc.data();
 
         if (!userData || (!canSubmitReports(userData.rank) && !canSubmitReports(userData.role))) {

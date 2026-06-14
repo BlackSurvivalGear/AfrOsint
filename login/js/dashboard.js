@@ -22,25 +22,32 @@ firebase.auth().onAuthStateChanged(async (user) => {
         }
 
         if (userData) {
+            let networkName = "AfroSINT Main";
             // Apply network branding
             if (currentNetworkId !== 'afrosint-main') {
                 const netDoc = await firebase.firestore().collection('networks').doc(currentNetworkId).get();
-                if (netDoc.exists && typeof applyNetworkBranding === 'function') {
-                    applyNetworkBranding(netDoc.data());
+                if (netDoc.exists) {
+                    const netData = netDoc.data();
+                    networkName = netData.name || currentNetworkId;
+                    if (typeof applyNetworkBranding === 'function') {
+                        applyNetworkBranding(netData);
+                    }
                 }
             }
-            updateDashboardUI(userData);
+            updateDashboardUI(userData, networkName);
         }
     }
 });
 
-function updateDashboardUI(userData) {
+function updateDashboardUI(userData, networkName) {
     document.getElementById('userName').textContent = userData.displayName || "Unknown Personnel";
     document.getElementById('welcomeName').textContent = userData.displayName || "";
     document.getElementById('userEmail').textContent = userData.email;
     document.getElementById('userRole').textContent = getRankName(userData.rank);
     document.getElementById('userPlan').textContent = (userData.plan || 'free').toUpperCase();
     document.getElementById('clearanceLevel').textContent = getClearanceLevel(userData);
+    const netEl = document.getElementById('currentNetworkDisplay');
+    if (netEl && networkName) netEl.textContent = `Network: ${networkName.toUpperCase()}`;
 
     if (userData.isOnline) {
         const indicator = document.getElementById('onlineStatusIndicator');
@@ -103,10 +110,9 @@ function updateDashboardUI(userData) {
     const switchBtn = document.getElementById('switchNetworkBtn');
     if (switchBtn) {
         switchBtn.classList.remove('hidden');
-        switchBtn.onclick = (e) => {
-            e.preventDefault();
-            openNetworkSwitcher(userData.uid);
-        };
+        switchBtn.href = 'networks.html';
+        // Remove old modal click handler if any
+        switchBtn.onclick = null;
     }
 
     // Network Setup Visibility (Fellows level 8+)
