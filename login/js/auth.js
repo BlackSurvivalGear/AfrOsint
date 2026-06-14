@@ -24,7 +24,27 @@ function checkAuthState(protectedPage = false, adminOnly = false) {
                     } else {
                         // Get user data from Firestore
                         const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                        userData = userDoc.data();
+
+                        if (!userDoc.exists) {
+                            // Self-healing: create missing user document (e.g. for first-time Google login)
+                            userData = {
+                                uid: user.uid,
+                                displayName: user.displayName || "Personnel",
+                                email: user.email,
+                                photoURL: user.photoURL || "../assets/images/default-avatar.png",
+                                role: "user",
+                                rank: "member",
+                                clearance: 1,
+                                plan: "free",
+                                isOnline: true,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            };
+                            await firebase.firestore().collection('users').doc(user.uid).set(userData);
+                        } else {
+                            userData = userDoc.data();
+                        }
+
                         if (userData) {
                             sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(userData));
                         }
@@ -156,8 +176,11 @@ async function loginWithGoogle() {
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             });
         } else {
-            // Update last login and status
+            // Update profile data, last login and status
             await firebase.firestore().collection('users').doc(user.uid).update({
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 isOnline: true
             });
@@ -189,14 +212,19 @@ async function logoutUser() {
             await firebase.firestore().collection('users').doc(user.uid).update({
                 isOnline: false,
                 lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            }).catch(err => console.warn("Firestore logout update failed:", err));
         }
+    } catch (error) {
+        console.error("Logout Firestore Error:", error.message);
+    } finally {
         if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
         sessionStorage.removeItem('afrosint_session_started');
-        await firebase.auth().signOut();
+        try {
+            await firebase.auth().signOut();
+        } catch (authErr) {
+            console.error("Firebase SignOut Error:", authErr);
+        }
         window.location.href = 'login.html';
-    } catch (error) {
-        console.error("Logout Error:", error.message);
     }
 }
 
