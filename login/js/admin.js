@@ -17,7 +17,12 @@ async function fetchPersonnel() {
     try {
         const authUser = firebase.auth().currentUser;
         const db = firebase.firestore();
-        const snapshot = await db.collection('users').get();
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+
+        // Fetch users assigned to this network
+        const snapshot = await db.collection('users')
+            .where('networkId', '==', currentNetworkId)
+            .get();
 
         // Get viewer's role for Super Admin checks
         let viewerRole = 'user';
@@ -121,7 +126,7 @@ async function manageUserRank(uid, currentRank, currentRole) {
     const selfRole = selfData.role || "user";
 
     // Use string ranks from RANKS constant
-    const rankList = [
+    let rankList = [
         AfroSINT.Permissions.RANKS.MEMBER,
         AfroSINT.Permissions.RANKS.ANALYST,
         AfroSINT.Permissions.RANKS.SENIOR_ANALYST,
@@ -132,7 +137,13 @@ async function manageUserRank(uid, currentRank, currentRole) {
         AfroSINT.Permissions.RANKS.AFROSINT_FELLOW
     ];
 
-    let msg = "Select new AfroSINT Rank:\n" + rankList.map((r, i) => `${i}: ${getRankName(r).toUpperCase()}`).join("\n");
+    // Fellows (Level 8) can only promote up to Chief Analyst (Level 7) in their network
+    const selfLevel = getRankLevel(selfRank);
+    if (selfLevel === 8) {
+        rankList = rankList.filter(r => getRankLevel(r) < 8);
+    }
+
+    let msg = "Select new Network Rank:\n" + rankList.map((r, i) => `${i}: ${getRankName(r).toUpperCase()}`).join("\n");
     const newRankIdx = prompt(msg, rankList.indexOf(currentRank.toLowerCase()));
 
     if (newRankIdx === null) return;

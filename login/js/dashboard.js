@@ -6,19 +6,29 @@ checkAuthState(true); // Protected page
 
 firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+
         // Check cache first for immediate UI rendering
-        const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}`);
+        const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}_${currentNetworkId}`);
         let userData = cachedData ? JSON.parse(cachedData) : null;
 
         if (!userData) {
-            const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+            const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
+            const userDoc = await firebase.firestore().collection('users').doc(docId).get();
             userData = userDoc.data();
             if (userData) {
-                sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(userData));
+                sessionStorage.setItem(`afrosint_user_${user.uid}_${currentNetworkId}`, JSON.stringify(userData));
             }
         }
 
         if (userData) {
+            // Apply network branding
+            if (currentNetworkId !== 'afrosint-main') {
+                const netDoc = await firebase.firestore().collection('networks').doc(currentNetworkId).get();
+                if (netDoc.exists && typeof applyNetworkBranding === 'function') {
+                    applyNetworkBranding(netDoc.data());
+                }
+            }
             updateDashboardUI(userData);
         }
     }
@@ -87,6 +97,20 @@ function updateDashboardUI(userData) {
     if (isAdmin(userData.role) || getRankLevel(userData.rank) >= 5) {
         const adminBtn = document.getElementById('adminPanelBtn');
         if (adminBtn) adminBtn.classList.remove('hidden');
+    }
+
+    // Switch Network Button (if user has multiple networks)
+    firebase.firestore().collection('users').where('uid', '==', userData.uid).get().then(snap => {
+        if (snap.size > 1) {
+            const switchBtn = document.getElementById('switchNetworkBtn');
+            if (switchBtn) switchBtn.classList.remove('hidden');
+        }
+    });
+
+    // Network Setup Visibility (Fellows level 8+)
+    if (getRankLevel(userData.rank) >= 8) {
+        const setupBtn = document.getElementById('establishNetworkBtn');
+        if (setupBtn) setupBtn.classList.remove('hidden');
     }
 
     // Handle initial routing if any

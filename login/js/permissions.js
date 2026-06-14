@@ -136,7 +136,8 @@ function canPromote(userRank, targetRank) {
     const userLevel = getRankLevel(userRank);
     const targetLevel = getRankLevel(targetRank);
 
-    if (userLevel >= 7) return true; // Chief Analyst or above can promote to any rank
+    if (userLevel >= 8) return targetLevel < 8; // Fellows can promote up to Chief Analyst
+    if (userLevel === 7) return targetLevel < 7; // Chief Analyst can promote up to DCA
     if (userLevel === 6) return [2, 3, 4, 5].includes(targetLevel);
     if (userLevel === 5) return targetLevel === 4;
     if (userLevel === 4) return [2, 3].includes(targetLevel);
@@ -154,7 +155,8 @@ function canSuspend(userRank, targetRank) {
     const userLevel = getRankLevel(userRank);
     const targetLevel = getRankLevel(targetRank);
 
-    if (userLevel >= 7) return true; // All ranks
+    if (userLevel >= 8) return true; // All ranks
+    if (userLevel === 7) return targetLevel <= 7; // Up to Chief Analyst
     if (userLevel === 6) return targetLevel < 7; // All ranks below Chief Analyst
     if (userLevel === 5) return [1, 2, 3, 4].includes(targetLevel);
 
@@ -179,6 +181,67 @@ window.AfroSINT.Permissions = {
     canSuspend
 };
 
+/**
+ * Unified Branding Application
+ * Applies network-specific aesthetics to both Main App and Dashboard
+ */
+function applyNetworkBranding(netData) {
+    if (!netData) return;
+
+    // CSS Variables
+    const root = document.documentElement;
+    if (netData.accentColor) {
+        root.style.setProperty('--cyan', netData.accentColor);
+        root.style.setProperty('--osint-cyan', netData.accentColor);
+    }
+    if (netData.secondaryColor) {
+        root.style.setProperty('--secondary', netData.secondaryColor);
+        root.style.setProperty('--osint-text-highlight', netData.secondaryColor);
+    }
+
+    // Logos and Watermarks
+    if (netData.logo) {
+        const logos = document.querySelectorAll('.header-logo, .logo-img, .user-avatar, img[src*="AFROSINT LOGO.png"]');
+        logos.forEach(img => {
+            if (img.tagName === 'IMG' && !img.classList.contains('user-avatar')) img.src = netData.logo;
+        });
+        const watermark = document.querySelector('.watermark-bg');
+        if (watermark) watermark.style.backgroundImage = `url(${netData.logo})`;
+    }
+
+    // Titles and Headers
+    if (netData.dashboardTitle) {
+        const callsign = document.querySelector('.callsign');
+        if (callsign) callsign.textContent = netData.dashboardTitle;
+
+        const welcomeSpan = document.querySelector('header h2 span:not(#welcomeName)');
+        if (welcomeSpan && welcomeSpan.textContent.includes('AfrOSINT')) {
+            welcomeSpan.textContent = netData.dashboardTitle;
+        }
+    }
+
+    // Sublines / Descriptions
+    if (netData.description) {
+        const subline = document.querySelector('.subline');
+        if (subline) subline.textContent = netData.description;
+    }
+
+    // Footers
+    if (netData.footerText) {
+        const footer = document.querySelector('#commandFooter a, footer a');
+        if (footer) footer.textContent = netData.footerText;
+    }
+
+    // Browser Tab Title
+    if (netData.name) {
+        if (document.title.includes('Dashboard')) {
+            document.title = `${netData.name} | Dashboard`;
+        } else {
+            document.title = `${netData.name} — AfroSINT`;
+        }
+    }
+}
+
 // Also expose functions directly for easier access if preferred
 window.hasRole = hasRole;
 window.isAdmin = isAdmin;
@@ -189,3 +252,4 @@ window.canSubmitReports = canSubmitReports;
 window.canReviewReports = canReviewReports;
 window.canPromote = canPromote;
 window.canSuspend = canSuspend;
+window.applyNetworkBranding = applyNetworkBranding;

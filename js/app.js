@@ -1060,7 +1060,7 @@ function _initLeafletMap(){
     };
     afrLeafletMap.on('click',function(){_globeClosePopup()});
 }
-function _leafletRefreshLayers(){
+async function _leafletRefreshLayers(){
     if(!afrLeafletMap)return;
     if(afrLeafletMap._currentTiles)afrLeafletMap.removeLayer(afrLeafletMap._currentTiles);
     var tileKey=afrMapMode==='flat-sat'?'sat':'dark';
@@ -1100,8 +1100,29 @@ function _leafletRefreshLayers(){
     if(afrShippingVisible){afrShippingRoutes.forEach(r=>{
         L.polyline(r.points.map(p=>[p[0],p[1]]),{color:'#44ddff',weight:2,dashArray:'5, 5'}).addTo(group).bindTooltip('<strong>'+r.name+'</strong><br>'+r.info);
     })}
+
+    // Load network-scoped report markers for Leaflet
+    try {
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+        const reportSnap = await firebase.firestore().collection('reports')
+            .where('networkId', '==', currentNetworkId)
+            .where('status', '==', 'Verified')
+            .get();
+
+        reportSnap.forEach(doc => {
+            const r = doc.data();
+            if (r.coordinates) {
+                const [lat, lng] = r.coordinates.split(',').map(Number);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    L.circleMarker([lat, lng], { radius: 6, color: '#00ffee', fillOpacity: 0.8 })
+                        .addTo(group)
+                        .bindTooltip('<strong>' + esc(r.title) + '</strong><br>REF: ' + r.referenceNumber + '<br>' + r.category);
+                }
+            }
+        });
+    } catch (e) { console.warn("Failed to load map reports (Leaflet):", e); }
 }
-function _globeRefreshLayers(){if(!afrMapInstance)return;
+async function _globeRefreshLayers(){if(!afrMapInstance)return;
 var pts=[];
 var rings=[];
 var arcs=[];
@@ -1132,6 +1153,34 @@ if(afrRiskyVisible&&typeof riskyZones!=='undefined'){riskyZones.forEach(function
     const maxR=z.radius/80000;
     rings.push({lat:z.lat,lng:z.lng,maxR:maxR,propagationSpeed:maxR/2,repeatPeriod:2000,color:'#ff4444',name:z.name,info:z.info,_cat:'risky'})
 })}
+
+// Load network-scoped report markers
+try {
+    const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+    const reportSnap = await firebase.firestore().collection('reports')
+        .where('networkId', '==', currentNetworkId)
+        .where('status', '==', 'Verified')
+        .get();
+
+    reportSnap.forEach(doc => {
+        const r = doc.data();
+        if (r.coordinates) {
+            const [lat, lng] = r.coordinates.split(',').map(Number);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                pts.push({
+                    lat: lat,
+                    lng: lng,
+                    size: 0.15,
+                    color: '#00ffee',
+                    name: r.title,
+                    info: 'REF: ' + r.referenceNumber + '<br>' + r.category,
+                    _cat: 'report'
+                });
+            }
+        }
+    });
+} catch (e) { console.warn("Failed to load map reports:", e); }
+
 afrMapInstance.pointsData(pts).pointLat('lat').pointLng('lng').pointAltitude(0.01).pointRadius('size').pointColor('color').pointLabel(function(d){return '<div style="font-family:Share Tech Mono,monospace;font-size:12px;background:rgba(6,16,24,0.95);border:1px solid #00ffee44;padding:8px 12px;border-radius:4px;color:#d7ffff"><strong style="color:'+d.color+'">'+d.name+'</strong><br>'+d.info+'</div>'});
 afrMapInstance.ringsData(rings).ringLat('lat').ringLng('lng').ringMaxRadius('maxR').ringPropagationSpeed('propagationSpeed').ringRepeatPeriod('repeatPeriod').ringColor(function(d){return[d.color]});
 afrMapInstance.arcsData(arcs).arcStartLat('startLat').arcStartLng('startLng').arcEndLat('endLat').arcEndLng('endLng').arcColor(function(d){return[d.color,d.color]}).arcStroke(0.5).arcDashLength(0.4).arcDashGap(0.2).arcDashAnimateTime(1500);
@@ -2024,6 +2073,12 @@ if(_liveFeedMode==='osint'){_fetchOsintTweets(vp)}else{_fetchLiveNews(vp)}
 }
 
 async function _fetchOsintTweets(vp){
+    const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+    if (currentNetworkId !== 'afrosint-main') {
+        // For white-label networks, we only show reports from that network as "tweets" or intel items
+        _fetchNetworkReportsAsFeed(vp, currentNetworkId);
+        return;
+    }
 var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCase()]=a.region});
 var accounts=_osintAccounts.map(function(a){return a.handle});
 var allTweets=[];
@@ -2101,6 +2156,40 @@ var _liveFeedRssFeeds=[
 {url:'https://www.channelstv.com/feed',tag:'CHANNELS TV'},
 {url:'https://www.theguardian.com/world/rss',tag:'GUARDIAN'}
 ];
+async function _fetchNetworkReportsAsFeed(vp, networkId) {
+    try {
+        const snapshot = await firebase.firestore().collection('reports')
+            .where('networkId', '==', networkId)
+            .where('status', 'in', ['Verified', 'Pending'])
+            .orderBy('createdAt', 'desc')
+            .limit(30)
+            .get();
+
+        if (snapshot.empty) {
+            vp.innerHTML = '<div style="text-align:center;color:#ffaa00;padding:40px;font-family:Share Tech Mono,monospace">No intelligence reports available for this network.</div>';
+            return;
+        }
+
+        const items = snapshot.docs.map(doc => doc.data());
+        vp.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">' + items.map(function(t) {
+            var dateStr = '';
+            try { if (t.createdAt) dateStr = t.createdAt.toDate().toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) {}
+            return '<div style="background:#081821;border:1px solid #00ffee33;border-radius:8px;padding:14px;transition:border-color 0.15s,box-shadow 0.15s" onmouseenter="this.style.borderColor=\'#00ffee\';this.style.boxShadow=\'0 0 12px #00ffee44\'" onmouseleave="this.style.borderColor=\'#00ffee33\';this.style.boxShadow=\'none\'">'
+                + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+                + '<div style="flex:1;min-width:0"><div style="color:#f1f5f9;font-weight:bold;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(t.title) + '</div><div style="color:#7fd6df;font-size:11px;font-family:Share Tech Mono,monospace">[' + esc(t.category) + ']</div></div>'
+                + '<div style="color:#7fd6df;font-size:10px;font-family:Share Tech Mono,monospace;white-space:nowrap;flex-shrink:0">' + esc(dateStr) + '</div></div>'
+                + '<div style="color:#d7ffff;font-size:13px;line-height:1.5;margin-bottom:8px;word-break:break-word">' + esc(t.description.substring(0, 200)) + (t.description.length > 200 ? '...' : '') + '</div>'
+                + '<div style="display:flex;gap:16px;color:#7fd6df;font-size:11px;font-family:Share Tech Mono,monospace;padding-top:6px;border-top:1px solid #00ffee11">'
+                + '<span style="color:' + (t.status === 'Verified' ? '#44ff88' : '#ffaa00') + '">' + t.status.toUpperCase() + '</span>'
+                + '<span>REF: ' + t.referenceNumber + '</span>'
+                + '</div></div>';
+        }).join('') + '</div>';
+    } catch (e) {
+        console.error("Error fetching network reports:", e);
+        vp.innerHTML = '<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">Failed to load intelligence feed.</div>';
+    }
+}
+
 async function _fetchLiveNews(vp){
 var allItems=[];
 for(var i=0;i<_liveFeedRssFeeds.length;i++){

@@ -51,8 +51,9 @@ function setupFilterListeners() {
 
 async function loadReports() {
     try {
-        // Load all reports including drafts
-        const snapshot = await reportsDB.get();
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+        // Load reports scoped to network
+        const snapshot = await reportsDB.where('networkId', '==', currentNetworkId).get();
         allReports = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
