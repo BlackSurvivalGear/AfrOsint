@@ -144,16 +144,17 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && (
         userNetworkId == request.auth.uid ||
-        userNetworkId.startsWith(request.auth.uid + '_') ||
+        (userNetworkId == request.auth.uid + "_" + request.resource.data.get('networkId', '') && getRankLevel(request.resource.data.get('rank', 'member')) <= 1) ||
         (request.resource.data.networkId != null && getUserInNetwork(request.auth.uid, request.resource.data.networkId) != null && getRankLevel(getUserInNetwork(request.auth.uid, request.resource.data.networkId).rank) >= 8)
       );
       allow delete: if isGlobalAdmin();
 
       allow update: if isAuthenticated() && (
         ( (userNetworkId == request.auth.uid || userNetworkId.startsWith(request.auth.uid + '_')) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rank', 'role', 'clearance', 'suspended', 'disabled', 'networkId'])) ||
+        ( (userNetworkId == request.auth.uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['defaultNetworkId', 'networkMemberships', 'displayName', 'photoURL', 'isOnline', 'lastSeen', 'lastLogin', 'appearance', 'countryCode', 'countryName', 'deviceType', 'sessionStart', 'lastSessionDuration'])) ||
         isGlobalAdmin() ||
         (
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rank', 'suspended', 'disabled', 'clearance']) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rank', 'suspended', 'disabled', 'clearance', 'status']) &&
           canManagePersonnel(request.auth.uid, resource.data, request.resource.data)
         )
       );

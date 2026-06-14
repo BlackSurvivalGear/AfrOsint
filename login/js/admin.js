@@ -48,10 +48,12 @@ async function fetchPersonnel() {
             const uid = doc.id;
             const role = user.role || "user";
             const rank = user.rank || "member";
-            const isSuspended = user.suspended === true || user.disabled === true;
+            const status = user.status || "active";
+            const isSuspended = user.suspended === true || user.disabled === true || status === "suspended";
+            const isPending = status === "pending";
 
             total++;
-            if (!isSuspended) active++;
+            if (!isSuspended && !isPending) active++;
             if (isSuspended) suspended++;
             // Analysts are rank level 2 or above
             if (getRankLevel(rank) >= 2) analysts++;
@@ -68,8 +70,8 @@ async function fetchPersonnel() {
                         <div class='text-white font-bold text-sm uppercase truncate'>${esc(user.displayName || "Unknown")}</div>
                         <div class='text-gray-500 text-[10px] font-mono truncate'>${esc(user.email || "No Email")}</div>
                     </div>
-                    <div class='${statusColor} text-[9px] font-bold border ${statusBorder} px-2 py-0.5 rounded-sm tracking-tighter'>
-                        ${statusText}
+                    <div class='${isPending ? "text-yellow-500 border-yellow-500/40" : statusColor} text-[9px] font-bold border ${isPending ? "border-yellow-500/40" : statusBorder} px-2 py-0.5 rounded-sm tracking-tighter'>
+                        ${isPending ? "PENDING" : statusText}
                     </div>
                 </div>
 
@@ -85,12 +87,21 @@ async function fetchPersonnel() {
                 </div>
 
                 <div class='mt-2 flex gap-2'>
+                    ${isPending ? `
+                    <button onclick='approveMembership("${uid}", "${esc(user.displayName || "Unknown")}")' class='flex-1 py-1.5 bg-[#00ffee] text-black text-[10px] font-bold uppercase hover:opacity-90 transition-all rounded-sm'>
+                        Approve Access
+                    </button>
+                    <button onclick='rejectMembership("${uid}")' class='flex-1 py-1.5 border border-red-500 text-red-500 text-[10px] font-bold uppercase hover:bg-red-500 hover:text-white transition-all rounded-sm'>
+                        Reject
+                    </button>
+                    ` : `
                     <button onclick='manageUserRank("${uid}", "${rank}", "${role}")' class='flex-1 py-1.5 border border-[#00ffee]/30 text-[#00ffee] text-[10px] font-bold uppercase hover:bg-[#00ffee] hover:text-black transition-all rounded-sm'>
                         Adjust Rank
                     </button>
                     <button onclick='toggleUserSuspension("${uid}", "${rank}", ${isSuspended})' class='flex-1 py-1.5 border ${isSuspended ? "border-[#00ffee]/30 text-[#00ffee]" : "border-red-500/30 text-red-500"} text-[10px] font-bold uppercase hover:opacity-80 transition-all rounded-sm'>
                         ${isSuspended ? "Restore" : "Suspend"}
                     </button>
+                    `}
                     ${isSuper && uid !== authUser.uid ? `
                     <button onclick='deleteUserRecord("${uid}", "${esc(user.displayName || "Unknown")}")' class='px-3 py-1.5 border border-red-600 text-red-500 hover:bg-red-600 hover:text-white transition-all rounded-sm' title='Delete Personnel Record'>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,6 +183,65 @@ async function manageUserRank(uid, currentRank, currentRole) {
     } catch (error) {
         console.error("Error updating rank:", error);
         alert("Action failed. " + error.message);
+    }
+}
+
+async function approveMembership(compositeUid, name) {
+    if (!confirm(`Approve network access for ${name}?`)) return;
+
+    try {
+        const db = firebase.firestore();
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+        const uid = compositeUid.split('_')[0];
+
+        // 1. Update composite doc to active
+        await db.collection('users').doc(compositeUid).update({
+            status: 'active',
+            rank: 'member',
+            clearance: 1,
+            joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // 2. Update central doc networkMemberships
+        const centralRef = db.collection('users').doc(uid);
+        const centralDoc = await centralRef.get();
+        if (centralDoc.exists) {
+            const data = centralDoc.data();
+            const memberships = data.networkMemberships || [];
+            if (!memberships.some(m => m.networkId === currentNetworkId)) {
+                memberships.push({
+                    networkId: currentNetworkId,
+                    rank: 'member',
+                    rankLevel: 1,
+                    joinedAt: new Date()
+                });
+                await centralRef.update({ networkMemberships: memberships });
+            }
+        }
+
+        // 3. Increment member count
+        await db.collection('networks').doc(currentNetworkId).update({
+            memberCount: firebase.firestore.FieldValue.increment(1)
+        }).catch(err => console.warn("Member count update failed:", err));
+
+        alert("Access approved. Personnel record activated.");
+        fetchPersonnel();
+    } catch (error) {
+        console.error("Approval Error:", error);
+        alert("Failed to approve membership: " + error.message);
+    }
+}
+
+async function rejectMembership(compositeUid) {
+    if (!confirm("Reject this access request? This will delete the pending record.")) return;
+
+    try {
+        await firebase.firestore().collection('users').doc(compositeUid).delete();
+        alert("Request rejected and purged.");
+        fetchPersonnel();
+    } catch (error) {
+        console.error("Rejection Error:", error);
+        alert("Failed to reject request: " + error.message);
     }
 }
 

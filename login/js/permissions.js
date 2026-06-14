@@ -17,7 +17,8 @@ const RANKS = {
     REGIONAL_COORDINATOR: 'regional_coordinator',
     DEPUTY_CHIEF_ANALYST: 'deputy_chief_analyst',
     CHIEF_ANALYST: 'chief_analyst',
-    AFROSINT_FELLOW: 'afrosint_fellow'
+    AFROSINT_FELLOW: 'afrosint_fellow',
+    NETWORK_DIRECTOR: 'network_director'
 };
 
 // Numeric hierarchy for permissions
@@ -36,7 +37,8 @@ const RANK_LEVELS = {
     [RANKS.REGIONAL_COORDINATOR]: 5,
     [RANKS.DEPUTY_CHIEF_ANALYST]: 6,
     [RANKS.CHIEF_ANALYST]: 7,
-    [RANKS.AFROSINT_FELLOW]: 8
+    [RANKS.AFROSINT_FELLOW]: 8,
+    [RANKS.NETWORK_DIRECTOR]: 8
 };
 
 const MIN_ANALYST_LEVEL = RANK_LEVELS[RANKS.ANALYST];

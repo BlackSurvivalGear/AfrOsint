@@ -51,9 +51,23 @@
                 </div>
             </div>
 
-            <!-- Step 2: Branding -->
+            <!-- Step 2: Network Access -->
             <div class="osint-card p-8 rounded-lg">
-                <h2 class="text-[#00E5FF] font-bold text-lg mb-6 uppercase tracking-wider border-b border-[#00E5FF]/20 pb-2">II. Branding & Aesthetics</h2>
+                <h2 class="text-[#00E5FF] font-bold text-lg mb-6 uppercase tracking-wider border-b border-[#00E5FF]/20 pb-2">II. Network Access Control</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-2 uppercase">Network Privacy</label>
+                        <select id="isPublic" class="osint-input w-full p-3 rounded bg-black text-[#00E5FF]">
+                            <option value="true">PUBLIC - Open Enrollment</option>
+                            <option value="false">PRIVATE - Access by Request</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Branding -->
+            <div class="osint-card p-8 rounded-lg">
+                <h2 class="text-[#00E5FF] font-bold text-lg mb-6 uppercase tracking-wider border-b border-[#00E5FF]/20 pb-2">III. Branding & Aesthetics</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
                         <label class="block text-xs font-semibold text-gray-500 mb-2 uppercase">Network Logo (URL or Upload)</label>
