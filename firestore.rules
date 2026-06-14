@@ -17,14 +17,14 @@ service cloud.firestore {
         'user': 1,
         'analyst': 2,
         'moderator': 2,
-        'research_analyst': 3,
-        'senior_analyst': 4,
-        'lead_analyst': 5,
-        'intelligence_specialist': 6,
-        'regional_intelligence_officer': 7,
-        'strategic_intelligence_officer': 8,
-        'afrosint_fellow': 9,
+        'admin': 10,
         'administrator': 10,
+        'senior_analyst': 3,
+        'lead_analyst': 4,
+        'regional_coordinator': 5,
+        'deputy_chief_analyst': 6,
+        'chief_analyst': 7,
+        'afrosint_fellow': 8,
         'super_admin': 11
       };
       return levels[rank.lower().replace(' ', '_')] || 0;
@@ -37,40 +37,77 @@ service cloud.firestore {
       );
     }
 
+    function canReviewReports() {
+      let data = getUserData();
+      let rankLvl = getRankLevel(data.rank);
+      let roleLvl = getRankLevel(data.role);
+      return isAuthenticated() && (
+        (rankLvl >= 3 && rankLvl <= 7) ||
+        roleLvl >= 10
+      );
+    }
+
     function isAdmin() {
-      return isAuthenticated() && (getUserData().role == 'admin' || getUserData().role == 'super_admin');
+      return isAuthenticated() && getRankLevel(getUserData().role) >= 10;
+    }
+
+    function canPromote(userRank, targetRank) {
+      let userLvl = getRankLevel(userRank);
+      let targetLvl = getRankLevel(targetRank);
+      return (userLvl == 7) ||
+             (userLvl == 6 && (targetLvl >= 2 && targetLvl <= 5)) ||
+             (userLvl == 5 && targetLvl == 4) ||
+             (userLvl == 4 && (targetLvl == 2 || targetLvl == 3));
+    }
+
+    function canSuspend(userRank, targetRank) {
+      let userLvl = getRankLevel(userRank);
+      let targetLvl = getRankLevel(targetRank);
+      return (userLvl == 7) ||
+             (userLvl == 6 && targetLvl < 7) ||
+             (userLvl == 5 && targetLvl < 5);
     }
 
     // Reports Collection
     match /reports/{reportId} {
-      // Analysts and above can read non-draft reports.
-      // Users can read their own reports (including drafts).
       allow read: if isAuthenticated() && (
         isAnalystPlus() ||
         resource.data.createdBy == request.auth.uid
       );
 
-      // Eligibility: Analyst level (2) or above to submit.
       allow create: if isAnalystPlus() &&
         request.resource.data.createdBy == request.auth.uid &&
         request.resource.data.status in ['Draft', 'Pending'];
 
-      // Update rules:
-      // 1. Owners can update their own drafts.
-      // 2. Analysts can update status and notes of submitted reports.
       allow update: if isAuthenticated() && (
         (resource.data.createdBy == request.auth.uid && resource.data.status == 'Draft') ||
-        (isAnalystPlus() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'analystNotes', 'verified', 'updatedAt', 'updatedBy']))
+        (canReviewReports() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'analystNotes', 'verified', 'updatedAt', 'updatedBy']))
       );
 
-      // Deletion restricted to admins.
       allow delete: if isAdmin();
     }
 
-    // Users collection (existing rules assumption)
+    // Users collection
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if request.auth.uid == userId || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if isAdmin();
+
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rank', 'role', 'clearance', 'suspended', 'disabled'])) ||
+        isAdmin() ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rank', 'suspended', 'disabled', 'clearance']) &&
+          (
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rank']) ||
+            (canPromote(getUserData().rank, request.resource.data.rank) && getRankLevel(getUserData().rank) >= getRankLevel(resource.data.rank))
+          ) &&
+          (
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['suspended', 'disabled']) ||
+            (canSuspend(getUserData().rank, resource.data.rank) && getRankLevel(getUserData().rank) >= getRankLevel(resource.data.rank))
+          )
+        )
+      );
     }
   }
 }

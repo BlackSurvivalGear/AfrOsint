@@ -23,16 +23,16 @@ if (typeof firebase !== 'undefined') {
 window.firebaseConfig = firebaseConfig;
 
 /**
- * AfroSINT Rank Definitions (Prestige Only)
+ * AfroSINT Rank Definitions
  */
 const AFROSINT_RANKS = {
     'member': "Member",
     'analyst': "Analyst",
     'senior_analyst': "Senior Analyst",
-    'research_specialist': "Research Specialist",
-    'field_observer': "Field Observer",
-    'intelligence_officer': "Intelligence Officer",
-    'senior_intelligence_officer': "Senior Intelligence Officer",
+    'lead_analyst': "Lead Analyst",
+    'regional_coordinator': "Regional Coordinator",
+    'deputy_chief_analyst': "Deputy Chief Analyst",
+    'chief_analyst': "Chief Analyst",
     'afrosint_fellow': "AfroSINT Fellow"
 };
 
@@ -43,9 +43,9 @@ const AFROSINT_RANKS = {
 function getRankName(rank) {
     if (typeof rank === 'number') {
         const legacy = {
-            1: "Member", 2: "Analyst", 3: "Research Analyst", 4: "Senior Analyst",
-            5: "Lead Analyst", 6: "Intelligence Specialist", 7: "Regional Intelligence Officer",
-            8: "Strategic Intelligence Officer", 9: "AfroSINT Fellow"
+            1: "Member", 2: "Analyst", 3: "Senior Analyst", 4: "Lead Analyst",
+            5: "Regional Coordinator", 6: "Deputy Chief Analyst", 7: "Chief Analyst",
+            8: "AfroSINT Fellow"
         };
         return legacy[rank] || `Level ${rank}`;
     }

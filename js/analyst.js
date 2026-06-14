@@ -24,12 +24,10 @@ async function checkAnalystAccess(user) {
         const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         const userData = userDoc.data();
 
-        // Analysts need index 1 or above (Moderator, Admin, etc.)
-        // But the requirement says "Analyst or above".
-        // In permissions.js, we defined MIN_ANALYST_LEVEL.
-        if (!userData || (!canSubmitReports(userData.rank) && !canSubmitReports(userData.role))) {
-            console.warn("[Auth] Analyst access denied for user:", user.uid, "Rank:", userData?.rank, "Role:", userData?.role);
-            alert("ACCESS DENIED: Analyst clearance required.");
+        // Report review/approval requires Senior Analyst (3) or above
+        if (!userData || (!canReviewReports(userData.rank) && !canReviewReports(userData.role))) {
+            console.warn("[Auth] Senior Analyst review access denied for user:", user.uid, "Rank:", userData?.rank, "Role:", userData?.role);
+            alert("ACCESS DENIED: Senior Analyst (Level 3) clearance required for report review.");
             window.location.href = 'index.html';
             return;
         }
@@ -43,10 +41,12 @@ async function checkAnalystAccess(user) {
 function setupFilterListeners() {
     const filters = ['filterStatus', 'filterCategory', 'filterThreat', 'filterUrgent'];
     filters.forEach(id => {
-        document.getElementById(id).addEventListener('change', renderReportsList);
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', renderReportsList);
     });
 
-    document.getElementById('updateReportBtn').addEventListener('click', updateReport);
+    const updateBtn = document.getElementById('updateReportBtn');
+    if (updateBtn) updateBtn.addEventListener('click', updateReport);
 }
 
 async function loadReports() {
@@ -68,7 +68,8 @@ async function loadReports() {
         renderReportsList();
     } catch (error) {
         console.error("Error loading reports:", error);
-        document.getElementById('reportsList').innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ff4444;">FAILED TO RETRIEVE RECORDS.</td></tr>`;
+        const list = document.getElementById('reportsList');
+        if (list) list.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ff4444;">FAILED TO RETRIEVE RECORDS.</td></tr>`;
     }
 }
 
@@ -87,6 +88,8 @@ function renderReportsList() {
     });
 
     const tbody = document.getElementById('reportsList');
+    if (!tbody) return;
+
     if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px; color:#7fd6df;">NO REPORTS FOUND MATCHING CRITERIA.</td></tr>`;
         return;
