@@ -62,9 +62,6 @@
 
         // Center: Navigation Hub (Dashboard Only)
         let navButtons = `<a href="dashboard.html" class="osint-button px-6 py-2">DASHBOARD</a>`;
-        if (isAdmin(userData.role)) {
-            navButtons += `<a href="admin.html" class="osint-button px-6 py-2 text-[#00E5FF] border-[#00E5FF]/40">ADMIN</a>`;
-        }
 
         const center = `
             <div class="header-center">

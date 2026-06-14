@@ -105,42 +105,6 @@ function updateUserInfoUI(data) {
     }
     if (imgEl) imgEl.src = data.photoURL;
 
-    // Inject Admin/Report buttons if they don't exist
-    if (profileContainer) {
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        // Remove existing dynamic buttons to avoid duplicates
-        const existingAdmin = document.getElementById('headerAdminBtn');
-        const existingReport = document.getElementById('headerReportBtn');
-        if (existingAdmin) existingAdmin.remove();
-        if (existingReport) existingReport.remove();
-
-        // 1. Admin Access - Requires Administrator role or above
-        if (typeof isAdmin === 'function' && isAdmin(data.role)) {
-            const adminBtn = document.createElement('button');
-            adminBtn.id = 'headerAdminBtn';
-            adminBtn.className = 'admin-btn';
-            adminBtn.textContent = 'ADMIN';
-            adminBtn.onclick = (e) => {
-                e.stopPropagation();
-                window.location.href = 'login/dashboard.html?view=personnel';
-            };
-            if (logoutBtn) profileContainer.insertBefore(adminBtn, logoutBtn);
-        }
-
-        // 2. Report Access - Requires Analyst rank or above
-        if (typeof canSubmitReports === 'function' && canSubmitReports(data.rank)) {
-            const reportBtn = document.createElement('button');
-            reportBtn.id = 'headerReportBtn';
-            reportBtn.className = 'admin-btn'; // Re-use styling
-            reportBtn.textContent = 'SUBMIT REPORT';
-            reportBtn.onclick = (e) => {
-                e.stopPropagation();
-                window.location.href = 'report.html';
-            };
-            if (logoutBtn) profileContainer.insertBefore(reportBtn, logoutBtn);
-        }
-    }
 }
 
 async function handleLogout() {

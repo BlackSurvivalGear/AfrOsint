@@ -61,17 +61,9 @@ function updateDashboardUI(userData) {
         }
     }
 
-    // Admin Panel Visibility
-    if (isAdmin(userData.role)) {
-        ['panelAdminLink', 'profileAdminLink'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('hidden');
-        });
-    }
-
     // Report Submission Visibility
     if (typeof canSubmitReports === 'function' && canSubmitReports(userData.rank)) {
-        ['profileReportLink', 'panelReportLink', 'panelAnalystLink'].forEach(id => {
+        ['panelReportLink', 'panelAnalystLink'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.remove('hidden');
         });
