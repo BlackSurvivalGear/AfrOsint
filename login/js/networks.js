@@ -45,7 +45,12 @@ async function loadNetworks(uid) {
         allNetworks.forEach(net => {
             const membership = myMemberships.find(m => m.networkId === net.id);
             if (membership) {
-                myNets.push({ ...net, myRank: membership.rank, isDefault: net.id === defaultNetId });
+                myNets.push({
+                    ...net,
+                    myRank: membership.rank,
+                    myPlan: userData.plan || 'free',
+                    isDefault: net.id === defaultNetId
+                });
             } else {
                 availableNets.push(net);
             }
@@ -53,6 +58,12 @@ async function loadNetworks(uid) {
 
         renderMyNetworks(myNets);
         renderAvailableNetworks(availableNets);
+
+        // Check if new user
+        if (myMemberships.length === 0) {
+            document.getElementById('screenTitle').textContent = "Choose Your First Intelligence Network";
+            document.getElementById('screenSubtitle').textContent = "Select a network to establish your operational context";
+        }
 
         // Check if user is a Fellow
         if (userData.rank === 'afrosint_fellow' || getRankLevel(userData.rank) >= 8) {
@@ -84,9 +95,25 @@ function renderMyNetworks(networks) {
                 <img src="${net.logo || 'AFROSINT LOGO.png'}" class="w-12 h-12 object-contain group-hover:drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]">
                 <div class="flex-1">
                     <h3 class="text-white font-bold text-sm uppercase tracking-wider group-hover:text-[#00E5FF] transition-colors">${net.name}</h3>
-                    <p class="text-[#00E5FF] text-[9px] font-bold uppercase tracking-tighter">${getRankName(net.myRank)}</p>
+                    <div class="flex gap-2">
+                        <p class="text-[#00E5FF] text-[9px] font-bold uppercase tracking-tighter">${getRankName(net.myRank)}</p>
+                        <p class="text-purple-400 text-[9px] font-bold uppercase tracking-tighter border-l border-white/10 pl-2">${(net.myPlan || 'FREE').toUpperCase()}</p>
+                    </div>
                 </div>
                 ${net.isDefault ? '<span class="text-[8px] bg-[#00E5FF]/20 text-[#00E5FF] px-2 py-0.5 rounded border border-[#00E5FF]/30 font-bold uppercase">DEFAULT</span>' : ''}
+            </div>
+            <div class="text-[10px] text-gray-400 leading-tight">
+                ${net.description || 'No mission statement available.'}
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
+                <div class="text-[9px]">
+                    <span class="text-gray-600 uppercase block">Region</span>
+                    <span class="text-gray-400 font-bold">${net.region || 'Global'}</span>
+                </div>
+                <div class="text-[9px]">
+                    <span class="text-gray-600 uppercase block">Personnel</span>
+                    <span class="text-gray-400 font-bold">${net.memberCount || 0}</span>
+                </div>
             </div>
             <div class="flex justify-between items-center mt-2 pt-2 border-t border-white/5">
                 <button onclick="selectNetwork('${net.id}')" class="text-[9px] font-bold uppercase tracking-widest text-[#00E5FF] hover:underline">Launch Dashboard</button>
@@ -210,7 +237,8 @@ async function joinNetwork(netId) {
         }).catch(err => console.warn("Could not increment member count:", err));
 
         alert("Welcome to the network. Intelligence access granted.");
-        loadNetworks(user.uid);
+        sessionStorage.setItem('afrosint_networkId', netId);
+        window.location.href = 'dashboard.html';
 
     } catch (error) {
         console.error("Error joining network:", error);

@@ -42,56 +42,30 @@ function checkAuthentication() {
                 const userDocCentral = await db.collection('users').doc(user.uid).get();
                 const centralData = userDocCentral.exists ? userDocCentral.data() : null;
 
-                // If no network selected, find available networks
+                // If no network selected, redirect to selection screen
                 if (!currentNetworkId) {
-                    if (centralData && centralData.defaultNetworkId) {
-                        currentNetworkId = centralData.defaultNetworkId;
-                        sessionStorage.setItem('afrosint_networkId', currentNetworkId);
-                    } else {
-                        const memberships = await db.collection('users')
-                            .where('uid', '==', user.uid)
-                            .get();
-
-                        if (memberships.empty) {
-                            if (centralData && centralData.networkId) {
-                                currentNetworkId = centralData.networkId;
-                            } else {
-                                // New user setup
-                                currentNetworkId = 'afrosint-main';
-                                const initialData = {
-                                    uid: user.uid,
-                                    networkId: 'afrosint-main',
-                                    defaultNetworkId: 'afrosint-main',
-                                    networkMemberships: [{
-                                        networkId: 'afrosint-main',
-                                        rank: 'member',
-                                        rankLevel: 1,
-                                        joinedAt: new Date()
-                                    }],
-                                    displayName: user.displayName || "Personnel",
-                                    email: user.email,
-                                    photoURL: user.photoURL || "assets/images/default-avatar.png",
-                                    role: "user",
-                                    rank: "member",
-                                    clearance: 1,
-                                    plan: "free",
-                                    isOnline: true,
-                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                                };
-                                await db.collection('users').doc(user.uid).set(initialData);
-                            }
-                            sessionStorage.setItem('afrosint_networkId', currentNetworkId);
-                        } else if (memberships.size > 1) {
-                            // Multiple networks, must choose
-                            window.location.href = "login/networks.html";
-                            return;
-                        } else {
-                            // Exactly one network
-                            currentNetworkId = memberships.docs[0].data().networkId || 'afrosint-main';
-                            sessionStorage.setItem('afrosint_networkId', currentNetworkId);
-                        }
+                    // Ensure central document exists for new users
+                    if (!centralData) {
+                        const initialData = {
+                            uid: user.uid,
+                            displayName: user.displayName || "Personnel",
+                            email: user.email,
+                            photoURL: user.photoURL || "assets/images/default-avatar.png",
+                            role: "user",
+                            rank: "member",
+                            clearance: 1,
+                            plan: "free",
+                            isOnline: true,
+                            networkMemberships: [],
+                            defaultNetworkId: '',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+                        await db.collection('users').doc(user.uid).set(initialData);
                     }
+                    console.log("No active network session. Redirecting to network selection.");
+                    window.location.href = "login/networks.html";
+                    return;
                 }
 
                 // Check cache first
@@ -127,10 +101,15 @@ function checkAuthentication() {
                 }
 
                 // Apply network branding if not main
+                let networkName = "AfroSINT Main";
                 if (currentNetworkId && currentNetworkId !== 'afrosint-main') {
                     const netDoc = await db.collection('networks').doc(currentNetworkId).get();
-                    if (netDoc.exists && typeof applyNetworkBranding === 'function') {
-                        applyNetworkBranding(netDoc.data());
+                    if (netDoc.exists) {
+                        const netData = netDoc.data();
+                        networkName = netData.name || currentNetworkId;
+                        if (typeof applyNetworkBranding === 'function') {
+                            applyNetworkBranding(netData);
+                        }
                     }
                 }
 
@@ -139,7 +118,8 @@ function checkAuthentication() {
                     displayName: userData.displayName || user.displayName || "Authorized Personnel",
                     role: userData.role || "User",
                     rank: userData.rank || "member",
-                    photoURL: userData.photoURL || user.photoURL || "assets/images/default-avatar.png"
+                    photoURL: userData.photoURL || user.photoURL || "assets/images/default-avatar.png",
+                    networkName: networkName
                 });
 
                 // Show application
@@ -170,7 +150,7 @@ function updateUserInfoUI(data) {
     const nameEl = document.getElementById('userDisplayName');
     const roleEl = document.getElementById('userRole');
     const imgEl = document.getElementById('userProfileImg');
-    const profileContainer = document.getElementById('userProfile');
+    const networkEl = document.getElementById('currentNetworkLabel');
 
     if (nameEl) nameEl.textContent = data.displayName;
     if (roleEl) {
@@ -178,6 +158,9 @@ function updateUserInfoUI(data) {
         roleEl.textContent = (typeof getRankName === 'function') ? getRankName(data.rank) : data.role;
     }
     if (imgEl) imgEl.src = data.photoURL;
+    if (networkEl && data.networkName) {
+        networkEl.textContent = `NETWORK: ${data.networkName.toUpperCase()}`;
+    }
 
 }
 

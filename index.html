@@ -43,8 +43,11 @@
     <div id="userRole" class="user-role">Member</div>
     <div class="badge-icon"></div>
 </div>
+<div id="currentNetworkLabel" class="current-network-label" style="font-size: 9px; color: #00E5FF; margin-top: 2px; font-family: 'Share Tech Mono', monospace; font-weight: bold; border-top: 1px solid rgba(0, 229, 255, 0.2); padding-top: 2px;">NETWORK: LOADING...</div>
 </div>
-<button id="logoutBtn" onclick="event.stopPropagation();handleLogout()" class="logout-btn">LOGOUT</button>
+<div class="profile-actions" style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
+    <button id="switchNetworkBtn" onclick="event.stopPropagation();window.location.href='login/networks.html'" class="logout-btn" style="background: rgba(0, 229, 255, 0.1); border-color: rgba(0, 229, 255, 0.3); color: #00E5FF; font-size: 8px; padding: 2px 6px;">SWITCH NETWORK</button>
+    <button id="logoutBtn" onclick="event.stopPropagation();handleLogout()" class="logout-btn" style="font-size: 8px; padding: 2px 6px;">LOGOUT</button>
 </div>
 
 </div>
