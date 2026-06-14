@@ -61,29 +61,33 @@ function updateDashboardUI(userData) {
         }
     }
 
-    // Report Submission Visibility
-    if (typeof canSubmitReports === 'function' && canSubmitReports(userData.rank)) {
-        ['panelReportLink', 'panelAnalystLink'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('hidden');
-        });
+    // Report Submission Visibility (Analyst level 2+)
+    if (typeof canSubmitReports === 'function' && (canSubmitReports(userData.rank) || canSubmitReports(userData.role))) {
+        const el = document.getElementById('panelReportLink');
+        if (el) el.classList.remove('hidden');
     }
 
-    // Personnel Management Visibility (Admins Only)
-    if (typeof isAdmin === 'function' && isAdmin(userData.role)) {
+    // Report Review Visibility (Senior Analyst level 3+)
+    if (typeof canReviewReports === 'function' && (canReviewReports(userData.rank) || canReviewReports(userData.role))) {
+        const el = document.getElementById('panelAnalystLink');
+        if (el) el.classList.remove('hidden');
+    }
+
+    // Personnel Management Visibility (Admins or High Rank 5+)
+    if (isAdmin(userData.role) || getRankLevel(userData.rank) >= 5) {
         const adminBtn = document.getElementById('adminPanelBtn');
         if (adminBtn) adminBtn.classList.remove('hidden');
     }
 
     // Handle initial routing if any
     const params = new URLSearchParams(window.location.search);
-    if (params.get('view') === 'personnel' && isAdmin(userData.role)) {
+    if (params.get('view') === 'personnel' && (isAdmin(userData.role) || getRankLevel(userData.rank) >= 5)) {
         window.location.href = 'admin.html';
     }
 }
 
 function getClearanceLevel(userData) {
-    const clearance = userData.clearance || 1;
+    const clearance = userData.clearance || getRankLevel(userData.rank);
     const rankName = getRankName(userData.rank).toUpperCase();
     return `LEVEL ${clearance} (${rankName})`;
 }

@@ -37,7 +37,8 @@ async function fetchPersonnel() {
             total++;
             if (!isSuspended) active++;
             if (isSuspended) suspended++;
-            if (getRankLevel(rank) >= 2) analysts++;
+            // Analysts are rank level 2 or above (but excluding Fellow status unless specified)
+            if (getRankLevel(rank) >= 2 && getRankLevel(rank) < 8) analysts++;
 
             const statusColor = isSuspended ? "text-red-500" : "text-[#00ffee]";
             const statusBorder = isSuspended ? "border-red-500/40" : "border-[#00ffee]/40";
@@ -59,19 +60,19 @@ async function fetchPersonnel() {
                 <div class='pt-3 border-t border-white/5 flex flex-col gap-2'>
                     <div class='flex justify-between items-center'>
                         <span class='text-gray-500 text-[10px] uppercase'>Role / Rank</span>
-                        <span class='text-[#00ffee] text-[10px] font-bold uppercase'>${role} / ${rank}</span>
+                        <span class='text-[#00ffee] text-[10px] font-bold uppercase'>${role} / ${getRankName(rank)}</span>
                     </div>
                     <div class='flex justify-between items-center'>
                         <span class='text-gray-500 text-[10px] uppercase'>Clearance</span>
-                        <span class='text-white text-[10px] font-bold'>LEVEL ${user.clearance || 1}</span>
+                        <span class='text-white text-[10px] font-bold'>LEVEL ${user.clearance || getRankLevel(rank)}</span>
                     </div>
                 </div>
 
                 <div class='mt-2 flex gap-2'>
-                    <button onclick='manageUserRank("${uid}", "${role}")' class='flex-1 py-1.5 border border-[#00ffee]/30 text-[#00ffee] text-[10px] font-bold uppercase hover:bg-[#00ffee] hover:text-black transition-all rounded-sm'>
+                    <button onclick='manageUserRank("${uid}", "${rank}", "${role}")' class='flex-1 py-1.5 border border-[#00ffee]/30 text-[#00ffee] text-[10px] font-bold uppercase hover:bg-[#00ffee] hover:text-black transition-all rounded-sm'>
                         Adjust Rank
                     </button>
-                    <button onclick='toggleUserSuspension("${uid}", ${isSuspended})' class='flex-1 py-1.5 border ${isSuspended ? "border-[#00ffee]/30 text-[#00ffee]" : "border-red-500/30 text-red-500"} text-[10px] font-bold uppercase hover:opacity-80 transition-all rounded-sm'>
+                    <button onclick='toggleUserSuspension("${uid}", "${rank}", ${isSuspended})' class='flex-1 py-1.5 border ${isSuspended ? "border-[#00ffee]/30 text-[#00ffee]" : "border-red-500/30 text-red-500"} text-[10px] font-bold uppercase hover:opacity-80 transition-all rounded-sm'>
                         ${isSuspended ? "Restore" : "Suspend"}
                     </button>
                 </div>
@@ -92,32 +93,75 @@ async function fetchPersonnel() {
     }
 }
 
-async function manageUserRank(uid, currentRole) {
-    const ranks = ["user", "moderator", "administrator", "super_admin"];
-    let msg = "Select new role:\n" + ranks.map((r, i) => `${i}: ${r.toUpperCase()}`).join("\n");
-    const newRoleIdx = prompt(msg, ranks.indexOf(currentRole.toLowerCase()));
+async function manageUserRank(uid, currentRank, currentRole) {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
 
-    if (newRoleIdx === null) return;
-    const idx = parseInt(newRoleIdx);
-    if (isNaN(idx) || idx < 0 || idx >= ranks.length) {
+    // Get current user's rank level to check authority
+    const selfDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+    const selfData = selfDoc.data();
+    const selfRank = selfData.rank || "member";
+    const selfRole = selfData.role || "user";
+
+    // Use string ranks from RANKS constant
+    const rankList = [
+        AfroSINT.Permissions.RANKS.MEMBER,
+        AfroSINT.Permissions.RANKS.ANALYST,
+        AfroSINT.Permissions.RANKS.SENIOR_ANALYST,
+        AfroSINT.Permissions.RANKS.LEAD_ANALYST,
+        AfroSINT.Permissions.RANKS.REGIONAL_COORDINATOR,
+        AfroSINT.Permissions.RANKS.DEPUTY_CHIEF_ANALYST,
+        AfroSINT.Permissions.RANKS.CHIEF_ANALYST,
+        AfroSINT.Permissions.RANKS.AFROSINT_FELLOW
+    ];
+
+    let msg = "Select new AfroSINT Rank:\n" + rankList.map((r, i) => `${i}: ${getRankName(r).toUpperCase()}`).join("\n");
+    const newRankIdx = prompt(msg, rankList.indexOf(currentRank.toLowerCase()));
+
+    if (newRankIdx === null) return;
+    const idx = parseInt(newRankIdx);
+    if (isNaN(idx) || idx < 0 || idx >= rankList.length) {
         alert("Invalid selection.");
+        return;
+    }
+
+    const targetRank = rankList[idx];
+
+    // Check UI authority (Permissions.js)
+    if (!isAdmin(selfRole) && !canPromote(selfRank, targetRank)) {
+        alert(`ACCESS DENIED: Your rank (${getRankName(selfRank)}) does not have authority to promote to ${getRankName(targetRank)}.`);
         return;
     }
 
     try {
         const db = firebase.firestore();
         await db.collection('users').doc(uid).update({
-            role: ranks[idx]
+            rank: targetRank,
+            clearance: getRankLevel(targetRank)
         });
-        alert(`User role updated to ${ranks[idx].toUpperCase()}`);
+        alert(`User rank updated to ${getRankName(targetRank).toUpperCase()}`);
         fetchPersonnel();
     } catch (error) {
         console.error("Error updating rank:", error);
-        alert("Action failed. Insufficient permissions.");
+        alert("Action failed. " + error.message);
     }
 }
 
-async function toggleUserSuspension(uid, currentlySuspended) {
+async function toggleUserSuspension(uid, targetRank, currentlySuspended) {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const selfDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+    const selfData = selfDoc.data();
+    const selfRank = selfData.rank || "member";
+    const selfRole = selfData.role || "user";
+
+    // Check suspension authority
+    if (!isAdmin(selfRole) && !canSuspend(selfRank, targetRank)) {
+        alert(`ACCESS DENIED: Your rank (${getRankName(selfRank)}) does not have authority to suspend/restore ${getRankName(targetRank)}.`);
+        return;
+    }
+
     const action = currentlySuspended ? "restore" : "suspend";
     if (!confirm(`Confirm account ${action}?`)) return;
 
@@ -131,7 +175,7 @@ async function toggleUserSuspension(uid, currentlySuspended) {
         fetchPersonnel();
     } catch (error) {
         console.error("Error toggling suspension:", error);
-        alert("Action failed.");
+        alert("Action failed. " + error.message);
     }
 }
 
@@ -142,7 +186,8 @@ firebase.auth().onAuthStateChanged(async (user) => {
         const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         const userData = userDoc.data();
 
-        if (userData && isAdmin(userData.role)) {
+        // Allow access if admin role OR high rank (Regional Coordinator +)
+        if (userData && (isAdmin(userData.role) || getRankLevel(userData.rank) >= 5)) {
             fetchPersonnel();
         } else {
             console.warn("Unauthorized access attempt to personnel data.");
