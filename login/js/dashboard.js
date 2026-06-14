@@ -61,6 +61,16 @@ function updateDashboardUI(userData) {
         }
     }
 
+    // Upgrade Button Visibility (Free plan only)
+    const upgradeBtn = document.getElementById('upgradePlanBtn');
+    if (upgradeBtn) {
+        if ((userData.plan || 'free').toLowerCase() === 'free') {
+            upgradeBtn.classList.remove('hidden');
+        } else {
+            upgradeBtn.classList.add('hidden');
+        }
+    }
+
     // Report Submission Visibility (Analyst level 2+)
     if (typeof canSubmitReports === 'function' && (canSubmitReports(userData.rank) || canSubmitReports(userData.role))) {
         const el = document.getElementById('panelReportLink');
@@ -90,4 +100,11 @@ function getClearanceLevel(userData) {
     const clearance = userData.clearance || getRankLevel(userData.rank);
     const rankName = getRankName(userData.rank).toUpperCase();
     return `LEVEL ${clearance} (${rankName})`;
+}
+
+/**
+ * Handle account upgrade requests
+ */
+function upgradePlan() {
+    alert("AfrOsint Subscription Services\n\nPlease contact central administration or your regional coordinator to upgrade to a PRO or ELITE account and unlock advanced surveillance modules.");
 }

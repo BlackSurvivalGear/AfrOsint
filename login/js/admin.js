@@ -15,8 +15,19 @@ async function fetchPersonnel() {
     listEl.innerHTML = '<div class="text-center py-20 text-[#00E5FF] font-mono animate-pulse uppercase">Fetching Personnel Records...</div>';
 
     try {
+        const authUser = firebase.auth().currentUser;
         const db = firebase.firestore();
         const snapshot = await db.collection('users').get();
+
+        // Get viewer's role for Super Admin checks
+        let viewerRole = 'user';
+        if (authUser) {
+            const viewerDoc = await db.collection('users').doc(authUser.uid).get();
+            if (viewerDoc.exists) {
+                viewerRole = viewerDoc.data().role || 'user';
+            }
+        }
+        const isSuper = typeof isSuperAdmin === 'function' ? isSuperAdmin(viewerRole) : viewerRole === 'super_admin';
 
         // Update Stats
         let total = 0, active = 0, analysts = 0, suspended = 0;
@@ -75,6 +86,12 @@ async function fetchPersonnel() {
                     <button onclick='toggleUserSuspension("${uid}", "${rank}", ${isSuspended})' class='flex-1 py-1.5 border ${isSuspended ? "border-[#00ffee]/30 text-[#00ffee]" : "border-red-500/30 text-red-500"} text-[10px] font-bold uppercase hover:opacity-80 transition-all rounded-sm'>
                         ${isSuspended ? "Restore" : "Suspend"}
                     </button>
+                    ${isSuper && uid !== authUser.uid ? `
+                    <button onclick='deleteUserRecord("${uid}", "${esc(user.displayName || "Unknown")}")' class='px-3 py-1.5 border border-red-600 text-red-500 hover:bg-red-600 hover:text-white transition-all rounded-sm' title='Delete Personnel Record'>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>` : ''}
                 </div>
             </div>`;
         });
@@ -143,6 +160,39 @@ async function manageUserRank(uid, currentRank, currentRole) {
         fetchPersonnel();
     } catch (error) {
         console.error("Error updating rank:", error);
+        alert("Action failed. " + error.message);
+    }
+}
+
+/**
+ * Super Admin only: Permanently delete a user record
+ */
+async function deleteUserRecord(uid, name) {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const selfDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+    const selfData = selfDoc.data();
+    const selfRole = selfData.role || "user";
+
+    const isSuper = typeof isSuperAdmin === 'function' ? isSuperAdmin(selfRole) : selfRole === 'super_admin';
+
+    if (!isSuper) {
+        alert("ACCESS DENIED: Super Admin privileges required for record deletion.");
+        return;
+    }
+
+    if (!confirm(`CRITICAL ACTION: Are you sure you want to PERMANENTLY DELETE personnel record for ${name.toUpperCase()}?\n\nThis action cannot be undone.`)) {
+        return;
+    }
+
+    try {
+        const db = firebase.firestore();
+        await db.collection('users').doc(uid).delete();
+        alert(`Personnel record for ${name} has been purged from system.`);
+        fetchPersonnel();
+    } catch (error) {
+        console.error("Error purging record:", error);
         alert("Action failed. " + error.message);
     }
 }
