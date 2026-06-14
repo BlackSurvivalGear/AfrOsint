@@ -45,11 +45,12 @@ async def test_rank_structure():
             // Check report submission (Analyst level 2+)
             results.push({ test: 'Member can submit', result: canSubmitReports('member') === false });
             results.push({ test: 'Analyst can submit', result: canSubmitReports('analyst') === true });
-            results.push({ test: 'Fellow can submit', result: canSubmitReports('afrosint_fellow') === false });
+            results.push({ test: 'Fellow can submit', result: canSubmitReports('afrosint_fellow') === true });
 
             // Check report review (Senior Analyst level 3+)
             results.push({ test: 'Analyst can review', result: canReviewReports('analyst') === false });
             results.push({ test: 'Senior Analyst can review', result: canReviewReports('senior_analyst') === true });
+            results.push({ test: 'Fellow can review', result: canReviewReports('afrosint_fellow') === true });
 
             // Check promotion authority
             // Lead Analyst (4) can promote to Analyst (2), Senior Analyst (3)
@@ -63,6 +64,7 @@ async def test_rank_structure():
 
             // Chief Analyst (7) can promote to any rank
             results.push({ test: 'Chief -> Fellow', result: canPromote('chief_analyst', 'afrosint_fellow') === true });
+            results.push({ test: 'Fellow -> Chief', result: canPromote('afrosint_fellow', 'chief_analyst') === true });
 
             // Check suspension authority
             // Regional Coordinator (5) can suspend below LC (1-4)
@@ -76,6 +78,7 @@ async def test_rank_structure():
 
             // Chief Analyst (7) can suspend all
             results.push({ test: 'Chief suspends Chief', result: canSuspend('chief_analyst', 'chief_analyst') === true });
+            results.push({ test: 'Fellow suspends Chief', result: canSuspend('afrosint_fellow', 'chief_analyst') === true });
 
             return results;
         }""")

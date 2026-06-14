@@ -48,8 +48,8 @@ async function fetchPersonnel() {
             total++;
             if (!isSuspended) active++;
             if (isSuspended) suspended++;
-            // Analysts are rank level 2 or above (but excluding Fellow status unless specified)
-            if (getRankLevel(rank) >= 2 && getRankLevel(rank) < 8) analysts++;
+            // Analysts are rank level 2 or above
+            if (getRankLevel(rank) >= 2) analysts++;
 
             const statusColor = isSuspended ? "text-red-500" : "text-[#00ffee]";
             const statusBorder = isSuspended ? "border-red-500/40" : "border-[#00ffee]/40";
