@@ -69,6 +69,12 @@ function updateDashboardUI(userData) {
         });
     }
 
+    // Personnel Management Visibility (Admins Only)
+    if (typeof isAdmin === 'function' && isAdmin(userData.role)) {
+        const adminBtn = document.getElementById('adminPanelBtn');
+        if (adminBtn) adminBtn.classList.remove('hidden');
+    }
+
     // Handle initial routing if any
     const params = new URLSearchParams(window.location.search);
     if (params.get('view') === 'personnel' && isAdmin(userData.role)) {
