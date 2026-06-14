@@ -42,7 +42,7 @@ service cloud.firestore {
       let rankLvl = getRankLevel(data.rank);
       let roleLvl = getRankLevel(data.role);
       return isAuthenticated() && (
-        (rankLvl >= 3 && rankLvl <= 7) ||
+        rankLvl >= 3 ||
         roleLvl >= 10
       );
     }
@@ -54,7 +54,7 @@ service cloud.firestore {
     function canPromote(userRank, targetRank) {
       let userLvl = getRankLevel(userRank);
       let targetLvl = getRankLevel(targetRank);
-      return (userLvl == 7) ||
+      return (userLvl >= 7) ||
              (userLvl == 6 && (targetLvl >= 2 && targetLvl <= 5)) ||
              (userLvl == 5 && targetLvl == 4) ||
              (userLvl == 4 && (targetLvl == 2 || targetLvl == 3));
@@ -63,7 +63,7 @@ service cloud.firestore {
     function canSuspend(userRank, targetRank) {
       let userLvl = getRankLevel(userRank);
       let targetLvl = getRankLevel(targetRank);
-      return (userLvl == 7) ||
+      return (userLvl >= 7) ||
              (userLvl == 6 && targetLvl < 7) ||
              (userLvl == 5 && targetLvl < 5);
     }

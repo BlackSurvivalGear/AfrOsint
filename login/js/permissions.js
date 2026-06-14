@@ -112,8 +112,6 @@ function getRankLevel(rank) {
  */
 function canSubmitReports(rank) {
     const level = getRankLevel(rank);
-    // Fellow (8) cannot submit unless separately assigned
-    if (level === RANK_LEVELS[RANKS.AFROSINT_FELLOW]) return false;
     return level >= MIN_ANALYST_LEVEL;
 }
 
@@ -125,8 +123,6 @@ function canSubmitReports(rank) {
  */
 function canReviewReports(rank) {
     const level = getRankLevel(rank);
-    // Fellow (8) holds no automatic authority
-    if (level === 8) return false;
     return level >= 3;
 }
 
@@ -140,7 +136,7 @@ function canPromote(userRank, targetRank) {
     const userLevel = getRankLevel(userRank);
     const targetLevel = getRankLevel(targetRank);
 
-    if (userLevel === 7) return true; // Chief Analyst can promote to any rank
+    if (userLevel >= 7) return true; // Chief Analyst or above can promote to any rank
     if (userLevel === 6) return [2, 3, 4, 5].includes(targetLevel);
     if (userLevel === 5) return targetLevel === 4;
     if (userLevel === 4) return [2, 3].includes(targetLevel);
@@ -158,7 +154,7 @@ function canSuspend(userRank, targetRank) {
     const userLevel = getRankLevel(userRank);
     const targetLevel = getRankLevel(targetRank);
 
-    if (userLevel === 7) return true; // All ranks
+    if (userLevel >= 7) return true; // All ranks
     if (userLevel === 6) return targetLevel < 7; // All ranks below Chief Analyst
     if (userLevel === 5) return [1, 2, 3, 4].includes(targetLevel);
 
