@@ -28,9 +28,12 @@ async function checkSubmissionAccess(user) {
         const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         const userData = userDoc.data();
 
-        if (!userData || !canSubmitReports(userData.rank)) {
+        if (!userData || (!canSubmitReports(userData.rank) && !canSubmitReports(userData.role))) {
+            console.warn("[Auth] Access denied for user:", user.uid, "Rank:", userData?.rank, "Role:", userData?.role);
             alert("ACCESS DENIED: Insufficient clearance for report submission.");
             window.location.href = 'index.html';
+        } else {
+            console.log("[Auth] Access granted for report submission.");
         }
     } catch (error) {
         console.error("Auth check error:", error);
@@ -90,6 +93,7 @@ window.removeFile = (index) => {
 };
 
 async function handleSubmit(status) {
+    console.log(`[ReportSubmit] Starting handleSubmit with status: ${status}`);
     const submitBtn = document.getElementById('submitBtn');
     const draftBtn = document.getElementById('draftBtn');
 
@@ -99,16 +103,24 @@ async function handleSubmit(status) {
     const country = document.getElementById('reportCountry').value;
     const description = document.getElementById('reportDescription').value;
 
+    console.log("[ReportSubmit] Form data:", { title, category, country, descriptionLength: description.length });
+
     if (status === 'Pending' && (!title || !category || !country || !description)) {
+        console.warn("[ReportSubmit] Validation failed: missing required fields");
         alert("Please fill in all required fields.");
         return;
     }
 
     try {
+        console.log("[ReportSubmit] Setting loading state to true");
         setLoading(true);
 
         const referenceNumber = generateRefNumber();
+        console.log(`[ReportSubmit] Generated reference number: ${referenceNumber}`);
+
+        console.log("[ReportSubmit] Starting file uploads...");
         const attachments = await uploadFiles(referenceNumber);
+        console.log(`[ReportSubmit] File uploads complete. Count: ${attachments.length}`);
 
         const reportData = {
             referenceNumber: referenceNumber,
@@ -136,44 +148,59 @@ async function handleSubmit(status) {
             verified: false
         };
 
-        await reportsDB.add(reportData);
+        console.log("[ReportSubmit] Adding report to Firestore:", reportData);
+        const docRef = await reportsDB.add(reportData);
+        console.log(`[ReportSubmit] Report added successfully. Document ID: ${docRef.id}`);
 
         if (status === 'Pending') {
+            console.log("[ReportSubmit] Showing success message");
             showSuccess(referenceNumber);
         } else {
+            console.log("[ReportSubmit] Draft saved, redirecting to index");
             alert("Draft saved successfully.");
             window.location.href = 'index.html';
         }
 
     } catch (error) {
-        console.error("Submission error:", error);
+        console.error("[ReportSubmit] CRITICAL ERROR during submission:", error);
         alert("Submission failed: " + error.message);
     } finally {
+        console.log("[ReportSubmit] Finalizing submission. Setting loading state to false.");
         setLoading(false);
     }
 }
 
 async function uploadFiles(ref) {
+    console.log(`[FileUpload] Starting upload for ref: ${ref}. Files to upload: ${selectedFiles.length}`);
     const urls = [];
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
     const progressArea = document.getElementById('uploadProgress');
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-    if (selectedFiles.length === 0) return urls;
+    if (selectedFiles.length === 0) {
+        console.log("[FileUpload] No files selected for upload.");
+        return urls;
+    }
 
     // Pre-validate file sizes
     for (const file of selectedFiles) {
         if (file.size > MAX_FILE_SIZE) {
+            console.error(`[FileUpload] File too large: ${file.name} (${file.size} bytes)`);
             throw new Error(`File "${file.name}" exceeds the 10MB limit.`);
         }
     }
 
-    if (progressArea) progressArea.style.display = 'block';
+    if (progressArea) {
+        console.log("[FileUpload] Displaying progress area");
+        progressArea.style.display = 'block';
+    }
 
     for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         const path = `reports/${ref}/${Date.now()}_${file.name}`;
+        console.log(`[FileUpload] Uploading file ${i+1}/${selectedFiles.length}: ${file.name} to path: ${path}`);
+
         const uploadTask = storageRef.child(path).put(file);
 
         await new Promise((resolve, reject) => {
@@ -183,22 +210,34 @@ async function uploadFiles(ref) {
                     const overallProgress = ((i / selectedFiles.length) * 100) + (progress / selectedFiles.length);
                     if (progressBar) progressBar.style.width = overallProgress + '%';
                     if (progressText) progressText.textContent = `UPLOADING EVIDENCE: ${Math.round(overallProgress)}%`;
+                    console.log(`[FileUpload] Progress for ${file.name}: ${Math.round(progress)}%`);
                 },
-                (error) => reject(error),
+                (error) => {
+                    console.error(`[FileUpload] Error uploading ${file.name}:`, error);
+                    reject(error);
+                },
                 async () => {
-                    const url = await uploadTask.snapshot.ref.getDownloadURL();
-                    urls.push({
-                        name: file.name,
-                        url: url,
-                        type: file.type,
-                        size: file.size
-                    });
-                    resolve();
+                    console.log(`[FileUpload] Upload complete for ${file.name}. Fetching download URL...`);
+                    try {
+                        const url = await uploadTask.snapshot.ref.getDownloadURL();
+                        console.log(`[FileUpload] Got URL for ${file.name}: ${url}`);
+                        urls.push({
+                            name: file.name,
+                            url: url,
+                            type: file.type,
+                            size: file.size
+                        });
+                        resolve();
+                    } catch (urlError) {
+                        console.error(`[FileUpload] Error getting download URL for ${file.name}:`, urlError);
+                        reject(urlError);
+                    }
                 }
             );
         });
     }
 
+    console.log(`[FileUpload] All files uploaded successfully. Total: ${urls.length}`);
     return urls;
 }
 

@@ -27,7 +27,8 @@ async function checkAnalystAccess(user) {
         // Analysts need index 1 or above (Moderator, Admin, etc.)
         // But the requirement says "Analyst or above".
         // In permissions.js, we defined MIN_ANALYST_LEVEL.
-        if (!userData || !canSubmitReports(userData.rank)) {
+        if (!userData || (!canSubmitReports(userData.rank) && !canSubmitReports(userData.role))) {
+            console.warn("[Auth] Analyst access denied for user:", user.uid, "Rank:", userData?.rank, "Role:", userData?.role);
             alert("ACCESS DENIED: Analyst clearance required.");
             window.location.href = 'index.html';
             return;

@@ -14,20 +14,27 @@ service cloud.firestore {
     function getRankLevel(rank) {
       let levels = {
         'member': 1,
+        'user': 1,
         'analyst': 2,
+        'moderator': 2,
         'research_analyst': 3,
         'senior_analyst': 4,
         'lead_analyst': 5,
         'intelligence_specialist': 6,
         'regional_intelligence_officer': 7,
         'strategic_intelligence_officer': 8,
-        'afrosint_fellow': 9
+        'afrosint_fellow': 9,
+        'administrator': 10,
+        'super_admin': 11
       };
       return levels[rank.lower().replace(' ', '_')] || 0;
     }
 
     function isAnalystPlus() {
-      return isAuthenticated() && getRankLevel(getUserData().rank) >= 2;
+      return isAuthenticated() && (
+        getRankLevel(getUserData().rank) >= 2 ||
+        getRankLevel(getUserData().role) >= 2
+      );
     }
 
     function isAdmin() {
