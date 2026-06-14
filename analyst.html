@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyst Dashboard | AfroSINT</title>
+    <title>Senior Analyst Dashboard | AfroSINT</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <!-- Firebase SDKs -->
@@ -17,7 +17,7 @@
     <div class="reports-dashboard">
         <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h1 style="color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 24px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 255, 238, 0.3);">ANALYST REVIEW DASHBOARD</h1>
+                <h1 style="color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 24px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 255, 238, 0.3);">Senior ANALYST REVIEW DASHBOARD</h1>
                 <p style="font-size: 12px; color: #7fd6df; margin-top: 5px; font-family: 'Share Tech Mono', monospace;">INTEL VERIFICATION HUB // LEVEL 2 CLEARANCE</p>
             </div>
             <button onclick="window.location.href='index.html'" class="atw-small-button" style="width: auto; font-size: 10px; padding: 6px 15px;">BACK TO MAP</button>
@@ -29,6 +29,7 @@
                 <label class="report-form-label" style="font-size: 10px;">STATUS</label>
                 <select id="filterStatus" class="report-select" style="padding: 8px; font-size: 12px;">
                     <option value="All">All Statuses</option>
+                    <option value="Draft">Draft</option>
                     <option value="Pending">Pending</option>
                     <option value="Under Review">Under Review</option>
                     <option value="Escalated">Escalated</option>
