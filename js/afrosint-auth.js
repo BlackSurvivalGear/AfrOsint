@@ -39,47 +39,58 @@ function checkAuthentication() {
             try {
                 let currentNetworkId = sessionStorage.getItem('afrosint_networkId');
 
+                const userDocCentral = await db.collection('users').doc(user.uid).get();
+                const centralData = userDocCentral.exists ? userDocCentral.data() : null;
+
                 // If no network selected, find available networks
                 if (!currentNetworkId) {
-                    const memberships = await db.collection('users')
-                        .where('uid', '==', user.uid)
-                        .get();
+                    if (centralData && centralData.defaultNetworkId) {
+                        currentNetworkId = centralData.defaultNetworkId;
+                        sessionStorage.setItem('afrosint_networkId', currentNetworkId);
+                    } else {
+                        const memberships = await db.collection('users')
+                            .where('uid', '==', user.uid)
+                            .get();
 
-                    if (memberships.empty) {
-                        // New user or legacy user without 'uid' field queryability
-                        // Check for legacy doc
-                        const legacyDoc = await db.collection('users').doc(user.uid).get();
-                        if (legacyDoc.exists) {
-                            currentNetworkId = 'afrosint-main';
+                        if (memberships.empty) {
+                            if (centralData && centralData.networkId) {
+                                currentNetworkId = centralData.networkId;
+                            } else {
+                                // New user setup
+                                currentNetworkId = 'afrosint-main';
+                                const initialData = {
+                                    uid: user.uid,
+                                    networkId: 'afrosint-main',
+                                    defaultNetworkId: 'afrosint-main',
+                                    networkMemberships: [{
+                                        networkId: 'afrosint-main',
+                                        rank: 'member',
+                                        rankLevel: 1,
+                                        joinedAt: new Date()
+                                    }],
+                                    displayName: user.displayName || "Personnel",
+                                    email: user.email,
+                                    photoURL: user.photoURL || "assets/images/default-avatar.png",
+                                    role: "user",
+                                    rank: "member",
+                                    clearance: 1,
+                                    plan: "free",
+                                    isOnline: true,
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                                };
+                                await db.collection('users').doc(user.uid).set(initialData);
+                            }
                             sessionStorage.setItem('afrosint_networkId', currentNetworkId);
+                        } else if (memberships.size > 1) {
+                            // Multiple networks, must choose
+                            window.location.href = "login/networks.html";
+                            return;
                         } else {
-                            // First time login - auto-enroll in main
-                            const initialData = {
-                                uid: user.uid,
-                                networkId: 'afrosint-main',
-                                displayName: user.displayName || "Personnel",
-                                email: user.email,
-                                photoURL: user.photoURL || "assets/images/default-avatar.png",
-                                role: "user",
-                                rank: "member",
-                                clearance: 1,
-                                plan: "free",
-                                isOnline: true,
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                            };
-                            await db.collection('users').doc(user.uid).set(initialData);
-                            currentNetworkId = 'afrosint-main';
+                            // Exactly one network
+                            currentNetworkId = memberships.docs[0].data().networkId || 'afrosint-main';
                             sessionStorage.setItem('afrosint_networkId', currentNetworkId);
                         }
-                    } else if (memberships.size > 1) {
-                        // Multiple networks, must choose
-                        window.location.href = "login/networks.html";
-                        return;
-                    } else {
-                        // Exactly one network
-                        currentNetworkId = memberships.docs[0].data().networkId || 'afrosint-main';
-                        sessionStorage.setItem('afrosint_networkId', currentNetworkId);
                     }
                 }
 

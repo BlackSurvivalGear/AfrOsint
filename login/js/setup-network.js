@@ -59,6 +59,8 @@ document.getElementById('networkForm').addEventListener('submit', async (e) => {
             description: document.getElementById('networkDescription').value,
             mission: document.getElementById('missionStatement').value,
             region: document.getElementById('regionFocus').value,
+            isPublic: document.getElementById('isPublic').value === 'true',
+            memberCount: 1,
             logo: logoUrl,
             dashboardTitle: document.getElementById('dashboardTitle').value || networkName.toUpperCase(),
             footerText: document.getElementById('footerText').value || `© ${new Date().getFullYear()} ${networkName}`,
@@ -75,17 +77,34 @@ document.getElementById('networkForm').addEventListener('submit', async (e) => {
         // Create Director record for the Fellow in the new network
         const mainUserDoc = await db.collection('users').doc(user.uid).get();
         const mainUserData = mainUserDoc.data();
+        const currentMemberships = mainUserData.networkMemberships || [];
+
+        // Check if already a member (should not happen for a new network)
+        if (!currentMemberships.some(m => m.networkId === networkId)) {
+            currentMemberships.push({
+                networkId: networkId,
+                rank: 'network_director',
+                rankLevel: 8,
+                joinedAt: new Date()
+            });
+        }
 
         const directorData = {
             ...mainUserData,
             networkId: networkId,
             role: 'administrator',
-            rank: 'afrosint_fellow', // Keep rank level 8
+            rank: 'network_director', // Keep rank level 8
             clearance: 8,
             joinedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         // Composite key for multi-network users
         await db.collection('users').doc(`${user.uid}_${networkId}`).set(directorData);
+
+        // Update central user doc with membership and default
+        await db.collection('users').doc(user.uid).update({
+            networkMemberships: currentMemberships,
+            defaultNetworkId: networkId
+        });
 
         statusEl.textContent = 'NETWORK ESTABLISHED SUCCESSFULLY. REDIRECTING...';
         setTimeout(() => {

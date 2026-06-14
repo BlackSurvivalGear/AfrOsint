@@ -18,41 +18,55 @@ function checkAuthState(protectedPage = false, adminOnly = false) {
                 try {
                     let currentNetworkId = sessionStorage.getItem('afrosint_networkId');
 
-                    if (!currentNetworkId) {
-                        const memberships = await firebase.firestore().collection('users')
-                            .where('uid', '==', user.uid)
-                            .get();
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    const centralData = userDoc.exists ? userDoc.data() : null;
 
-                        if (memberships.empty) {
-                            const legacyDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                            if (legacyDoc.exists) {
-                                currentNetworkId = 'afrosint-main';
-                            } else {
-                                const initialData = {
-                                    uid: user.uid,
-                                    networkId: 'afrosint-main',
-                                    displayName: user.displayName || "Personnel",
-                                    email: user.email,
-                                    photoURL: user.photoURL || "../assets/images/default-avatar.png",
-                                    role: "user",
-                                    rank: "member",
-                                    clearance: 1,
-                                    plan: "free",
-                                    isOnline: true,
-                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                                };
-                                await firebase.firestore().collection('users').doc(user.uid).set(initialData);
-                                currentNetworkId = 'afrosint-main';
-                            }
-                            sessionStorage.setItem('afrosint_networkId', currentNetworkId);
-                        } else if (memberships.size > 1 && !isAuthPage) {
-                            window.location.href = 'networks.html';
-                            return;
+                    if (!currentNetworkId) {
+                        if (centralData && centralData.defaultNetworkId) {
+                            currentNetworkId = centralData.defaultNetworkId;
                         } else {
-                            currentNetworkId = memberships.docs[0].data().networkId || 'afrosint-main';
-                            sessionStorage.setItem('afrosint_networkId', currentNetworkId);
+                            // Find memberships
+                            const memberships = await firebase.firestore().collection('users')
+                                .where('uid', '==', user.uid)
+                                .get();
+
+                            if (memberships.empty) {
+                                if (centralData && centralData.networkId) {
+                                    currentNetworkId = centralData.networkId;
+                                } else {
+                                    // New user setup
+                                    currentNetworkId = 'afrosint-main';
+                                    const initialData = {
+                                        uid: user.uid,
+                                        networkId: 'afrosint-main',
+                                        defaultNetworkId: 'afrosint-main',
+                                        networkMemberships: [{
+                                            networkId: 'afrosint-main',
+                                            rank: 'member',
+                                            rankLevel: 1,
+                                            joinedAt: new Date()
+                                        }],
+                                        displayName: user.displayName || "Personnel",
+                                        email: user.email,
+                                        photoURL: user.photoURL || "../assets/images/default-avatar.png",
+                                        role: "user",
+                                        rank: "member",
+                                        clearance: 1,
+                                        plan: "free",
+                                        isOnline: true,
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                                    };
+                                    await firebase.firestore().collection('users').doc(user.uid).set(initialData);
+                                }
+                            } else if (memberships.size > 1 && !isAuthPage) {
+                                window.location.href = 'networks.html';
+                                return;
+                            } else {
+                                currentNetworkId = memberships.docs[0].data().networkId || 'afrosint-main';
+                            }
                         }
+                        sessionStorage.setItem('afrosint_networkId', currentNetworkId);
                     }
 
                     // Check cache first
@@ -145,6 +159,8 @@ async function registerUser(email, password, name) {
         await firebase.firestore().collection('users').doc(user.uid).set({
             uid: user.uid,
             networkId: 'afrosint-main',
+            defaultNetworkId: '', // Prompt to choose
+            networkMemberships: [], // Start empty to trigger network selection
             displayName: name,
             email: email,
             photoURL: "",
@@ -162,7 +178,7 @@ async function registerUser(email, password, name) {
             displayName: name
         });
 
-        window.location.href = 'dashboard.html';
+        window.location.href = 'networks.html';
     } catch (error) {
         console.error("Registration Error:", error.message);
         alert(error.message);
@@ -205,6 +221,8 @@ async function loginWithGoogle() {
             await firebase.firestore().collection('users').doc(user.uid).set({
                 uid: user.uid,
                 networkId: 'afrosint-main',
+                defaultNetworkId: '', // Prompt to choose
+                networkMemberships: [],
                 displayName: user.displayName,
                 email: user.email,
                 photoURL: user.photoURL,
@@ -216,6 +234,8 @@ async function loginWithGoogle() {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             });
+            window.location.href = 'networks.html';
+            return;
         } else {
             // Update profile data, last login and status
             await firebase.firestore().collection('users').doc(user.uid).update({

@@ -21,10 +21,18 @@
             <p class="text-gray-400 mt-2 text-xs uppercase">Choose an operational command to proceed</p>
         </div>
 
-        <div id="networkList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Networks will be loaded here -->
-            <div class="col-span-full text-center py-10 text-[#00E5FF] animate-pulse font-mono">
-                SCANNING AVAILABLE NETWORKS...
+        <div id="yourNetworksSection" class="hidden mb-10">
+            <h2 class="text-[#00E5FF] text-xs font-bold uppercase tracking-widest mb-4 border-b border-[#00E5FF]/20 pb-1">Your Operational Commands</h2>
+            <div id="yourNetworkList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <div id="availableNetworksSection">
+            <h2 class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-1">Explore Intelligence Networks</h2>
+            <div id="networkList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Networks will be loaded here -->
+                <div class="col-span-full text-center py-10 text-[#00E5FF] animate-pulse font-mono">
+                    SCANNING AVAILABLE NETWORKS...
+                </div>
             </div>
         </div>
 
