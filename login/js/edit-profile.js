@@ -28,16 +28,18 @@ function populateNations() {
 firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
         populateNations();
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
 
         // Check cache first for immediate UI rendering
-        const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}`);
+        const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}_${currentNetworkId}`);
         let userData = cachedData ? JSON.parse(cachedData) : null;
 
         if (!userData) {
-            const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+            const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
+            const userDoc = await firebase.firestore().collection('users').doc(docId).get();
             userData = userDoc.data();
             if (userData) {
-                sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(userData));
+                sessionStorage.setItem(`afrosint_user_${user.uid}_${currentNetworkId}`, JSON.stringify(userData));
             }
         }
 
@@ -85,7 +87,9 @@ async function saveProfileChanges(event) {
         };
 
         // Update Firestore
-        await firebase.firestore().collection('users').doc(user.uid).update(updates);
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
+        const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
+        await firebase.firestore().collection('users').doc(docId).update(updates);
 
         // Update Local User Profile (Firebase Auth)
         await user.updateProfile({
@@ -94,9 +98,9 @@ async function saveProfileChanges(event) {
         });
 
         // Fetch updated data to refresh sessionStorage
-        const updatedDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        const updatedDoc = await firebase.firestore().collection('users').doc(docId).get();
         const updatedData = updatedDoc.data();
-        sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(updatedData));
+        sessionStorage.setItem(`afrosint_user_${user.uid}_${currentNetworkId}`, JSON.stringify(updatedData));
 
         statusEl.textContent = "SUCCESS: Profile records updated.";
         statusEl.classList.replace('text-[#00E5FF]', 'text-green-500');

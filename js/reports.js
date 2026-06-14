@@ -122,7 +122,9 @@ async function handleSubmit(status) {
         const attachments = await uploadFiles(referenceNumber);
         console.log(`[ReportSubmit] File uploads complete. Count: ${attachments.length}`);
 
+        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
         const reportData = {
+            networkId: currentNetworkId,
             referenceNumber: referenceNumber,
             title: title,
             category: category,

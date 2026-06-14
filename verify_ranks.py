@@ -62,8 +62,8 @@ async def test_rank_structure():
             results.push({ test: 'RC -> Lead', result: canPromote('regional_coordinator', 'lead_analyst') === true });
             results.push({ test: 'RC -> RC', result: canPromote('regional_coordinator', 'regional_coordinator') === false });
 
-            // Chief Analyst (7) can promote to any rank
-            results.push({ test: 'Chief -> Fellow', result: canPromote('chief_analyst', 'afrosint_fellow') === true });
+            // Chief Analyst (7) can promote up to DCA
+            results.push({ test: 'Chief -> Fellow', result: canPromote('chief_analyst', 'afrosint_fellow') === false });
             results.push({ test: 'Fellow -> Chief', result: canPromote('afrosint_fellow', 'chief_analyst') === true });
 
             // Check suspension authority
