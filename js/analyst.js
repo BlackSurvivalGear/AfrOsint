@@ -51,8 +51,8 @@ function setupFilterListeners() {
 
 async function loadReports() {
     try {
-        // Exclude drafts from analyst dashboard
-        const snapshot = await reportsDB.where('status', '!=', 'Draft').get();
+        // Load all reports including drafts
+        const snapshot = await reportsDB.get();
         allReports = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()

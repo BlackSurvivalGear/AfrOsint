@@ -722,6 +722,7 @@ a{color:#00ffee;text-decoration:none}
     letter-spacing: 1px;
 }
 
+.status-draft { background: rgba(156, 163, 175, 0.2); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
 .status-pending { background: rgba(255, 170, 0, 0.2); color: #ffaa00; border: 1px solid #ffaa0044; }
 .status-verified { background: rgba(0, 255, 238, 0.2); color: var(--cyan); border: 1px solid rgba(0, 255, 238, 0.4); }
 .status-published { background: rgba(68, 255, 136, 0.2); color: #44ff88; border: 1px solid #44ff8844; }
