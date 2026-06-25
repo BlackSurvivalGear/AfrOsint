@@ -1,11 +1,34 @@
 /**
- * Admin Panel Logic - Personnel Management
+ * Admin Console Logic
  */
 
 function esc(s) {
     let d = document.createElement('div');
     d.textContent = s;
     return d.innerHTML;
+}
+
+/**
+ * Tab Navigation Logic
+ */
+function showTab(tabId) {
+    // Update Sidebar
+    document.querySelectorAll('.sidebar-link').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeBtn = document.getElementById('btn-' + tabId);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Update Content
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    const activeTab = document.getElementById('tab-' + tabId);
+    if (activeTab) activeTab.classList.add('active');
+
+    // Trigger Data Loaders
+    if (tabId === 'personnel') fetchPersonnel();
+    if (tabId === 'backups') renderBackups();
 }
 
 async function fetchPersonnel() {
@@ -65,7 +88,7 @@ async function fetchPersonnel() {
             html += `
             <div class='osint-card p-5 flex flex-col gap-4 relative group hover:border-[#00ffee]/60 transition-all'>
                 <div class='flex items-center gap-4'>
-                    <img src='${user.photoURL || "https://via.placeholder.com/150"}' class='w-12 h-12 rounded-full border border-[#00ffee]/30 p-0.5 object-cover'>
+                    <img src='${user.photoURL || "../assets/images/default-avatar.png"}' class='w-12 h-12 rounded-full border border-[#00ffee]/30 p-0.5 object-cover'>
                     <div class='flex-1 min-width-0'>
                         <div class='text-white font-bold text-sm uppercase truncate'>${esc(user.displayName || "Unknown")}</div>
                         <div class='text-gray-500 text-[10px] font-mono truncate'>${esc(user.email || "No Email")}</div>
@@ -310,6 +333,139 @@ async function toggleUserSuspension(uid, targetRank, currentlySuspended) {
     }
 }
 
+/**
+ * Backup and Restoration Engine
+ */
+
+async function renderBackups() {
+    const listEl = document.getElementById('backupsList');
+    if (!listEl) return;
+
+    listEl.innerHTML = '<tr><td colspan="3" class="py-20 text-center text-[#00E5FF] font-mono animate-pulse uppercase">Syncing with Snapshot Archive...</td></tr>';
+
+    try {
+        const db = firebase.firestore();
+        const snapshot = await db.collection('backups').orderBy('createdAt', 'desc').get();
+
+        if (snapshot.empty) {
+            listEl.innerHTML = '<tr><td colspan="3" class="py-20 text-center text-gray-600 font-mono uppercase italic">No system snapshots found.</td></tr>';
+            return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+            const b = doc.data();
+            const date = b.createdAt ? (typeof b.createdAt.toDate === 'function' ? b.createdAt.toDate().toLocaleString() : new Date(b.createdAt).toLocaleString()) : 'Unknown';
+            html += `
+            <tr class="border-b border-white/5 hover:bg-[#00E5FF]/5 transition-all group">
+                <td class="py-4 px-4 text-white font-medium">${date}</td>
+                <td class="py-4 px-4 text-gray-500 font-mono uppercase">${esc(b.createdBy || 'System')}</td>
+                <td class="py-4 px-4 text-right">
+                    <button onclick="restoreSystem('${doc.id}')" class="px-4 py-1.5 bg-[#00ffee]/10 border border-[#00ffee]/40 text-[#00ffee] text-[10px] font-bold uppercase hover:bg-[#00ffee] hover:text-black transition-all">Restore</button>
+                </td>
+            </tr>`;
+        });
+        listEl.innerHTML = html;
+
+    } catch (error) {
+        console.error("Backup fetch error:", error);
+        listEl.innerHTML = `<tr><td colspan="3" class="py-20 text-center text-red-500 font-mono uppercase">Snapshot Retrieval Failed: ${error.message}</td></tr>`;
+    }
+}
+
+async function restoreSystem(backupId) {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    // Permissions check
+    const selfDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+    const selfRole = selfDoc.data().role || 'user';
+    const isSuper = typeof isSuperAdmin === 'function' ? isSuperAdmin(selfRole) : selfRole === 'super_admin';
+
+    if (!isSuper) {
+        alert("CRITICAL ERROR: Super Admin clearance required for system-wide restoration.");
+        return;
+    }
+
+    if (!confirm("CRITICAL ACTION: You are about to initiate a system-wide data restoration. This will PURGE and OVERWRITE current Users, Reports, and Networks data with the selected snapshot.\n\nARE YOU ABSOLUTELY SURE?")) {
+        return;
+    }
+
+    try {
+        const db = firebase.firestore();
+        const backupDoc = await db.collection('backups').doc(backupId).get();
+        if (!backupDoc.exists) throw new Error("Snapshot not found.");
+        const snapshot = backupDoc.data().snapshot;
+
+        // Perform clean restoration: Purge active data and replace with snapshot
+        const collections = ['users', 'networks', 'reports'];
+
+        for (const col of collections) {
+            const currentSnap = await db.collection(col).get();
+            const deletePromises = currentSnap.docs.map(doc => doc.ref.delete());
+            await Promise.all(deletePromises);
+
+            const colData = snapshot[col] || {};
+            const restorePromises = Object.entries(colData).map(([id, data]) => {
+                return db.collection(col).doc(id).set(data);
+            });
+            await Promise.all(restorePromises);
+        }
+
+        alert("SYSTEM RESTORATION SUCCESSFUL. Core modules have been reset to selected snapshot state.");
+        window.location.reload();
+
+    } catch (error) {
+        console.error("Restoration failure:", error);
+        alert("RESTORATION FAILED: " + error.message);
+    }
+}
+
+async function createSystemBackup() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const selfDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+    const selfData = selfDoc.data();
+    const selfRole = selfData.role || 'user';
+    const isSuper = typeof isSuperAdmin === 'function' ? isSuperAdmin(selfRole) : selfRole === 'super_admin';
+
+    if (!isSuper) {
+        alert("ACCESS DENIED: Super Admin clearance required to create system snapshots.");
+        return;
+    }
+
+    if (!confirm("Generate a new full system snapshot?")) return;
+
+    try {
+        const db = firebase.firestore();
+        const snapshot = { users: {}, networks: {}, reports: {} };
+
+        // Parallel data collection
+        const [usersSnap, netsSnap, reportsSnap] = await Promise.all([
+            db.collection('users').get(),
+            db.collection('networks').get(),
+            db.collection('reports').get()
+        ]);
+
+        usersSnap.forEach(d => snapshot.users[d.id] = d.data());
+        netsSnap.forEach(d => snapshot.networks[d.id] = d.data());
+        reportsSnap.forEach(d => snapshot.reports[d.id] = d.data());
+
+        await db.collection('backups').add({
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdBy: selfData.displayName || user.email,
+            snapshot: snapshot
+        });
+
+        alert("System snapshot created successfully.");
+        renderBackups();
+    } catch (error) {
+        console.error("Backup creation failed:", error);
+        alert("Failed to create snapshot: " + error.message);
+    }
+}
+
 // Initial fetch - Listen for auth state to ensure we have permissions before fetching
 firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
@@ -319,9 +475,10 @@ firebase.auth().onAuthStateChanged(async (user) => {
 
         // Allow access if admin role OR high rank (Regional Coordinator +)
         if (userData && (isAdmin(userData.role) || getRankLevel(userData.rank) >= 5)) {
-            fetchPersonnel();
+            showTab('personnel'); // This also calls fetchPersonnel
         } else {
             console.warn("Unauthorized access attempt to personnel data.");
+            window.location.href = 'dashboard.html';
         }
     }
 });
