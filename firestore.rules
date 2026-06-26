@@ -31,11 +31,6 @@ service cloud.firestore {
       return isAuthenticated() && data != null && getRankLevel(data.role) >= 10;
     }
 
-    function isSuperAdmin() {
-      let data = getUserInNetwork(request.auth.uid, 'afrosint-main');
-      return isAuthenticated() && data != null && (getRankLevel(data.role) >= 11 || getRankLevel(data.rank) >= 11);
-    }
-
     function isFellow() {
       let data = getUserInNetwork(request.auth.uid, 'afrosint-main');
       return isAuthenticated() && data != null && getRankLevel(data.rank) >= 8;
@@ -142,10 +137,6 @@ service cloud.firestore {
     match /settings/{docId} {
       allow read: if isAuthenticated();
       allow write: if isGlobalAdmin() || (isAuthenticated() && resource.data.get('networkId', 'afrosint-main') == getUserInNetwork(request.auth.uid, resource.data.get('networkId', 'afrosint-main')).get('networkId', ''));
-    }
-
-    match /backups/{docId} {
-      allow read, write: if isSuperAdmin();
     }
 
     // Users collection
