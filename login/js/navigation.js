@@ -7,17 +7,15 @@
     firebase.auth().onAuthStateChanged(async (user) => {
         if (user) {
             try {
-                const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
                 // Check cache first for faster header injection
-                const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}_${currentNetworkId}`);
+                const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}`);
                 let userData = cachedData ? JSON.parse(cachedData) : null;
 
                 if (!userData) {
-                    const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
-                    const userDoc = await firebase.firestore().collection('users').doc(docId).get();
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
                     userData = userDoc.data();
                     if (userData) {
-                        sessionStorage.setItem(`afrosint_user_${user.uid}_${currentNetworkId}`, JSON.stringify(userData));
+                        sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(userData));
                     }
                 }
 
@@ -76,16 +74,12 @@
         // Right: Authenticated User Card
         const right = `
             <div class="header-right">
-                <div class="user-card" onclick="window.location.href='dashboard.html'">
+                <div class="user-card">
                     <img src="${userData.photoURL || 'https://via.placeholder.com/32'}" class="user-avatar" alt="Avatar">
                     <div class="user-info">
                         <span class="user-name">${userData.displayName || 'Unnamed'}</span>
                         <span class="role-badge">${getRankName(userData.rank)}</span>
-                        <div style="font-size: 8px; color: #00E5FF; margin-top: 2px; font-family: 'Share Tech Mono', monospace; font-weight: bold; border-top: 1px solid rgba(0, 229, 255, 0.2); padding-top: 2px;">NETWORK: ${sessionStorage.getItem('afrosint_networkId') || 'NONE'}</div>
-                    </div>
-                    <div class="profile-actions" style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
-                        <span class="logout-link" style="color: #00E5FF; font-size: 8px;" onclick="event.stopPropagation();window.location.href='networks.html'">Switch Network</span>
-                        <span class="logout-link" style="font-size: 8px;" onclick="event.stopPropagation();logoutUser()">Logout</span>
+                        <span class="logout-link" onclick="logoutUser()">Logout</span>
                     </div>
                 </div>
             </div>

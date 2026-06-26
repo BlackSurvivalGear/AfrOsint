@@ -1060,7 +1060,7 @@ function _initLeafletMap(){
     };
     afrLeafletMap.on('click',function(){_globeClosePopup()});
 }
-async function _leafletRefreshLayers(){
+function _leafletRefreshLayers(){
     if(!afrLeafletMap)return;
     if(afrLeafletMap._currentTiles)afrLeafletMap.removeLayer(afrLeafletMap._currentTiles);
     var tileKey=afrMapMode==='flat-sat'?'sat':'dark';
@@ -1100,29 +1100,8 @@ async function _leafletRefreshLayers(){
     if(afrShippingVisible){afrShippingRoutes.forEach(r=>{
         L.polyline(r.points.map(p=>[p[0],p[1]]),{color:'#44ddff',weight:2,dashArray:'5, 5'}).addTo(group).bindTooltip('<strong>'+r.name+'</strong><br>'+r.info);
     })}
-
-    // Load network-scoped report markers for Leaflet
-    try {
-        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
-        const reportSnap = await firebase.firestore().collection('reports')
-            .where('networkId', '==', currentNetworkId)
-            .where('status', '==', 'Verified')
-            .get();
-
-        reportSnap.forEach(doc => {
-            const r = doc.data();
-            if (r.coordinates) {
-                const [lat, lng] = r.coordinates.split(',').map(Number);
-                if (!isNaN(lat) && !isNaN(lng)) {
-                    L.circleMarker([lat, lng], { radius: 6, color: '#00ffee', fillOpacity: 0.8 })
-                        .addTo(group)
-                        .bindTooltip('<strong>' + esc(r.title) + '</strong><br>REF: ' + r.referenceNumber + '<br>' + r.category);
-                }
-            }
-        });
-    } catch (e) { console.warn("Failed to load map reports (Leaflet):", e); }
 }
-async function _globeRefreshLayers(){if(!afrMapInstance)return;
+function _globeRefreshLayers(){if(!afrMapInstance)return;
 var pts=[];
 var rings=[];
 var arcs=[];
@@ -1153,34 +1132,6 @@ if(afrRiskyVisible&&typeof riskyZones!=='undefined'){riskyZones.forEach(function
     const maxR=z.radius/80000;
     rings.push({lat:z.lat,lng:z.lng,maxR:maxR,propagationSpeed:maxR/2,repeatPeriod:2000,color:'#ff4444',name:z.name,info:z.info,_cat:'risky'})
 })}
-
-// Load network-scoped report markers
-try {
-    const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
-    const reportSnap = await firebase.firestore().collection('reports')
-        .where('networkId', '==', currentNetworkId)
-        .where('status', '==', 'Verified')
-        .get();
-
-    reportSnap.forEach(doc => {
-        const r = doc.data();
-        if (r.coordinates) {
-            const [lat, lng] = r.coordinates.split(',').map(Number);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                pts.push({
-                    lat: lat,
-                    lng: lng,
-                    size: 0.15,
-                    color: '#00ffee',
-                    name: r.title,
-                    info: 'REF: ' + r.referenceNumber + '<br>' + r.category,
-                    _cat: 'report'
-                });
-            }
-        }
-    });
-} catch (e) { console.warn("Failed to load map reports:", e); }
-
 afrMapInstance.pointsData(pts).pointLat('lat').pointLng('lng').pointAltitude(0.01).pointRadius('size').pointColor('color').pointLabel(function(d){return '<div style="font-family:Share Tech Mono,monospace;font-size:12px;background:rgba(6,16,24,0.95);border:1px solid #00ffee44;padding:8px 12px;border-radius:4px;color:#d7ffff"><strong style="color:'+d.color+'">'+d.name+'</strong><br>'+d.info+'</div>'});
 afrMapInstance.ringsData(rings).ringLat('lat').ringLng('lng').ringMaxRadius('maxR').ringPropagationSpeed('propagationSpeed').ringRepeatPeriod('repeatPeriod').ringColor(function(d){return[d.color]});
 afrMapInstance.arcsData(arcs).arcStartLat('startLat').arcStartLng('startLng').arcEndLat('endLat').arcEndLng('endLng').arcColor(function(d){return[d.color,d.color]}).arcStroke(0.5).arcDashLength(0.4).arcDashGap(0.2).arcDashAnimateTime(1500);
@@ -1660,15 +1611,7 @@ let splitLeftIdx=0,splitRightIdx=1;
 function initSplitIdx(){splitLeftIdx=splitChannels.findIndex(c=>c[0]==='RT');splitRightIdx=splitChannels.findIndex(c=>c[0]==='AL JAZEERA');if(splitLeftIdx<0)splitLeftIdx=0;if(splitRightIdx<0)splitRightIdx=1}
 let newsGridIdx=globalFeeds.map(f=>{let i=splitChannels.findIndex(c=>c[1]===f[1]);return i>=0?i:0});
 function newsGridChangeChannel(p,dir){newsGridIdx[p]=(newsGridIdx[p]+dir+splitChannels.length)%splitChannels.length;let ch=splitChannels[newsGridIdx[p]];document.getElementById('newsLabel'+p).textContent=ch[0];document.getElementById('newsFrame'+p).src=_autoMute(ch[1]);syncTickerToChannel(ch[0])}
-function syncTickerToChannel(name){
-    const n = name.toUpperCase();
-    let foundIdx = intelTheatres.findIndex(t => t.tag === n || n.includes(t.tag) || t.tag.includes(n));
-    if (foundIdx >= 0) {
-        currentTheatreIdx = foundIdx;
-        buildTickerChannels();
-        loadTicker();
-    }
-}
+function syncTickerToChannel(name){const n=name.toUpperCase();const channelToTag={'RT':'RT','AL JAZEERA':'AJ','AL JAZEERA ARABIC':'AJ','BLOOMBERG':'CNBC','DW':'DW','CHANNELS TV':'AFRICA','SKY':'SKY','SKY NEWS':'SKY','BBC NEWS':'BBC','ABC NEWS':'AP','ABC NEWS AUSTRALIA':'AP','CNN':'AP','CNBC':'CNBC','FRANCE 24':'EURO','FRANCE 24 FR':'EURO','EURONEWS':'EURO','TRT WORLD':'REUTERS','WION':'REUTERS','CNA':'AP','INDIA TODAY':'REUTERS','NHK WORLD':'AP'};const africaNames=['AFRICA','AFRICA LIVE','AFRICA TODAY','AFRICA NOW','AFRICANEWS','SABC','CHANNELS TV','PREMIUM TIMES','NEWS24','DAILY TRUST','NAN NIGERIA'];if(africaNames.indexOf(n)>=0){let ai=africaTickerFeeds.findIndex(f=>f.tag===n||n.includes(f.tag)||f.tag.includes(n));if(ai<0)ai=0;tickerMode='africa';cf=ai;document.querySelectorAll('.tickerModeBtn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tickerModeBtn').forEach(b=>{if(b.textContent==='AFRICA')b.classList.add('active')});buildTickerChannels();loadTicker()}else if(channelToTag[n]){let gi=tags.indexOf(channelToTag[n]);if(gi<0)gi=0;tickerMode='global';cf=gi;document.querySelectorAll('.tickerModeBtn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tickerModeBtn').forEach(b=>{if(b.textContent==='GLOBAL')b.classList.add('active')});buildTickerChannels();loadTicker()}}
 let newsGridFsPanel=-1;
 function newsGridFullScreen(p){newsGridFsPanel=p;let grid=document.getElementById('newsGrid');if(!grid)return;document.getElementById('opsBay').style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;border:none';let shell=document.getElementById('opsShell');if(shell)shell.classList.add('fullscreen');grid.style.gridTemplateColumns='1fr';grid.style.gridTemplateRows='1fr';var panels=grid.querySelectorAll('.feed-panel');for(let i=0;i<panels.length;i++){panels[i].style.display=(i===p)?'flex':'none'}let exitBtn=document.createElement('button');exitBtn.id='newsGridFsExit';exitBtn.textContent='EXIT';exitBtn.style.cssText='position:absolute;top:10px;right:10px;z-index:10000;padding:8px 16px;background:#081821;border:1px solid #00ffee66;color:#00ffee;cursor:pointer;font-family:Share Tech Mono';exitBtn.onclick=newsGridExitFs;grid.style.position='relative';grid.appendChild(exitBtn)}
 function newsGridExitFs(){newsGridFsPanel=-1;let grid=document.getElementById('newsGrid');if(!grid)return;document.getElementById('opsBay').style.cssText='';let shell=document.getElementById('opsShell');if(shell)shell.classList.remove('fullscreen');var currentFeeds=_newsWallMode==='africa'?africanChannels:globalFeeds;var rows=Math.ceil(currentFeeds.length/3);grid.style.gridTemplateColumns='repeat(3,1fr)';grid.style.gridTemplateRows='repeat('+rows+',1fr)';grid.style.position='';var panels=grid.querySelectorAll('.feed-panel');for(let i=0;i<panels.length;i++){panels[i].style.display='flex'}let exitBtn=document.getElementById('newsGridFsExit');if(exitBtn)exitBtn.remove()}
@@ -1680,7 +1623,7 @@ let headlineMode='africa';
 function loadHeadlines(mode){if(mode)headlineMode=mode;active('headlinesBtn');renderOps(`
 <button class='command-btn' onclick='loadHeadlines()'>REFRESH</button>
 `,`<div id='headlinesFrame' style='height:100%;overflow-y:auto;padding:20px;background:#061018'></div>`);renderHeadlineContent()}
-function renderHeadlineContent(){const frame=document.getElementById('headlinesFrame');const toggleHtml='<div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px"><button id="hlAfricaBtn" onclick="headlineMode=\'africa\';setTickerMode(\'AFRICA\');renderHeadlineContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:14px;letter-spacing:2px;border:1px solid #00ffee44;border-radius:4px;cursor:pointer;transition:all 0.2s;'+(headlineMode==='africa'?'background:#00ffee;color:#061018;text-shadow:none;box-shadow:0 0 12px #00ffee66':'background:transparent;color:#00ffee;text-shadow:0 0 6px #00ffee88')+'">AFRICA</button><button id="hlGlobalBtn" onclick="headlineMode=\'global\';setTickerMode(\'GLOBAL\');renderHeadlineContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:14px;letter-spacing:2px;border:1px solid #00ffee44;border-radius:4px;cursor:pointer;transition:all 0.2s;'+(headlineMode==='global'?'background:#00ffee;color:#061018;text-shadow:none;box-shadow:0 0 12px #00ffee66':'background:transparent;color:#00ffee;text-shadow:0 0 6px #00ffee88')+'">GLOBAL</button></div>';if(headlineMode==='channels'){headlineMode='africa'}frame.innerHTML=toggleHtml+'<div id="headlinesGrid" style="text-align:center;color:#00ffee;font-family:Share Tech Mono,monospace;padding:40px">Loading headlines...</div>';if(headlineMode==='africa'){fetchAfricaHeadlines()}else{fetchAllHeadlines()}}
+function renderHeadlineContent(){const frame=document.getElementById('headlinesFrame');const toggleHtml='<div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px"><button id="hlAfricaBtn" onclick="headlineMode=\'africa\';setTickerMode(\'africa\');renderHeadlineContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:14px;letter-spacing:2px;border:1px solid #00ffee44;border-radius:4px;cursor:pointer;transition:all 0.2s;'+(headlineMode==='africa'?'background:#00ffee;color:#061018;text-shadow:none;box-shadow:0 0 12px #00ffee66':'background:transparent;color:#00ffee;text-shadow:0 0 6px #00ffee88')+'">AFRICA</button><button id="hlGlobalBtn" onclick="headlineMode=\'global\';setTickerMode(\'global\');renderHeadlineContent()" style="padding:8px 24px;font-family:Share Tech Mono,monospace;font-size:14px;letter-spacing:2px;border:1px solid #00ffee44;border-radius:4px;cursor:pointer;transition:all 0.2s;'+(headlineMode==='global'?'background:#00ffee;color:#061018;text-shadow:none;box-shadow:0 0 12px #00ffee66':'background:transparent;color:#00ffee;text-shadow:0 0 6px #00ffee88')+'">GLOBAL</button></div>';if(headlineMode==='channels'){headlineMode='africa'}frame.innerHTML=toggleHtml+'<div id="headlinesGrid" style="text-align:center;color:#00ffee;font-family:Share Tech Mono,monospace;padding:40px">Loading headlines...</div>';if(headlineMode==='africa'){fetchAfricaHeadlines()}else{fetchAllHeadlines()}}
 function _renderChannelCard(ch){
 return '<div style="border:1px solid #00ffee44;border-radius:8px;overflow:hidden;background:#081821">'+
 '<div style="padding:8px 12px;background:linear-gradient(90deg,#081821,#0c2a35);border-bottom:1px solid #00ffee33;display:flex;align-items:center;gap:8px">'+
@@ -1717,66 +1660,15 @@ const rss=[
 'https://www.rt.com/rss/news/',
 'https://feeds.skynews.com/feeds/rss/world.xml'
 ];
-const tags=['AJ','AP','BBC','CNBC','DW','EURO','AFRICA','GUARDIAN','REUTERS','RT','SKY'];
-const intelTheatres = [
-    { tag: 'GLOBAL', url: 'https://www.aljazeera.com/xml/rss/all.xml' },
-    { tag: 'AFRICA', url: 'https://www.africanews.com/feed/rss' },
-    { tag: 'AFRICANEWS', url: 'https://www.africanews.com/feed/rss' },
-    { tag: 'PREMIUM TIMES', url: 'https://www.premiumtimesng.com/feed' },
-    { tag: 'SABC', url: 'https://www.sabcnews.com/sabcnews/feed' },
-    { tag: 'NEWS24', url: 'https://feeds.news24.com/articles/news24/TopStories/rss' },
-    { tag: 'CHANNELS TV', url: 'https://www.channelstv.com/feed' },
-    { tag: 'DAILY TRUST', url: 'https://www.dailytrust.com/feed' },
-    { tag: 'NAN NIGERIA', url: 'https://nannews.ng/feed/' },
-    { tag: 'HWMIA', url: 'https://www.howwemadeitinafrica.com/feed/' }
-];
-let currentTheatreIdx = 0;
-
-function setTickerMode(mode) {
-    let tag = mode.toUpperCase();
-    let idx = intelTheatres.findIndex(t => t.tag === tag);
-    if (idx >= 0) {
-        currentTheatreIdx = idx;
-        buildTickerChannels();
-        loadTicker();
-    }
-}
-
+const tags=['AJ','AP','BBC','CNBC','DW','EURO','AFRICA','GUARDIAN','REUTERS','RT','SKY'];let cf=0;
+let tickerMode='africa';
+const africaTickerFeeds=africaRssFeeds.filter(f=>f.tag!=='NATION'&&f.tag!=='THE CABLE'&&!f.tag.startsWith('AI ')&&f.tag!=='BUSINESS DAY'&&f.tag!=='DAILY MAVERICK'&&f.tag!=='ENA ETHIOPIA'&&f.tag!=='EAST AFRICAN'&&f.tag!=='MAP MOROCCO'&&f.tag!=='SA GOV');
+function setTickerMode(mode){tickerMode=mode;cf=0;document.querySelectorAll('.tickerModeBtn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tickerModeBtn').forEach(b=>{if((mode==='global'&&b.textContent==='GLOBAL')||(mode==='africa'&&b.textContent==='AFRICA'))b.classList.add('active')});buildTickerChannels();loadTicker()}
 var _lastPopupInfo=null;
 function popupSetCountry(name){var m=atwAllCities.find(function(c){return c.name===name});if(m){setHeaderTime(m.tz,m.name,m.iso);var p=document.getElementById('africaTimePanel');if(!africaTimePanelOpen){p.classList.add('open');africaTimePanelOpen=true}atwViewCountry(m.name,m.iso)}}
-function buildTickerChannels(){
-    const wrap = document.getElementById('tickerChannels');
-    if(!wrap) return;
-    wrap.innerHTML = intelTheatres.map((t, i) =>
-        `<button class='channel${i === currentTheatreIdx ? " active" : ""}' data-idx='${i}'>${t.tag}</button>`
-    ).join('');
-
-    wrap.querySelectorAll('.channel').forEach(b => b.onclick = () => {
-        wrap.querySelectorAll('.channel').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        currentTheatreIdx = parseInt(b.dataset.idx);
-        loadTicker();
-    });
-}
+function buildTickerChannels(){const wrap=document.getElementById('tickerChannels');if(tickerMode==='africa'){wrap.innerHTML=africaTickerFeeds.map((f,i)=>`<button class='channel${i===cf?" active":""}' data-idx='${i}'>${f.tag}</button>`).join('')}else{wrap.innerHTML=tags.map((t,i)=>`<button class='channel${i===cf?" active":""}' data-idx='${i}'>${t}</button>`).join('')}wrap.querySelectorAll('.channel').forEach(b=>b.onclick=()=>{wrap.querySelectorAll('.channel').forEach(x=>x.classList.remove('active'));b.classList.add('active');cf=parseInt(b.dataset.idx);loadTicker()})}
 buildTickerChannels();
-async function loadTicker() {
-    const ticker = document.getElementById('newsTicker');
-    if(!ticker) return;
-    try {
-        const theatre = intelTheatres[currentTheatreIdx];
-        const r = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(theatre.url));
-        const d = await r.json();
-        if(d.status === 'ok' && d.items) {
-            ticker.innerHTML = d.items.slice(0, 15).map(i =>
-                `<a class='headline-link' href='${safeHref(i.link)}' target='_blank'>[${theatre.tag}] ${esc(i.title)}</a>`
-            ).join('');
-        } else {
-            ticker.innerHTML = 'Tactical Feed Offline...';
-        }
-    } catch(e) {
-        ticker.innerHTML = 'Tactical Feed Offline...';
-    }
-}
+async function loadTicker(){try{let feedUrl;let tagLabel;if(tickerMode==='africa'){feedUrl=africaTickerFeeds[cf].url;tagLabel=africaTickerFeeds[cf].tag}else{feedUrl=rss[cf];tagLabel=tags[cf]}let r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feedUrl));let d=await r.json();newsTicker.innerHTML=d.items.slice(0,10).map(i=>`<a class='headline-link' href='${safeHref(i.link)}' target='_blank'>[${tagLabel}] ${esc(i.title)}</a>`).join('')}catch(e){newsTicker.innerHTML='Tactical Feed Offline...'}}
 
 
 loadTicker();loadHeadlines();
@@ -2132,12 +2024,6 @@ if(_liveFeedMode==='osint'){_fetchOsintTweets(vp)}else{_fetchLiveNews(vp)}
 }
 
 async function _fetchOsintTweets(vp){
-    const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
-    if (currentNetworkId !== 'afrosint-main') {
-        // For white-label networks, we only show reports from that network as "tweets" or intel items
-        _fetchNetworkReportsAsFeed(vp, currentNetworkId);
-        return;
-    }
 var regionMap={};_osintAccounts.forEach(function(a){regionMap[a.handle.toLowerCase()]=a.region});
 var accounts=_osintAccounts.map(function(a){return a.handle});
 var allTweets=[];
@@ -2215,40 +2101,6 @@ var _liveFeedRssFeeds=[
 {url:'https://www.channelstv.com/feed',tag:'CHANNELS TV'},
 {url:'https://www.theguardian.com/world/rss',tag:'GUARDIAN'}
 ];
-async function _fetchNetworkReportsAsFeed(vp, networkId) {
-    try {
-        const snapshot = await firebase.firestore().collection('reports')
-            .where('networkId', '==', networkId)
-            .where('status', 'in', ['Verified', 'Pending'])
-            .orderBy('createdAt', 'desc')
-            .limit(30)
-            .get();
-
-        if (snapshot.empty) {
-            vp.innerHTML = '<div style="text-align:center;color:#ffaa00;padding:40px;font-family:Share Tech Mono,monospace">No intelligence reports available for this network.</div>';
-            return;
-        }
-
-        const items = snapshot.docs.map(doc => doc.data());
-        vp.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">' + items.map(function(t) {
-            var dateStr = '';
-            try { if (t.createdAt) dateStr = t.createdAt.toDate().toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) {}
-            return '<div style="background:#081821;border:1px solid #00ffee33;border-radius:8px;padding:14px;transition:border-color 0.15s,box-shadow 0.15s" onmouseenter="this.style.borderColor=\'#00ffee\';this.style.boxShadow=\'0 0 12px #00ffee44\'" onmouseleave="this.style.borderColor=\'#00ffee33\';this.style.boxShadow=\'none\'">'
-                + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
-                + '<div style="flex:1;min-width:0"><div style="color:#f1f5f9;font-weight:bold;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(t.title) + '</div><div style="color:#7fd6df;font-size:11px;font-family:Share Tech Mono,monospace">[' + esc(t.category) + ']</div></div>'
-                + '<div style="color:#7fd6df;font-size:10px;font-family:Share Tech Mono,monospace;white-space:nowrap;flex-shrink:0">' + esc(dateStr) + '</div></div>'
-                + '<div style="color:#d7ffff;font-size:13px;line-height:1.5;margin-bottom:8px;word-break:break-word">' + esc(t.description.substring(0, 200)) + (t.description.length > 200 ? '...' : '') + '</div>'
-                + '<div style="display:flex;gap:16px;color:#7fd6df;font-size:11px;font-family:Share Tech Mono,monospace;padding-top:6px;border-top:1px solid #00ffee11">'
-                + '<span style="color:' + (t.status === 'Verified' ? '#44ff88' : '#ffaa00') + '">' + t.status.toUpperCase() + '</span>'
-                + '<span>REF: ' + t.referenceNumber + '</span>'
-                + '</div></div>';
-        }).join('') + '</div>';
-    } catch (e) {
-        console.error("Error fetching network reports:", e);
-        vp.innerHTML = '<div style="text-align:center;color:#ff4444;padding:40px;font-family:Share Tech Mono,monospace">Failed to load intelligence feed.</div>';
-    }
-}
-
 async function _fetchLiveNews(vp){
 var allItems=[];
 for(var i=0;i<_liveFeedRssFeeds.length;i++){

@@ -1,4 +1,4 @@
-:root{--cyan:#00ffee;--bg:#02070d;--panel:#061018;--secondary:#7FFBFF}
+:root{--cyan:#00ffee;--bg:#02070d;--panel:#061018}
 *{margin:0;padding:0;box-sizing:border-box}
 .watermark-bg{position:fixed;top:0;left:0;width:100%;height:100%;background-image:url('../assets/images/AFROSINT LOGO.png');background-repeat:no-repeat;background-position:center;background-size:40%;opacity:0.04;pointer-events:none;z-index:0}
 #opsViewport,#panAfricaViewport,#channelHubViewport,#headlinesFrame,.ai-grid{scrollbar-width:none}#opsViewport::-webkit-scrollbar,#panAfricaViewport::-webkit-scrollbar,#channelHubViewport::-webkit-scrollbar,#headlinesFrame::-webkit-scrollbar,.ai-grid::-webkit-scrollbar{display:none}
@@ -59,15 +59,10 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .market-box div:first-child{font-size:10px;color:#7fd6df;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
 .market-price{font-size:16px;color:#00ffee;font-weight:700;font-family:'Share Tech Mono',monospace}
 
-#newsTickerWrap{display:flex;flex-direction:column;background:#050b12;border-top:1px solid #00ffee55;border-bottom:1px solid #00ffee55;overflow:hidden;position:relative;z-index:2000}
-.theatre-selector-outer{display:flex;align-items:stretch;height:32px;border-bottom:1px solid #00ffee22}
-.channel{background:#071923;border:none;color:#7fd6df;padding:0 16px;cursor:pointer;font-family:'Share Tech Mono';font-size:11px;font-weight:700;white-space:nowrap;transition:all 0.2s;border-right:1px solid #00ffee22}
-.channel.active{background:#0c2430;color:#00ffee;text-shadow:0 0 8px #00ffee;box-shadow:inset 0 -2px 0 #00ffee}
-.channel:hover{background:#0c2430;color:#00ffee}
-.channel-wrap{display:flex;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;touch-action:pan-x;width:100%}
-.channel-wrap::-webkit-scrollbar{height:2px}
-.channel-wrap::-webkit-scrollbar-thumb{background:#00ffee44}
-.ticker-window{height:36px;overflow:hidden;display:flex;align-items:center;cursor:grab;background:rgba(0,255,238,0.02)}.ticker-window.dragging{cursor:grabbing}.ticker-track{display:inline-flex;align-items:center;white-space:nowrap;padding-left:100%;animation:scroll 150s linear infinite;font-size:18px}.ticker-window:hover .ticker-track,.ticker-window:active .ticker-track{animation-play-state:paused}.ticker-track.dragging{animation-play-state:paused !important}
+#newsTickerWrap{display:flex;flex-direction:column;background:#050b12;border-top:1px solid #00ffee55;border-bottom:1px solid #00ffee55;overflow:hidden}
+.channel{background:#071923;border:none;color:#7fd6df;padding:0 14px;cursor:pointer;font-family:'Share Tech Mono';font-size:12px;white-space:nowrap;transition:background 0.15s,color 0.15s,text-shadow 0.15s,box-shadow 0.15s}.channel.active{background:#0c2430;color:#00ffee;font-weight:700;text-shadow:0 0 8px #00ffee;box-shadow:inset 0 -2px 0 #00ffee}
+.channel-wrap{display:flex;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;touch-action:pan-x}
+.ticker-window{flex:1;overflow:hidden;display:flex;align-items:center;cursor:grab}.ticker-window.dragging{cursor:grabbing}.ticker-track{display:inline-flex;align-items:center;white-space:nowrap;padding-left:100%;animation:scroll 150s linear infinite;font-size:18px}.ticker-window:hover .ticker-track,.ticker-window:active .ticker-track{animation-play-state:paused}.ticker-track.dragging{animation-play-state:paused !important}
 @keyframes scroll{100%{transform:translateX(-100%)}}
 .headline-link{display:inline-block;padding-right:95px;color:#d7ffff;text-decoration:none;font-size:18px;line-height:42px}
 .placeholder{height:calc(100vh - 126px);display:flex;justify-content:center;align-items:center;position:relative}
@@ -194,10 +189,9 @@ a{color:#00ffee;text-decoration:none}
 #aiDecisionPanel{bottom:60px;right:10px;top:auto;left:auto}
 #persistentNewsBoxes .afrNewsBox,#persistentNewsBoxes>div{width:280px !important;height:180px !important}
 #newsTickerWrap{font-size:15px}
-.theatre-selector-outer{height:38px}
 .ticker-window{height:32px !important}
 .headline-link{font-size:15px;line-height:32px;padding-right:60px}
-.channel{padding:0 12px;font-size:11px}
+.channel{padding:0 10px;font-size:11px}
 #newsGrid{grid-template-columns:repeat(2, 1fr) !important;grid-template-rows:none !important;overflow-y:auto !important}
 #newsGrid .feed-panel{min-height:250px}
 #opsViewport>div[style*="display:flex"][style*="gap:4px"]{flex-direction:column !important}
