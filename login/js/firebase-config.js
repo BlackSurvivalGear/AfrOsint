@@ -33,8 +33,7 @@ const AFROSINT_RANKS = {
     'regional_coordinator': "Regional Coordinator",
     'deputy_chief_analyst': "Deputy Chief Analyst",
     'chief_analyst': "Chief Analyst",
-    'afrosint_fellow': "AfroSINT Fellow",
-    'network_director': "Network Director"
+    'afrosint_fellow': "AfroSINT Fellow"
 };
 
 /**

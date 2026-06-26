@@ -25,9 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function checkSubmissionAccess(user) {
     try {
-        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
-        const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
-        const userDoc = await firebase.firestore().collection('users').doc(docId).get();
+        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         const userData = userDoc.data();
 
         if (!userData || (!canSubmitReports(userData.rank) && !canSubmitReports(userData.role))) {
@@ -124,9 +122,7 @@ async function handleSubmit(status) {
         const attachments = await uploadFiles(referenceNumber);
         console.log(`[ReportSubmit] File uploads complete. Count: ${attachments.length}`);
 
-        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
         const reportData = {
-            networkId: currentNetworkId,
             referenceNumber: referenceNumber,
             title: title,
             category: category,

@@ -16,74 +16,23 @@ function checkAuthState(protectedPage = false, adminOnly = false) {
             // Handle user data and security checks
             const processUserData = async () => {
                 try {
-                    let currentNetworkId = sessionStorage.getItem('afrosint_networkId');
-
-                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                    const centralData = userDoc.exists ? userDoc.data() : null;
-
-                    if (!currentNetworkId && !path.includes('networks.html')) {
-                        // For new users, ensure a central document exists before redirecting
-                        if (!centralData) {
-                            console.log("Initializing new user central record...");
-                            const initialData = {
-                                uid: user.uid,
-                                displayName: user.displayName || "Personnel",
-                                email: user.email,
-                                photoURL: user.photoURL || "../assets/images/default-avatar.png",
-                                role: "user",
-                                rank: "member",
-                                clearance: 1,
-                                plan: "free",
-                                isOnline: true,
-                                networkMemberships: [],
-                                defaultNetworkId: '',
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                            };
-                            await firebase.firestore().collection('users').doc(user.uid).set(initialData);
-                        }
-                        console.log("No active network session. Redirecting to network selection.");
-                        window.location.href = 'networks.html';
-                        return;
-                    }
-
                     // Check cache first
                     let userData = null;
-                    const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}_${currentNetworkId}`);
+                    const cachedData = sessionStorage.getItem(`afrosint_user_${user.uid}`);
                     if (cachedData) {
                         userData = JSON.parse(cachedData);
                     } else {
-                        // Get network-specific user data
-                        const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
-                        const userDoc = await firebase.firestore().collection('users').doc(docId).get();
-
-                        if (userDoc.exists) {
-                            userData = userDoc.data();
-                            sessionStorage.setItem(`afrosint_user_${user.uid}_${currentNetworkId}`, JSON.stringify(userData));
-
-                            // Apply Branding if not main
-                            if (currentNetworkId !== 'afrosint-main') {
-                                const netDoc = await firebase.firestore().collection('networks').doc(currentNetworkId).get();
-                                if (netDoc.exists) {
-                                    const netData = netDoc.data();
-                                    if (netData.accentColor) document.documentElement.style.setProperty('--osint-cyan', netData.accentColor);
-                                    if (netData.secondaryColor) document.documentElement.style.setProperty('--osint-text-highlight', netData.secondaryColor);
-                                    if (netData.logo) {
-                                        const logos = document.querySelectorAll('img[src*="AFROSINT LOGO.png"], .header-logo, .logo-img');
-                                        logos.forEach(img => img.src = netData.logo);
-                                    }
-                                }
-                            }
-                        } else if (!isAuthPage) {
-                            sessionStorage.removeItem('afrosint_networkId');
-                            window.location.href = 'networks.html';
-                            return;
+                        // Get user data from Firestore
+                        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                        userData = userDoc.data();
+                        if (userData) {
+                            sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(userData));
                         }
                     }
 
                     // Immediate redirection for authenticated users on auth pages
                     if (isAuthPage) {
-                        window.location.href = 'networks.html';
+                        window.location.href = 'dashboard.html';
                         return;
                     }
 
@@ -136,9 +85,6 @@ async function registerUser(email, password, name) {
         // Create Firestore record
         await firebase.firestore().collection('users').doc(user.uid).set({
             uid: user.uid,
-            networkId: 'afrosint-main',
-            defaultNetworkId: '', // Prompt to choose
-            networkMemberships: [], // Start empty to trigger network selection
             displayName: name,
             email: email,
             photoURL: "",
@@ -156,7 +102,7 @@ async function registerUser(email, password, name) {
             displayName: name
         });
 
-        window.location.href = 'networks.html';
+        window.location.href = 'dashboard.html';
     } catch (error) {
         console.error("Registration Error:", error.message);
         alert(error.message);
@@ -177,7 +123,7 @@ async function loginUser(email, password, rememberMe) {
             isOnline: true
         });
 
-        window.location.href = 'networks.html';
+        window.location.href = 'dashboard.html';
     } catch (error) {
         console.error("Login Error:", error.message);
         alert(error.message);
@@ -191,16 +137,13 @@ async function loginWithGoogle() {
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
 
-        // Check if user exists in Firestore (legacy or initial login)
+        // Check if user exists in Firestore
         const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
 
         if (!userDoc.exists) {
             // Create new record for Google user
             await firebase.firestore().collection('users').doc(user.uid).set({
                 uid: user.uid,
-                networkId: 'afrosint-main',
-                defaultNetworkId: '', // Prompt to choose
-                networkMemberships: [],
                 displayName: user.displayName,
                 email: user.email,
                 photoURL: user.photoURL,
@@ -212,20 +155,15 @@ async function loginWithGoogle() {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             });
-            window.location.href = 'networks.html';
-            return;
         } else {
-            // Update profile data, last login and status
+            // Update last login and status
             await firebase.firestore().collection('users').doc(user.uid).update({
-                displayName: user.displayName,
-                email: user.email,
-                photoURL: user.photoURL,
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 isOnline: true
             });
         }
 
-        window.location.href = 'networks.html';
+        window.location.href = 'dashboard.html';
     } catch (error) {
         console.error("Google Login Error:", error.message);
         alert(error.message);
@@ -251,19 +189,14 @@ async function logoutUser() {
             await firebase.firestore().collection('users').doc(user.uid).update({
                 isOnline: false,
                 lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(err => console.warn("Firestore logout update failed:", err));
+            });
         }
-    } catch (error) {
-        console.error("Logout Firestore Error:", error.message);
-    } finally {
         if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
         sessionStorage.removeItem('afrosint_session_started');
-        try {
-            await firebase.auth().signOut();
-        } catch (authErr) {
-            console.error("Firebase SignOut Error:", authErr);
-        }
+        await firebase.auth().signOut();
         window.location.href = 'login.html';
+    } catch (error) {
+        console.error("Logout Error:", error.message);
     }
 }
 

@@ -21,9 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function checkAnalystAccess(user) {
     try {
-        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
-        const docId = currentNetworkId === 'afrosint-main' ? user.uid : `${user.uid}_${currentNetworkId}`;
-        const userDoc = await firebase.firestore().collection('users').doc(docId).get();
+        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         const userData = userDoc.data();
 
         // Report review/approval requires Senior Analyst (3) or above
@@ -53,9 +51,8 @@ function setupFilterListeners() {
 
 async function loadReports() {
     try {
-        const currentNetworkId = sessionStorage.getItem('afrosint_networkId') || 'afrosint-main';
-        // Load reports scoped to network
-        const snapshot = await reportsDB.where('networkId', '==', currentNetworkId).get();
+        // Load all reports including drafts
+        const snapshot = await reportsDB.get();
         allReports = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()

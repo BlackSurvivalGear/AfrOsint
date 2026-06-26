@@ -7,62 +7,54 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function getRankLevel(rank) {
       let levels = {
-        'member': 1, 'user': 1, 'analyst': 2, 'moderator': 2,
-        'admin': 10, 'administrator': 10, 'senior_analyst': 3,
-        'lead_analyst': 4, 'regional_coordinator': 5,
-        'deputy_chief_analyst': 6, 'chief_analyst': 7,
-        'afrosint_fellow': 8, 'super_admin': 11
+        'member': 1,
+        'user': 1,
+        'analyst': 2,
+        'moderator': 2,
+        'admin': 10,
+        'administrator': 10,
+        'senior_analyst': 3,
+        'lead_analyst': 4,
+        'regional_coordinator': 5,
+        'deputy_chief_analyst': 6,
+        'chief_analyst': 7,
+        'afrosint_fellow': 8,
+        'super_admin': 11
       };
-      return (rank != null) ? (levels[rank.lower().replace(' ', '_')] || 0) : 0;
+      return levels[rank.lower().replace(' ', '_')] || 0;
     }
 
-    function getUserInNetwork(uid, networkId) {
-      return exists(/databases/$(database)/documents/users/$(uid + '_' + networkId))
-        ? get(/databases/$(database)/documents/users/$(uid + '_' + networkId)).data
-        : (networkId == 'afrosint-main' && exists(/databases/$(database)/documents/users/$(uid)))
-          ? get(/databases/$(database)/documents/users/$(uid)).data
-          : null;
-    }
-
-    function isGlobalAdmin() {
-      let data = getUserInNetwork(request.auth.uid, 'afrosint-main');
-      return isAuthenticated() && data != null && getRankLevel(data.role) >= 10;
-    }
-
-    function isFellow() {
-      let data = getUserInNetwork(request.auth.uid, 'afrosint-main');
-      return isAuthenticated() && data != null && getRankLevel(data.rank) >= 8;
-    }
-
-    function isAnalystPlus(networkId) {
-      let data = getUserInNetwork(request.auth.uid, networkId);
+    function isAnalystPlus() {
       return isAuthenticated() && (
-        isGlobalAdmin() ||
-        (data != null && (
-          getRankLevel(data.rank) >= 2 ||
-          getRankLevel(data.role) >= 2
-        ))
+        getRankLevel(getUserData().rank) >= 2 ||
+        getRankLevel(getUserData().role) >= 2
       );
     }
 
-    function canReviewReports(networkId) {
-      let data = getUserInNetwork(request.auth.uid, networkId);
+    function canReviewReports() {
+      let data = getUserData();
+      let rankLvl = getRankLevel(data.rank);
+      let roleLvl = getRankLevel(data.role);
       return isAuthenticated() && (
-        isGlobalAdmin() ||
-        (data != null && (
-          getRankLevel(data.rank) >= 3 ||
-          getRankLevel(data.role) >= 10
-        ))
+        (rankLvl >= 3 && rankLvl <= 7) ||
+        roleLvl >= 10
       );
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getRankLevel(getUserData().role) >= 10;
     }
 
     function canPromote(userRank, targetRank) {
       let userLvl = getRankLevel(userRank);
       let targetLvl = getRankLevel(targetRank);
-      return (userLvl >= 8 && targetLvl < 8) ||
-             (userLvl == 7 && targetLvl < 7) ||
+      return (userLvl == 7) ||
              (userLvl == 6 && (targetLvl >= 2 && targetLvl <= 5)) ||
              (userLvl == 5 && targetLvl == 4) ||
              (userLvl == 4 && (targetLvl == 2 || targetLvl == 3));
@@ -71,91 +63,49 @@ service cloud.firestore {
     function canSuspend(userRank, targetRank) {
       let userLvl = getRankLevel(userRank);
       let targetLvl = getRankLevel(targetRank);
-      return (userLvl >= 8) ||
-             (userLvl == 7 && targetLvl <= 7) ||
+      return (userLvl == 7) ||
              (userLvl == 6 && targetLvl < 7) ||
              (userLvl == 5 && targetLvl < 5);
-    }
-
-    function canManagePersonnel(actorUid, resourceData, requestResourceData) {
-      let netId = resourceData.get('networkId', 'afrosint-main');
-      let actorData = getUserInNetwork(actorUid, netId);
-      return actorData != null && (
-        (!requestResourceData.diff(resourceData).affectedKeys().hasAny(['rank']) ||
-         (canPromote(actorData.rank, requestResourceData.rank) && getRankLevel(actorData.rank) >= getRankLevel(resourceData.get('rank', 'member')))) &&
-        (!requestResourceData.diff(resourceData).affectedKeys().hasAny(['suspended', 'disabled']) ||
-         (canSuspend(actorData.rank, resourceData.get('rank', 'member')) && getRankLevel(actorData.rank) >= getRankLevel(resourceData.get('rank', 'member'))))
-      );
-    }
-
-    // Networks Collection
-    match /networks/{networkId} {
-      allow read: if isAuthenticated();
-      allow create: if isFellow();
-      allow update: if isAuthenticated() && (isGlobalAdmin() || resource.data.createdBy == request.auth.uid);
-      allow delete: if isGlobalAdmin();
     }
 
     // Reports Collection
     match /reports/{reportId} {
       allow read: if isAuthenticated() && (
-        isGlobalAdmin() ||
-        (isAnalystPlus(resource.data.get('networkId', 'afrosint-main')) || resource.data.createdBy == request.auth.uid)
+        isAnalystPlus() ||
+        resource.data.createdBy == request.auth.uid
       );
 
-      allow create: if isAuthenticated() &&
-        isAnalystPlus(request.resource.data.get('networkId', 'afrosint-main')) &&
+      allow create: if isAnalystPlus() &&
         request.resource.data.createdBy == request.auth.uid &&
         request.resource.data.status in ['Draft', 'Pending'];
 
       allow update: if isAuthenticated() && (
         (resource.data.createdBy == request.auth.uid && resource.data.status == 'Draft') ||
-        (canReviewReports(resource.data.get('networkId', 'afrosint-main')) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'analystNotes', 'verified', 'updatedAt', 'updatedBy'])) ||
-        isGlobalAdmin()
+        (canReviewReports() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'analystNotes', 'verified', 'updatedAt', 'updatedBy']))
       );
 
-      allow delete: if isGlobalAdmin();
-    }
-
-    // Feeds, Alerts, Teams, Settings
-    match /feeds/{docId} {
-      allow read: if isAuthenticated() && (isGlobalAdmin() || isAnalystPlus(resource.data.get('networkId', 'afrosint-main')));
-      allow create, update: if isAuthenticated() && isAnalystPlus(request.resource.data.get('networkId', 'afrosint-main'));
-      allow delete: if isGlobalAdmin();
-    }
-
-    match /alerts/{docId} {
-      allow read: if isAuthenticated() && (isGlobalAdmin() || resource.data.get('networkId', 'afrosint-main') == getUserInNetwork(request.auth.uid, resource.data.get('networkId', 'afrosint-main')).get('networkId', ''));
-      allow create, update: if isAuthenticated() && isAnalystPlus(request.resource.data.get('networkId', 'afrosint-main'));
-      allow delete: if isGlobalAdmin();
-    }
-
-    match /teams/{docId} {
-      allow read, write: if isAuthenticated() && (isGlobalAdmin() || resource.data.get('networkId', 'afrosint-main') == getUserInNetwork(request.auth.uid, resource.data.get('networkId', 'afrosint-main')).get('networkId', ''));
-    }
-
-    match /settings/{docId} {
-      allow read: if isAuthenticated();
-      allow write: if isGlobalAdmin() || (isAuthenticated() && resource.data.get('networkId', 'afrosint-main') == getUserInNetwork(request.auth.uid, resource.data.get('networkId', 'afrosint-main')).get('networkId', ''));
+      allow delete: if isAdmin();
     }
 
     // Users collection
-    match /users/{userNetworkId} {
+    match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && (
-        userNetworkId == request.auth.uid ||
-        (userNetworkId == request.auth.uid + "_" + request.resource.data.get('networkId', '') && getRankLevel(request.resource.data.get('rank', 'member')) <= 1) ||
-        (request.resource.data.networkId != null && getUserInNetwork(request.auth.uid, request.resource.data.networkId) != null && getRankLevel(getUserInNetwork(request.auth.uid, request.resource.data.networkId).rank) >= 8)
-      );
-      allow delete: if isGlobalAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if isAdmin();
 
       allow update: if isAuthenticated() && (
-        ( (userNetworkId == request.auth.uid || userNetworkId.startsWith(request.auth.uid + '_')) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rank', 'role', 'clearance', 'suspended', 'disabled', 'networkId'])) ||
-        ( (userNetworkId == request.auth.uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['defaultNetworkId', 'networkMemberships', 'displayName', 'photoURL', 'isOnline', 'lastSeen', 'lastLogin', 'appearance', 'countryCode', 'countryName', 'deviceType', 'sessionStart', 'lastSessionDuration'])) ||
-        isGlobalAdmin() ||
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rank', 'role', 'clearance', 'suspended', 'disabled'])) ||
+        isAdmin() ||
         (
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rank', 'suspended', 'disabled', 'clearance', 'status']) &&
-          canManagePersonnel(request.auth.uid, resource.data, request.resource.data)
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rank', 'suspended', 'disabled', 'clearance']) &&
+          (
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rank']) ||
+            (canPromote(getUserData().rank, request.resource.data.rank) && getRankLevel(getUserData().rank) >= getRankLevel(resource.data.rank))
+          ) &&
+          (
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['suspended', 'disabled']) ||
+            (canSuspend(getUserData().rank, resource.data.rank) && getRankLevel(getUserData().rank) >= getRankLevel(resource.data.rank))
+          )
         )
       );
     }
