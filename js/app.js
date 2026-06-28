@@ -250,14 +250,13 @@ async function atwViewCountry(name,iso){
 const w=document.getElementById('africaTimeWidget');
 w.innerHTML=`<div style='text-align:center;padding:40px;color:#00ffee;font-family:Share Tech Mono,monospace'>Loading ${name}...</div>`;
 try{
-const r=await fetch('https://restcountries.com/v3.1/name/'+encodeURIComponent(name)+'?fullText=true');
-const d=await r.json();
-if(!d||!d.length)throw new Error('Not found');
-const c=d[0];
-const flag=c.flags?c.flags.png:'';
+const c = getCountryMetadata(name, iso);
+if(!c) throw new Error('Country metadata not found');
+
+const flag=c.flags?c.flags.png||c.flags.svg:'';
 const region=c.region||'N/A';
 const subregion=c.subregion||'N/A';
-const capital=c.capital?c.capital[0]:'N/A';
+const capital=Array.isArray(c.capital)?c.capital[0]:c.capital||'N/A';
 const code=(c.idd&&c.idd.root?c.idd.root:'')+(c.idd&&c.idd.suffixes?c.idd.suffixes[0]:'');
 const pop=c.population?c.population.toLocaleString():'N/A';
 const area=c.area?c.area.toLocaleString()+' km²':'N/A';
@@ -536,13 +535,15 @@ function navigateToVisaFreeCountry(rawName){
 var clean=rawName.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]\s*/g,'').trim();
 var p=document.getElementById('africaTimePanel');if(p){p.classList.remove('open');africaTimePanelOpen=false}
 if(afrMapInstance)_globeClosePopup();
-fetch('https://restcountries.com/v3.1/name/'+encodeURIComponent(clean)+'?fullText=true').then(function(r){return r.json()}).then(function(data){
-var c=Array.isArray(data)?data[0]:data;if(!c||!c.latlng)return;
-var lat=c.latlng[0],lng=c.latlng[1];
-var iso3=c.cca3||'';var latlng={lat:lat,lng:lng};
-if(afrMapInstance){afrMapInstance.pointOfView({lat:lat,lng:lng,altitude:1.5},1200)}
-setTimeout(function(){showCountryPopup(c.name&&c.name.common||clean,iso3,latlng)},1400);
-}).catch(function(){})}
+
+var c = getCountryMetadata(clean);
+if(c && c.latlng) {
+    var lat=c.latlng[0],lng=c.latlng[1];
+    var iso3=c.iso3||'';var latlng={lat:lat,lng:lng};
+    if(afrMapInstance){afrMapInstance.pointOfView({lat:lat,lng:lng,altitude:1.5},1200)}
+    setTimeout(function(){showCountryPopup(c.name||clean,iso3,latlng)},1400);
+}
+}
 function visaFreeClickable(v){
 var label=esc(v.name+(v.days?' ('+v.days+' days)':''));
 var nameEsc=v.name.replace(/'/g,"\\'");
@@ -1157,6 +1158,48 @@ else return f;
 return {type:'Feature',properties:f.properties,geometry:{type:g.type,coordinates:newCoords}}}
 var _FOCUS_ISOS=new Set(['DZA','AGO','BEN','BWA','BFA','BDI','CPV','CMR','CAF','TCD','COM','COG','COD','CIV','DJI','EGY','GNQ','ERI','SWZ','ETH','GAB','GMB','GHA','GIN','GNB','KEN','LSO','LBR','LBY','MDG','MWI','MLI','MRT','MUS','MAR','MOZ','NAM','NER','NGA','RWA','STP','SEN','SYC','SLE','SOM','ZAF','SSD','SDN','TZA','TGO','TUN','UGA','ZMB','ZWE','ESH','ATG','BRB','CUB','DMA','DOM','GRD','HTI','JAM','KNA','LCA','VCT','TTO','ABW','CUW','SXM','TCA','CYM','VGB','VIR','PRI','BLZ','GUY','SUR','MSR','AIA','BLM','MAF']);
 function _isFocusCountry(f){var iso=f.properties['ISO3166-1-Alpha-3']||f.properties.ISO_A3||'';return _FOCUS_ISOS.has(iso)}
+
+/**
+ * Clean lookup for country metadata
+ */
+function getCountryMetadata(name, iso) {
+    if (typeof afrCountriesMetadata === 'undefined') {
+        console.error("afrCountriesMetadata not found");
+        return null;
+    }
+
+    const data = afrCountriesMetadata.countries;
+    const iso3Map = afrCountriesMetadata.iso3Map;
+    const iso2Map = afrCountriesMetadata.iso2Map;
+    const aliases = afrCountriesMetadata.aliases;
+
+    console.log(`[Metadata Lookup] name: "${name}", iso: "${iso}"`);
+
+    let lookupKey = name;
+    if (data[name]) {
+        lookupKey = name;
+    } else if (iso && iso.length === 3 && iso3Map[iso]) {
+        lookupKey = iso3Map[iso];
+    } else if (iso && iso.length === 2 && iso2Map[iso]) {
+        lookupKey = iso2Map[iso];
+    } else if (aliases[name]) {
+        lookupKey = aliases[name];
+    }
+
+    const country = data[lookupKey];
+    if (country) {
+        console.log(`[Metadata Found] Key: "${lookupKey}"`, country);
+        const missing = [];
+        const required = ['capital', 'population', 'region', 'area', 'languages', 'idd', 'currencies', 'timezones'];
+        required.forEach(p => { if (!country[p]) missing.push(p); });
+        if (missing.length) console.warn(`[Metadata Warning] Missing properties for ${lookupKey}:`, missing);
+        return country;
+    }
+
+    console.warn(`[Metadata Failed] No data found for: ${name} (${iso})`);
+    return null;
+}
+
 function _extractOutlinePaths(features,tolerance){
 var paths=[];
 features.forEach(function(f){
@@ -1221,43 +1264,41 @@ function showCountryPopup(name,iso,latlng,screenX,screenY){
 var cacheKey=name+'_'+iso;
 var cached=afrCountryDataCache[cacheKey];
 if(cached){renderCountryPopup(cached,latlng,screenX,screenY);return}
-var url=(iso.length===3&&iso!=='-99')?'https://restcountries.com/v3.1/alpha/'+iso:'https://restcountries.com/v3.1/name/'+encodeURIComponent(name)+'?fullText=true';
-fetch(url).then(r=>r.json()).then(data=>{
-var c=Array.isArray(data)?data[0]:data;
-var callingCode='N/A';
-if(c.idd&&c.idd.root){callingCode=c.idd.root+(c.idd.suffixes&&c.idd.suffixes.length===1?c.idd.suffixes[0]:'')}
-var currCodes=c.currencies?Object.keys(c.currencies):[];
-var info={
-name:c.name&&c.name.common||name,
-official:c.name&&c.name.official||'',
-capital:c.capital?c.capital.join(', '):'N/A',
-population:c.population?c.population.toLocaleString():'N/A',
-region:c.region||'N/A',
-subregion:c.subregion||'',
-area:c.area?c.area.toLocaleString()+' km²':'N/A',
-languages:c.languages?Object.values(c.languages).join(', '):'N/A',
-currencies:c.currencies?Object.values(c.currencies).map(cu=>cu.name+' ('+cu.symbol+')').join(', '):'N/A',
-currCodes:currCodes,
-callingCode:callingCode,
-flag:c.flags&&c.flags.svg||'',
-timezone:c.timezones?c.timezones[0]:'N/A',
-continent:c.continents?c.continents.join(', '):'N/A',
-exchangeRate:null,
-aes:false
-};
-var aesCountries=['Mali','Burkina Faso','Niger'];
-if(aesCountries.indexOf(info.name)>=0)info.aes=true;
-afrCountryDataCache[cacheKey]=info;
-if(currCodes.length>0&&currCodes[0]!=='USD'){
-fetch('https://api.exchangerate-api.com/v4/latest/USD').then(r2=>r2.json()).then(exData=>{
-var rate=exData.rates[currCodes[0]];
-if(rate){info.exchangeRate='1 USD = '+rate.toFixed(2)+' '+currCodes[0]}
-renderCountryPopup(info,latlng,screenX,screenY);
-}).catch(function(){renderCountryPopup(info,latlng,screenX,screenY)});
-}else{renderCountryPopup(info,latlng,screenX,screenY)}
-}).catch(function(){
-renderCountryPopup({name:name,official:'',capital:'N/A',population:'N/A',region:'N/A',subregion:'',area:'N/A',languages:'N/A',currencies:'N/A',currCodes:[],callingCode:'N/A',flag:'',timezone:'N/A',continent:'N/A',exchangeRate:null,aes:['Mali','Burkina Faso','Niger'].indexOf(name)>=0},latlng,screenX,screenY);
-});
+
+var c = getCountryMetadata(name, iso);
+if(c) {
+    var callingCode='N/A';
+    if(c.idd&&c.idd.root){callingCode=c.idd.root+(c.idd.suffixes&&c.idd.suffixes.length===1?c.idd.suffixes[0]:'')}
+    var currCodes=c.currencies?Object.keys(c.currencies):[];
+    var info={
+        name:c.name||name,
+        official:c.official||'',
+        capital:Array.isArray(c.capital)?c.capital.join(', '):c.capital||'N/A',
+        population:c.population?c.population.toLocaleString():'N/A',
+        region:c.region||'N/A',
+        subregion:c.subregion||'',
+        area:c.area?c.area.toLocaleString()+' km²':'N/A',
+        languages:c.languages?Object.values(c.languages).join(', '):'N/A',
+        currencies:c.currencies?Object.values(c.currencies).map(cu=>cu.name+' ('+cu.symbol+')').join(', '):'N/A',
+        currCodes:currCodes,
+        callingCode:callingCode,
+        flag:c.flags?(c.flags.png||c.flags.svg):'',
+        timezone:c.timezones?c.timezones[0]:'N/A',
+        continent:c.continents?c.continents.join(', '):'N/A',
+        exchangeRate:null,
+        aes:['Mali','Burkina Faso','Niger'].indexOf(c.name)>=0
+    };
+    afrCountryDataCache[cacheKey]=info;
+    if(currCodes.length>0&&currCodes[0]!=='USD'){
+        fetch('https://api.exchangerate-api.com/v4/latest/USD').then(r2=>r2.json()).then(exData=>{
+            var rate=exData.rates[currCodes[0]];
+            if(rate){info.exchangeRate='1 USD = '+rate.toFixed(2)+' '+currCodes[0]}
+            renderCountryPopup(info,latlng,screenX,screenY);
+        }).catch(function(){renderCountryPopup(info,latlng,screenX,screenY)});
+    }else{renderCountryPopup(info,latlng,screenX,screenY)}
+} else {
+    renderCountryPopup({name:name,official:'',capital:'N/A',population:'N/A',region:'N/A',subregion:'',area:'N/A',languages:'N/A',currencies:'N/A',currCodes:[],callingCode:'N/A',flag:'',timezone:'N/A',continent:'N/A',exchangeRate:null,aes:['Mali','Burkina Faso','Niger'].indexOf(name)>=0},latlng,screenX,screenY);
+}
 }
 function renderCountryPopup(info,latlng,screenX,screenY){
 if(!afrMapInstance)return;
