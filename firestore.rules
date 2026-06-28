@@ -17,33 +17,42 @@ service cloud.firestore {
         'user': 1,
         'analyst': 2,
         'moderator': 2,
+        'research_analyst': 3,
+        'research analyst': 3,
+        'senior_analyst': 3,
+        'senior analyst': 3,
+        'lead_analyst': 4,
+        'lead analyst': 4,
+        'regional_coordinator': 5,
+        'regional coordinator': 5,
+        'deputy_chief_analyst': 6,
+        'deputy chief analyst': 6,
+        'chief_analyst': 7,
+        'chief analyst': 7,
+        'afrosint_fellow': 8,
+        'afrosint fellow': 8,
         'admin': 10,
         'administrator': 10,
-        'senior_analyst': 3,
-        'lead_analyst': 4,
-        'regional_coordinator': 5,
-        'deputy_chief_analyst': 6,
-        'chief_analyst': 7,
-        'afrosint_fellow': 8,
-        'super_admin': 11
+        'super_admin': 11,
+        'super admin': 11
       };
-      return levels[rank.lower().replace(' ', '_')] || 0;
+      let normalized = (rank != null && rank is string) ? rank.lower().replace(' ', '_') : 'unknown';
+      return levels.get(normalized, 0);
     }
 
     function isAnalystPlus() {
-      return isAuthenticated() && (
-        getRankLevel(getUserData().rank) >= 2 ||
-        getRankLevel(getUserData().role) >= 2
+      let data = getUserData();
+      return isAuthenticated() && data != null && (
+        getRankLevel(data.get('rank', 'member')) >= 2 ||
+        getRankLevel(data.get('role', 'user')) >= 2
       );
     }
 
     function canReviewReports() {
       let data = getUserData();
-      let rankLvl = getRankLevel(data.rank);
-      let roleLvl = getRankLevel(data.role);
-      return isAuthenticated() && (
-        (rankLvl >= 3 && rankLvl <= 7) ||
-        roleLvl >= 10
+      return isAuthenticated() && data != null && (
+        (getRankLevel(data.get('rank', 'member')) >= 3 && getRankLevel(data.get('rank', 'member')) <= 7) ||
+        getRankLevel(data.get('role', 'user')) >= 10
       );
     }
 
