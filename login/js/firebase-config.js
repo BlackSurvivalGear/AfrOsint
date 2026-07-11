@@ -12,7 +12,9 @@ const firebaseConfig = {
 // Initialize Firebase (will be loaded via CDN in HTML files)
 // This file just exports the config or provides a global reference
 if (typeof firebase !== 'undefined') {
-    firebase.initializeApp(firebaseConfig);
+    if (firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const auth = firebase.auth();
     const db = firebase.firestore();
 } else {
