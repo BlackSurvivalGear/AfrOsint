@@ -13,7 +13,9 @@ const AFR_RANKS = ["User", "Moderator", "Administrator", "Super Admin"];
 
 // Initialize Firebase
 if (typeof firebase !== 'undefined') {
-    firebase.initializeApp(firebaseConfig);
+    if (firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+    }
 } else {
     console.warn("Firebase SDK not found. Authentication will not function.");
 }
@@ -46,6 +48,30 @@ function checkAuthentication() {
                     // Fetch additional user data from Firestore
                     const userDoc = await db.collection('users').doc(user.uid).get();
                     userData = userDoc.data();
+
+                    // Self-healing: if authenticated user is missing a Firestore document, automatically create it
+                    if (!userDoc.exists || !userData) {
+                        console.log("Self-healing (Main Auth): Creating missing Firestore document for authenticated user:", user.email);
+                        userData = {
+                            uid: user.uid,
+                            displayName: user.displayName || "Authorized Personnel",
+                            email: user.email || "",
+                            photoURL: user.photoURL || "assets/images/default-avatar.png",
+                            role: "user",
+                            rank: "member",
+                            clearance: 1,
+                            plan: "free",
+                            isOnline: true,
+                            createdAt: firebase.firestore.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
+                            lastLogin: firebase.firestore.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+                        };
+                        await db.collection('users').doc(user.uid).set(userData);
+
+                        // Re-fetch to synchronize/hydrate
+                        const freshDoc = await db.collection('users').doc(user.uid).get();
+                        userData = freshDoc.data();
+                    }
+
                     if (userData) {
                         sessionStorage.setItem(`afrosint_user_${user.uid}`, JSON.stringify(userData));
                     }
