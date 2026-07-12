@@ -100,6 +100,36 @@ atwSelect.addEventListener('change',()=>{const idx=atwSelect.value;if(idx!==''){
 atwHourFormat.addEventListener('change',atwUpdateTimes);
 function _atwOutsideClose(e){const panel=document.getElementById('africaTimePanel');const clock=document.getElementById('gmtClock');const flag=document.getElementById('gmtClockFlag');const setBtn=document.getElementById('setCountryBtn');if(africaTimePanelOpen&&document.contains(e.target)&&!panel.contains(e.target)&&!clock.contains(e.target)&&!(flag&&flag.contains(e.target))&&!(setBtn&&setBtn.contains(e.target))){panel.classList.remove('open');africaTimePanelOpen=false}}
 document.addEventListener('click',_atwOutsideClose);document.addEventListener('touchend',function(e){if(e.touches&&e.touches.length>0)return;_atwOutsideClose(e)},{passive:true});
+
+function closeCountryPanel() {
+    const panel = document.getElementById('africaTimePanel');
+    if (panel) {
+        panel.classList.remove('open');
+        africaTimePanelOpen = false;
+    }
+    _globeHighlightedCountry = null;
+    if (afrMapInstance) {
+        afrMapInstance.polygonsData(_globeCountryFeatures);
+    }
+    _globeClosePopup();
+
+    // Return focus to map container or body
+    const mapContainer = document.getElementById('afrMapContainer');
+    if (mapContainer) {
+        mapContainer.focus();
+    } else {
+        document.body.focus();
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const panel = document.getElementById('africaTimePanel');
+        if (panel && panel.classList.contains('open')) {
+            closeCountryPanel();
+        }
+    }
+});
 function atwRestoreWidget(){
 document.getElementById('africaTimePanel').onmouseleave=scheduleAfricaTimeHide;
 const w=document.getElementById('africaTimeWidget');
@@ -279,7 +309,10 @@ if(newsSources.length){var iframeSrcs=[];var extSrcs=[];newsSources.forEach(func
 const escapedName=name.replace(/'/g,"\\'");
 w.innerHTML=`<div style='padding:12px;position:relative'>
 <button class='atw-small-button' onclick='atwRestoreWidget()' style='margin-bottom:16px'>⬅ BACK</button>
-<div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name}</h2><div style='color:#7fd6df;font-size:13px'>${region} — ${subregion}</div></div></div>
+<div style='display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;position:relative'>
+<div style='display:flex;align-items:center;gap:12px'><img src='${flag}' style='width:60px;border-radius:4px'><div><h2 style='margin:0;color:#00ffee;font-family:Share Tech Mono,monospace'>${name}</h2><div style='color:#7fd6df;font-size:13px'>${region} — ${subregion}</div></div></div>
+<button id='closeCountryPanelBtn' aria-label="Close country information" onclick='closeCountryPanel()' class='close-country-panel-btn'>✕</button>
+</div>
 <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-family:Rajdhani,sans-serif;font-size:13px;margin-bottom:10px'>
 <div><span style='color:#7fd6df'>Capital:</span> <span style='color:#d7ffff'>${capital}</span></div>
 <div><span style='color:#7fd6df'>Population:</span> <span style='color:#d7ffff'>${pop}</span></div>
@@ -314,6 +347,10 @@ ${localBtns}
 </div>
 </div>`;
 _renderCpApiKey();
+setTimeout(() => {
+    const closeBtn = document.getElementById('closeCountryPanelBtn');
+    if (closeBtn) closeBtn.focus();
+}, 50);
 (function(){var card=document.getElementById('aiCardPanel');var header=document.getElementById('aiCardHeader');if(!card||!header)return;function toggleCollapse(){var b=document.getElementById('aiCardBody');var a=document.getElementById('aiCardCollapseArrow');if(!b||!a)return;if(b.style.display==='none'){b.style.display='block';a.textContent='\u25bc'}else{b.style.display='none';a.textContent='\u25b6'}}header.addEventListener('click',function(){toggleCollapse()});var parentEl=card.parentElement;if(parentEl){parentEl.addEventListener('click',function(e){var b=document.getElementById('aiCardBody');if(b&&b.style.display!=='none'&&!card.contains(e.target)){b.style.display='none';var a=document.getElementById('aiCardCollapseArrow');if(a)a.textContent='\u25b6'}})}})();
 if(coords.length>=2){fetch('https://api.open-meteo.com/v1/forecast?latitude='+coords[0]+'&longitude='+coords[1]+'&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&timezone=auto').then(r=>r.json()).then(wd=>{
 var el=document.getElementById('countryWeather');
