@@ -29,12 +29,40 @@ body{background:var(--bg);color:#fff;font-family:Rajdhani,sans-serif;overflow-x:
 .channel:hover,.channel:active{background:#0c2430!important;box-shadow:0 0 12px #00ffee66;text-shadow:0 0 8px #00ffee;color:#00ffee}
 #gmtClock{text-align:center;color:#00ffee;width:100%;cursor:pointer;user-select:none}
 #gmtClock:hover{text-shadow:0 0 8px #00ffee}
-#africaTimePanel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:10000;width:min(960px,92vw);max-height:calc(100vh - 80px);overflow-y:auto;overscroll-behavior:contain;border-radius:12px;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+#africaTimePanel{position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(10px) scale(0.98);opacity:0;visibility:hidden;pointer-events:none;z-index:10000;width:min(960px,92vw);max-height:calc(100vh - 80px);overflow-y:auto;overscroll-behavior:contain;border-radius:12px;box-shadow:0 8px 40px rgba(0,255,238,0.15),0 0 1px #00ffee44;-webkit-overflow-scrolling:touch;touch-action:pan-y;transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease}
 #africaTimePanel::-webkit-scrollbar{width:8px}
 #africaTimePanel::-webkit-scrollbar-track{background:#061018;border-radius:4px}
 #africaTimePanel::-webkit-scrollbar-thumb{background:#00ffee44;border-radius:4px}
 #africaTimePanel::-webkit-scrollbar-thumb:hover{background:#00ffee88}
-#africaTimePanel.open{display:block}
+#africaTimePanel.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%) translateY(0) scale(1)}
+
+.close-country-panel-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid #00E5FF;
+    border-radius: 4px;
+    color: #00E5FF;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    text-shadow: none;
+    box-shadow: none;
+}
+.close-country-panel-btn:hover,
+.close-country-panel-btn:focus {
+    border-color: #FF4D4D;
+    color: #FF4D4D;
+    box-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+    text-shadow: 0 0 4px rgba(255, 77, 77, 0.6);
+}
 #africaTimeWidget{font-family:Rajdhani,sans-serif;background:#061018;color:#f1f5f9;border-radius:12px;padding:16px;box-sizing:border-box;border:1px solid #00ffee44}
 #africaTimeWidget h2{text-align:center;color:#00ffee;margin-bottom:10px;margin-top:0;font-family:'Share Tech Mono',monospace;letter-spacing:2px;text-shadow:0 0 10px #00ffee88}
 #africaTimeWidget input,#africaTimeWidget select{width:100%;padding:8px;margin-bottom:10px;border-radius:8px;border:1px solid #00ffee44;background:#081821;color:#00ffee;box-sizing:border-box;font-family:'Share Tech Mono',monospace}
@@ -170,7 +198,8 @@ a{color:#00ffee;text-decoration:none}
 #opsMenu .panel-trigger{position:fixed;top:70px;left:8px;z-index:9999;width:44px;height:44px;font-size:18px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
 #opsMenu.open{width:240px;overflow-y:auto;border-right:1px solid #00ffee55;box-shadow:4px 0 24px rgba(0,0,0,0.6)}
 #opsViewport{margin-left:0}
-#africaTimePanel{width:96vw;left:2vw;transform:none}
+#africaTimePanel{width:96vw;left:2vw;transform:translateY(10px) scale(0.98)}
+#africaTimePanel.open{transform:translateY(0) scale(1)}
 .atw-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
 .atw-time{font-size:18px}
 #donatePanel,#sharePanel{left:50%;transform:translateX(-50%);margin-top:8px}
