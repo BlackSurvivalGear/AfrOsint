@@ -60,8 +60,8 @@ async function loadReports() {
 
         // Sort by date (descending)
         allReports.sort((a, b) => {
-            const dateA = a.createdAt ? a.createdAt.toDate() : new Date(0);
-            const dateB = b.createdAt ? b.createdAt.toDate() : new Date(0);
+            const dateA = (a.createdAt && typeof a.createdAt.toDate === 'function') ? a.createdAt.toDate() : new Date(0);
+            const dateB = (b.createdAt && typeof b.createdAt.toDate === 'function') ? b.createdAt.toDate() : new Date(0);
             return dateB - dateA;
         });
 
@@ -69,7 +69,13 @@ async function loadReports() {
     } catch (error) {
         console.error("Error loading reports:", error);
         const list = document.getElementById('reportsList');
-        if (list) list.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ff4444;">FAILED TO RETRIEVE RECORDS.</td></tr>`;
+        if (list) {
+            let errorMsg = "FAILED TO RETRIEVE RECORDS";
+            if (error.code === 'permission-denied') errorMsg = "ACCESS DENIED: INSUFFICIENT PERMISSIONS";
+            else if (error.message) errorMsg = error.message.toUpperCase();
+
+            list.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ff4444; font-family:'Share Tech Mono', monospace; padding: 40px;">${errorMsg}</td></tr>`;
+        }
     }
 }
 
@@ -80,6 +86,9 @@ function renderReportsList() {
     const urgent = document.getElementById('filterUrgent').value;
 
     let filtered = allReports.filter(r => {
+        // Defensive checks for required fields
+        if (!r.status || !r.category || !r.threatLevel) return false;
+
         if (status !== 'All' && r.status !== status) return false;
         if (category !== 'All' && r.category !== category) return false;
         if (threat !== 'All' && r.threatLevel !== threat) return false;
@@ -96,19 +105,21 @@ function renderReportsList() {
     }
 
     tbody.innerHTML = filtered.map(r => {
-        const date = r.createdAt ? r.createdAt.toDate().toLocaleDateString() : 'N/A';
-        const statusClass = `status-${r.status.toLowerCase().replace(' ', '-')}`;
+        const date = (r.createdAt && typeof r.createdAt.toDate === 'function') ? r.createdAt.toDate().toLocaleDateString() : 'N/A';
+        const reportStatus = r.status || 'Pending';
+        const statusClass = `status-${reportStatus.toLowerCase().replace(/\s+/g, '-')}`;
         const urgentStyle = r.urgent ? 'border-left: 3px solid #ff4444;' : '';
+        const threatLevel = r.threatLevel || 'Low';
 
         return `
             <tr style="${urgentStyle}">
-                <td style="font-family: 'Share Tech Mono', monospace; color: var(--cyan);">${r.referenceNumber}</td>
+                <td style="font-family: 'Share Tech Mono', monospace; color: var(--cyan);">${r.referenceNumber || 'N/A'}</td>
                 <td style="font-size: 11px;">${date}</td>
-                <td>${r.category}</td>
-                <td>${r.country}</td>
-                <td><span style="color: ${getThreatColor(r.threatLevel)}">${r.threatLevel.toUpperCase()}</span></td>
-                <td style="font-size: 11px;">${r.createdByName}</td>
-                <td><span class="status-badge ${statusClass}">${r.status}</span></td>
+                <td>${r.category || 'N/A'}</td>
+                <td>${r.country || 'N/A'}</td>
+                <td><span style="color: ${getThreatColor(threatLevel)}">${threatLevel.toUpperCase()}</span></td>
+                <td style="font-size: 11px;">${r.createdByName || 'Unknown'}</td>
+                <td><span class="status-badge ${statusClass}">${reportStatus}</span></td>
                 <td>
                     <button onclick="viewReport('${r.id}')" class="atw-small-button" style="padding: 4px 10px; font-size: 10px;">VIEW</button>
                 </td>
@@ -131,10 +142,10 @@ window.viewReport = (id) => {
     if (!r) return;
 
     currentReportId = id;
-    document.getElementById('modalRef').textContent = r.referenceNumber;
-    document.getElementById('modalTitle').textContent = r.title;
-    document.getElementById('modalDescription').textContent = r.description;
-    document.getElementById('updateStatus').value = r.status;
+    document.getElementById('modalRef').textContent = r.referenceNumber || 'N/A';
+    document.getElementById('modalTitle').textContent = r.title || 'Untitled Report';
+    document.getElementById('modalDescription').textContent = r.description || 'No description provided.';
+    document.getElementById('updateStatus').value = r.status || 'Pending';
     document.getElementById('analystNotes').value = r.analystNotes || "";
 
     const attachments = document.getElementById('modalAttachments');
